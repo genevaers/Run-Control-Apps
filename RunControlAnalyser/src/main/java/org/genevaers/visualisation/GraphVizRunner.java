@@ -41,12 +41,8 @@ public class GraphVizRunner {
 				logger.atWarning().log("Running %s returned %s", command, cmd.getCmdOutput());
 			}
 	        cmd.clear();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException | InterruptedException e) {
+            logger.atSevere().log("processDot failed\n%s", e.getMessage());
 		}
 	}
 }

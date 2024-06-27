@@ -21,11 +21,12 @@ import com.google.common.flogger.FluentLogger;
 
 import java.sql.Connection;
 
+import org.genevaers.genevaio.dbreader.WBConnection;
 import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 
 public class RepositoryBuilderFactory {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-	private static Connection databaseConnection;
+	private static WBConnection wbConnection;
 
 	public static RepositoryBuilder get() {
 
@@ -39,7 +40,7 @@ public class RepositoryBuilderFactory {
 			case "POSTGRES":
 				return new PostgresBuilder();
 			case "WBCONNECTION":
-				return new WBConnectionBuilder(databaseConnection);
+				return new WBConnectionBuilder();
 			default:
 				logger.atSevere().log("Unknown Input Type %s", RunControlConfigration.getInputType());
 				return null;
@@ -47,7 +48,10 @@ public class RepositoryBuilderFactory {
 	}
 
 	public static void setDatabaseConnection(Connection dbc) {
-		databaseConnection = dbc;
+		if(wbConnection == null) {
+			wbConnection = new WBConnection();
+		}
+		wbConnection.setSQLConnection(dbc);
 	}
 
 }

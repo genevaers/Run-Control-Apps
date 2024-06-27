@@ -113,8 +113,7 @@ public class AnalyserDriver {
 			//On a mac this will be different
 			Runtime.getRuntime().exec("explorer.exe /root," + dataStore.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Cannot open the data store\n%s", e.getMessage());
 		}
 	}
 
@@ -366,7 +365,7 @@ public class AnalyserDriver {
 			properties.load(resourceStream);
             version = properties.getProperty("build.version") + " (" + properties.getProperty("build.timestamp") + ")";
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot read application.properties\n,%s", e.getMessage());
 		}
     	String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		generation = String.format("Generated %s version %s",formattedDate, version);

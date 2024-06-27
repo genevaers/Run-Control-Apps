@@ -21,22 +21,21 @@ package org.genevaers.genevaio.recordreader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.flogger.FluentLogger;
 import com.ibm.jzos.RcException;
 import com.ibm.jzos.ZFile;
 import com.ibm.jzos.ZFileException;
 
 public class ZosHelper {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public static void deleteDataSet(String name) {
         try {
@@ -73,8 +72,7 @@ public class ZosHelper {
                 count++;
             }
         } catch ( IOException e ) {
-            System.out.println("Failed to copy " + source.toString() + " to " + dataset);
-            e.printStackTrace();
+            logger.atSevere().log("Failed to copy %s to %s\n%s", source.toString(), dataset, e.getMessage());
         } finally {
             try {
                 if(in != null) {
@@ -84,7 +82,7 @@ public class ZosHelper {
                     fileOut.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.atSevere().log("copyFile2Dataset Failed to close\n%s", e.getMessage());
             }
         }
     }
@@ -109,8 +107,7 @@ public class ZosHelper {
                 count++;
             }
         } catch ( IOException e ) {
-            System.out.println("Failed to copy " + source.toString() + " to " + dataset);
-            e.printStackTrace();
+            logger.atSevere().log("convertA2EAndCopyFile2Dataset Failed to copy %s to %s\n%s", source.toString(), dataset, e.getMessage());
         } finally {
             try {
                 if(in != null) {
@@ -120,7 +117,7 @@ public class ZosHelper {
                     fileOut.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.atSevere().log("convertA2EAndCopyFile2Dataset Failed to close\n%s", e.getMessage());
             }
         }
     }
@@ -156,8 +153,7 @@ public class ZosHelper {
               }
               copied = true;
           } catch (IOException e) {
-              System.out.println("Failed to copy " + target.toString() + " to " + dataset);
-              e.printStackTrace();
+            logger.atSevere().log("convertE2AAndCopyDataset2File Failed to copy %s to %s\n%s", target.toString(), dataset, e.getMessage());
           } finally {
               try {
                   if (fileIn != null) {
@@ -165,7 +161,7 @@ public class ZosHelper {
                   }
                   fw.close();
               } catch (IOException e) {
-                  e.printStackTrace();
+                logger.atSevere().log("convertE2AAndCopyDataset2File Failed to close\n%s", e.getMessage());
               }
           }
           return copied;
@@ -189,8 +185,7 @@ public class ZosHelper {
                         writer.write(recordBuf, 0, len);
                     }
                 } catch (ZFileException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.atSevere().log("putEventFile %s failed\n%s", datasetName, e.getMessage());
                 } finally {
                     if (writer != null) {
                         try {
@@ -205,22 +200,20 @@ public class ZosHelper {
                         rce.printStackTrace(); // but continue
                     }
                 }
-            } catch (NumberFormatException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (IOException e) {
+                logger.atSevere().log("putEventFile %s failed\n%s", datasetName, e.getMessage());
             }
         }
     }
 
-      private static boolean datasetDoesNotExist(String datasetName) {
-          boolean notExist = true;
-          try {
-              notExist = !ZFile.dsExists("//'"+datasetName+"'");
-          } catch (ZFileException e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
-          }
-          return notExist;
-      }
+    private static boolean datasetDoesNotExist(String datasetName) {
+        boolean notExist = true;
+        try {
+            notExist = !ZFile.dsExists("//'" + datasetName + "'");
+        } catch (ZFileException e) {
+            logger.atSevere().log("datasetDoesNotExist %s failed\n%s", datasetName, e.getMessage());
+        }
+        return notExist;
+    }
 
 }

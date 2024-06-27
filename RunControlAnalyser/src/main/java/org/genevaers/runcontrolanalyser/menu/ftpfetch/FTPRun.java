@@ -27,8 +27,10 @@ import org.genevaers.runcontrolanalyser.menu.RCAGenerationData;
 import org.genevaers.utilities.menu.Menu;
 import org.genevaers.utilities.menu.MenuItem;
 
-public class FTPRun extends MenuItem{
+import com.google.common.flogger.FluentLogger;
 
+public class FTPRun extends MenuItem{
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     FTPRun() {
         color = Color.RED;
@@ -59,8 +61,7 @@ public class FTPRun extends MenuItem{
                     System.getenv("TSO_USERID"),
                     System.getenv("TSO_PASSWORD"));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("ftpRcSet failed\n%s", e.getMessage());
         }
     }
 

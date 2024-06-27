@@ -173,8 +173,16 @@ RunDateASTNode::getLength() const
 
     @Override
     public int getMaxNumberOfDigits() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaxNumberOfDigits'");
+        switch (value) {
+            case "RUNDAY":
+                return 8;
+            case "RUNMONTH":
+                return 6;
+            case "RUNYEAR":
+                return 4;
+            default:
+                return 0;
+        }
     }
 
 }

@@ -4,23 +4,23 @@ templates:
 #
 # JCL templates
 #
-  - name: "jcl/gvbrcg.ftl"
+  - name: "jcl/GRCGL.ftl"
     target: "${test}L"
     type: "JCL"
-  - name: "jcl/MR91R.ftl"
+  - name: "jcl/GRCGR.ftl"
     target: "${test}R"
     type: "JCL"
-  - name: "jcl/MR91E.ftl"
+  - name: "jcl/GRCGE.ftl"
     target: "${test}E"
     type: "JCL"
-  - name: "jcl/MR91F.ftl"
+  - name: "jcl/GRCGF.ftl"
     target: "${test}F"
     type: "JCL"
 # The two below are run if COVERAGE is set to Y - should this be managed by env vars?
-  - name: "jcl/MR91X.ftl"
+  - name: "jcl/GRCGX.ftl"
     target: "${test}X"
     type: "COVERAGEJCL"
-  - name: "jcl/MR91J.ftl"
+  - name: "jcl/GRCGJ.ftl"
     target: "${test}J"
     type: "COVERAGEJCL"
 # Only generate the G JCL if we are comparing on the Mainframe -->
@@ -36,8 +36,8 @@ templates:
 #
 # Config templates
 #
-  - name: "cfg/mr91CFG.ftl"
-    target: "MR91PARM"
+  - name: "cfg/GRCGCFG.ftl"
+    target: "GRCGPARM"
     type: "Config"
   - name: "cfg/PMConf_D95C.ftl"
     target: "REGRR95C"

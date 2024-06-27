@@ -112,12 +112,8 @@ public class ReportWriter {
 			}
 	    	template.process(nodeMap, out);
             out.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (TemplateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException | TemplateException e) {
+            logger.atSevere().log("Cannot generate template %s", e.getMessage());
         }
     }
 
@@ -152,7 +148,7 @@ public class ReportWriter {
 			properties.load(resourceStream);
             version = properties.getProperty("build.version") + " (" + properties.getProperty("build.timestamp") + ")";
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.atSevere().log("Cannot readVersion %s", e.getMessage());
 		}
 		return version;
 	}

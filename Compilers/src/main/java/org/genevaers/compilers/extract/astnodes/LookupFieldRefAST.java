@@ -313,8 +313,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     public short getLeftEntry(ColumnAST col, ExtractBaseAST rhs, short length) {
         getAssignmentEntry(col, rhs);
         int numRecords = ltEmitter.getNumberOfRecords();
-        LogicTableF1 dtc = (LogicTableF1) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
-        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -3);
+        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
         short fieldlen = arg1.getFieldLength();
         if(length < fieldlen) { 
@@ -329,8 +328,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     public short getRightEntry(ColumnAST col, ExtractBaseAST rhs, short length) {
         getAssignmentEntry(col, rhs);
         int numRecords = ltEmitter.getNumberOfRecords();
-        LogicTableF1 dtc = (LogicTableF1) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
-        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -3);
+        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
         short fieldlen = arg1.getFieldLength();
         if(length < fieldlen) { 
@@ -346,8 +344,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     public short getSubstreEntry(ColumnAST col, ExtractBaseAST rhs, short start, short length) {
         getAssignmentEntry(col, rhs);
         int numRecords = ltEmitter.getNumberOfRecords();
-        LogicTableF1 dtc = (LogicTableF1) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
-        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -3);
+        LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
         short fieldlen = arg1.getFieldLength();
         if(length < fieldlen) { 

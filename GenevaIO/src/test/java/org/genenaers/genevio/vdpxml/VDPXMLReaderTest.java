@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-
+import java.io.IOException;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -66,9 +66,12 @@ public class VDPXMLReaderTest {
         VDPXMLSaxIterator vdpxmlReader = new VDPXMLSaxIterator();
         Path root = Paths.get(resources);
         Path readme = root.resolve(TEST_FILE);
-        vdpxmlReader.setInputBuffer(new BufferedInputStream(new FileInputStream(readme.toFile())));
-        vdpxmlReader.addToRepository();
-
+        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(readme.toFile()))) {
+            vdpxmlReader.setInputBuffer(bis);
+            vdpxmlReader.addToRepository();
+        }  catch (IOException e ) {
+            logger.atSevere().log("testOpenVDPXMLFile failed: %s",e.getMessage());
+        }
         assertEquals(1, Repository.getViews().size());
     }
 

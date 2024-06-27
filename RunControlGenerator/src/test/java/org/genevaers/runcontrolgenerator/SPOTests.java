@@ -48,6 +48,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
+import com.google.common.flogger.FluentLogger;
+
 /**
  * Test various cominations of the inputs to the Simgle Pass Optimisation
  * processor.
@@ -65,6 +67,7 @@ import org.junit.jupiter.api.TestInfo;
  * Combination of above with less than 7 resulting groups?
  */
 public class SPOTests {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private ParmReader pr;
 
@@ -224,8 +227,7 @@ public class SPOTests {
             RepositoryBuilder rb = RepositoryBuilderFactory.get();
             rb.run();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+			logger.atSevere().log("readConfigAndBuildRepo error %s", e.getMessage());
         }
     }
 

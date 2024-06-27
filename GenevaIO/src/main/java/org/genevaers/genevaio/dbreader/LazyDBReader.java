@@ -53,7 +53,7 @@ public class LazyDBReader implements CompilerDataProvider {
     // }
 
     public void setSQLConnection(Connection c) {
-        databaseConnection = new WBConnection(c);
+        sqlConnection = c;
     }
 
     public Connection getSqlConnection() {

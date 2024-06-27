@@ -38,8 +38,6 @@ import com.google.common.flogger.FluentLogger;
 public class DBLookupsReader extends DBReaderBase{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    //private String lookups = "";
-
     private Set<Integer> lookupIds;
 
     @Override
@@ -110,17 +108,12 @@ public class DBLookupsReader extends DBReaderBase{
                 while(ii2.hasNext()) {
                     ps.setInt(parmNum++, ii2.next());
                 }
-                //     String[] idsIn = viewIdsString.split(",");
-                // for(int i=0; i<idsIn.length; i++) {
-                //     ps.setString(parmNum++, idsIn[i]);
-                // }
                 ResultSet rs = dbConnection.getResults(ps);
                 while(rs.next()) {
                     lookupIds.add(rs.getInt("LOOKUPID"));
                 }
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.atSevere().log("getSourceLookupIds failed\n%s", e.getMessage());
             }
     
     }

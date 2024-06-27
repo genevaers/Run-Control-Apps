@@ -24,7 +24,10 @@ import java.nio.file.Path;
 import org.genevaers.runcontrolanalyser.AnalyserDriver;
 import org.genevaers.utilities.CommandRunner;
 
+import com.google.common.flogger.FluentLogger;
+
 public class RCAGenerationData {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private static String rcSet;
     private static String dbServer = "sp13.svl.ibm.com";
@@ -131,8 +134,7 @@ public class RCAGenerationData {
                 runner.run("gvbrcg", rcDir.toFile());
             }
         } catch (IOException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("runRCG failed\n%s", e.getMessage());
         }
     }
 
@@ -145,15 +147,14 @@ public class RCAGenerationData {
      */
     public static void generateFlow() {
         try {
-            flow.makeRunControlAnalyserDataStore(null);
-            flow.setTargetDirectory(RCAGenerationData.getRcSet());
-            flow.generateFlowDataFrom(RCAGenerationData.getRcSet(),
+            AnalyserDriver.makeRunControlAnalyserDataStore(null);
+            AnalyserDriver.setTargetDirectory(RCAGenerationData.getRcSet());
+            AnalyserDriver.generateFlowDataFrom(RCAGenerationData.getRcSet(),
                     true, // default to generate
                     false,
                     "");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("generateFlow failed\n%s", e.getMessage());
         }
     }
 

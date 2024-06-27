@@ -28,8 +28,10 @@ import org.genevaers.runcontrolanalyser.menu.RCAGenerationData;
 import org.genevaers.utilities.menu.Menu;
 import org.genevaers.utilities.menu.MenuItem;
 
-public class GenXmlRun extends MenuItem{
+import com.google.common.flogger.FluentLogger;
 
+public class GenXmlRun extends MenuItem{
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     GenXmlRun() {
         color = Color.RED;
@@ -60,8 +62,7 @@ public class GenXmlRun extends MenuItem{
             fw.write("WBXMLI=" + RCAGenerationData.getWbxmli() + "\n");
             fw.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("buildMR91Parm failed\n%s", e.getMessage());
         }
     }
 

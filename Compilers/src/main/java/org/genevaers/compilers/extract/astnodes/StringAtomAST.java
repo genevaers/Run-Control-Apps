@@ -97,9 +97,7 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         LogicTableF1 f1 = (LogicTableF1) getAssignmentEntry(col, rhs);
         LogicTableArg arg = f1.getArg();
         //This is different in that we need to get the original string value and change it?
-        //arg.setStartPosition(start);
-        arg.setFieldLength((short)arg.getValue().length());
-        short fieldlen = arg.getFieldLength();
+        int fieldlen = arg.getValue().length();
         if(length < fieldlen) { 
             String val = ((StringAtomAST)rhs).getValue();
             arg.setValue(new Cookie(val.substring(0, length)));
@@ -115,11 +113,10 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         LogicTableF1 f1 = (LogicTableF1) getAssignmentEntry(col, rhs);
         LogicTableArg arg = f1.getArg();
         //This is different in that we need to get the original string value and change it?
-        //arg.setStartPosition(start);
-        short fieldlen = arg.getFieldLength();
+        int fieldlen = arg.getValue().length();
         if(length < fieldlen) { 
             String val = ((StringAtomAST)rhs).getValue();
-            arg.setValue(new Cookie(val.substring(0, length)));
+            arg.setValue(new Cookie(val.substring(fieldlen-length, fieldlen)));
             ltEmitter.addToLogicTable((LTRecord)f1);
         } else {
             //Error 
@@ -133,10 +130,10 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         LogicTableArg arg = f1.getArg();
         //This is different in that we need to get the original string value and change it?
         //arg.setStartPosition(start);
-        short fieldlen = arg.getFieldLength();
+        int fieldlen = arg.getValue().length();
         if(length < fieldlen) { 
             String val = ((StringAtomAST)rhs).getValue();
-            arg.setValue(new Cookie(val.substring(0, length)));
+            arg.setValue(new Cookie(val.substring(start, start+length)));
             ltEmitter.addToLogicTable((LTRecord)f1);
         } else {
             //Error 

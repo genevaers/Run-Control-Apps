@@ -1,0 +1,1 @@
+find . -type f -name '*.new' | while read f; do mv -v "$f" "${f%.*}"; done

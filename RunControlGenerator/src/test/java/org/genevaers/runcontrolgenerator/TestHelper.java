@@ -86,6 +86,9 @@ public class TestHelper {
 	public static final String CFAX_TEST = "CFAXTest[12051].xml";
 	public static final String CFXA_TEST = "CFXATest[12051].xml";
 	public static final String CONCAT = "ConcatNew[12150].xml";
+	public static final String RIGHT = "Right.xml";
+	public static final String LEFT = "Left.xml";
+	public static final String SUBSTR = "Substr.xml";
 	
     public static final String MERGESS = "mergeAssAll.xml";
 
@@ -151,11 +154,11 @@ public class TestHelper {
 			File base = resoucesPath.resolve(TEST_BASEFILE).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
 			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-			+   RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
-			} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			logger.atSevere().log("setupWithBaseView failed %s", e.getMessage());
 		}
 	}
 
@@ -166,11 +169,11 @@ public class TestHelper {
 			File base = resoucesPath.resolve(ONE_COL).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
 			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-			+   RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
-			} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			logger.atSevere().log("setupWithOneColumnView failed %s", e.getMessage());
 		}
 	}
 
@@ -181,11 +184,11 @@ public class TestHelper {
 			File base = resoucesPath.resolve(SELECTIF).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
 			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-			+   RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
-			} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			logger.atSevere().log("setupWithSelectView failed %s", e.getMessage());
 		}
 	}
 
@@ -196,14 +199,14 @@ public class TestHelper {
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(xml).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n" 
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n" 
-					+ RunControlConfigration.EMIT_ENABLED + "=Y" + "\n" 
+			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
+					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n"
+					+ RunControlConfigration.EMIT_ENABLED + "=Y" + "\n"
 					+ RunControlConfigration.DOT_JLT + "=Y" + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("setupWithView failed %s", e.getMessage());
 		}
 	}
 
@@ -224,7 +227,7 @@ public class TestHelper {
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("setupWithViewCompileOnlyAndDot failed %s", e.getMessage());
 		}
 	}
 

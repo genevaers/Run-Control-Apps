@@ -19,6 +19,7 @@ package org.genevaers.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -133,15 +134,18 @@ public class FTPSession {
 	}
 
 	public void getFile(String srcFile, File destFile) throws IOException {
-		FileOutputStream out = new FileOutputStream(destFile);
-		ftp.retrieveFile(srcFile, out);
-		out.close();
-		int rc = ftp.getReplyCode();								
-		String replyText = ftp.getReplyString().trim();
-		logger.log(Level.FINE, "Transfer file " + destFile.getName() + ", " + replyText);
-		if (rc != 226 && rc != 250) {
-			throw new IOException("Couldn't transfer file " + srcFile + ", rc " + rc + " " + replyText);					
-		}						
+		try (FileOutputStream out = new FileOutputStream(destFile);)  {
+			ftp.retrieveFile(srcFile, out);
+			out.close();
+			int rc = ftp.getReplyCode();								
+			String replyText = ftp.getReplyString().trim();
+			logger.log(Level.FINE, "Transfer file " + destFile.getName() + ", " + replyText);
+			if (rc != 226 && rc != 250) {
+				throw new IOException("Couldn't transfer file " + srcFile + ", rc " + rc + " " + replyText);					
+			}						
+		} catch (FileNotFoundException e) {
+			logger.log(Level.SEVERE, "getFile failed %s", e.getMessage());
+		}
 	}
 	
 	public void setUserAndPassword(String user, String pwd) throws IOException {
@@ -330,28 +334,33 @@ public class FTPSession {
 			throw new IOException("Couldn't change to destination directory " + destDir + ", rc " + rc);
 		}
 
-		FileInputStream in = new FileInputStream(srcFile);
-		ftp.storeFile(srcFile.getName(), in);
-		rc = ftp.getReplyCode();				
-		replyText = ftp.getReplyString().trim();
-		logger.log(Level.FINE, "Transfer file " + srcFile.getName() + ", " + replyText);
-		if (rc != 226 && rc != 250) {
-			throw new IOException("Couldn't transfer file " + srcFile.getName() + ", rc " + rc);					
+		try (FileInputStream in = new FileInputStream(srcFile);) {
+			ftp.storeFile(srcFile.getName(), in);
+			rc = ftp.getReplyCode();				
+			replyText = ftp.getReplyString().trim();
+			logger.log(Level.FINE, "Transfer file " + srcFile.getName() + ", " + replyText);
+			if (rc != 226 && rc != 250) {
+				throw new IOException("Couldn't transfer file " + srcFile.getName() + ", rc " + rc);					
+			}
+		} catch( FileNotFoundException e) {
+			logger.log(Level.SEVERE, "putFile failed %s", e.getMessage());
 		}
 		
 	}
 	
 	public void putDataset(File srcFile, String dataset) throws IOException {
-		FileInputStream in = new FileInputStream(srcFile);
-		ftp.storeFile(dataset, in);
-		int rc = ftp.getReplyCode();				
-		String replyText = ftp.getReplyString().trim();
-		logger.log(Level.FINE, "Transfer file " + srcFile.getName() + ", " + replyText);
-		if (rc != 226 && rc != 250) {
-			throw new IOException("Couldn't transfer file " + srcFile.getName() + ", rc " + rc);					
+		try (FileInputStream in = new FileInputStream(srcFile);) {
+			ftp.storeFile(dataset, in);
+			int rc = ftp.getReplyCode();
+			String replyText = ftp.getReplyString().trim();
+			logger.log(Level.FINE, "Transfer file " + srcFile.getName() + ", " + replyText);
+			if (rc != 226 && rc != 250) {
+				throw new IOException("Couldn't transfer file " + srcFile.getName() + ", rc " + rc);
+			}
+		} catch (FileNotFoundException e) {
+			logger.log(Level.SEVERE, "putDataset failed %s", e.getMessage());
 		}
-		
-	}
 
+	}
 	
 }

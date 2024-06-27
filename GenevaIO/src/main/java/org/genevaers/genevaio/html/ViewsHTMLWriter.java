@@ -42,17 +42,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
-
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewNode;
 
-import j2html.tags.DomContent;
-import j2html.tags.specialized.TrTag;
+import com.google.common.flogger.FluentLogger;
 import j2html.tags.DomContent;
 
 public class ViewsHTMLWriter {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String filename = "ViewsTable.html";
 	private FileWriter fw;
 	private static final String POPUP = "w3-modal-content w3-animate-zoom";
@@ -69,9 +67,7 @@ public class ViewsHTMLWriter {
 	public void writeFromVDP(Path cwd) {
 
 		File output = cwd.resolve(filename).toFile();
-		try {
-			
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);) {
 			fw.write(
 					html(
 							head(
@@ -84,10 +80,8 @@ public class ViewsHTMLWriter {
 							body(
 									bodyContent()
 							)).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("ViewsHTMLWriter writeFromVDP failed, %s", e.getMessage());
 		}
 	}
 	

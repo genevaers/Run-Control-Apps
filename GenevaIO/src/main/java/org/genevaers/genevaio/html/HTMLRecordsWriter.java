@@ -50,6 +50,9 @@ import org.genevaers.genevaio.fieldnodes.NumericFieldNode;
 import org.genevaers.genevaio.fieldnodes.RecordNode;
 import org.genevaers.genevaio.fieldnodes.StringFieldNode;
 import org.genevaers.genevaio.fieldnodes.ViewFieldNode;
+
+import com.google.common.flogger.FluentLogger;
+
 import org.genevaers.genevaio.fieldnodes.FieldNodeBase.FieldNodeType;
 
 import j2html.tags.DomContent;
@@ -59,6 +62,7 @@ import j2html.tags.specialized.ThTag;
 import j2html.tags.specialized.TrTag;
 
 public abstract class HTMLRecordsWriter {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	
 	private  FileWriter fw;
 	private  final String POPUP = "w3-modal-content w3-animate-zoom";
@@ -101,8 +105,7 @@ public abstract class HTMLRecordsWriter {
 							)).withStyle("overflow-x: scroll").renderFormatted());
 			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("HTMLRecordsWriter failed\n%s", e.getMessage());
 		}
 	}
 	

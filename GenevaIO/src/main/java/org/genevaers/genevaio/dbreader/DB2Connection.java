@@ -68,8 +68,7 @@ public class DB2Connection extends DatabaseConnection{
         try {
             retval =  con.isValid(10);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("DB2Connection failed %s", e.getMessage() );
         }
         return retval;
     }

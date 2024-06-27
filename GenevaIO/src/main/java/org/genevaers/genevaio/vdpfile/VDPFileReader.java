@@ -82,7 +82,6 @@ public class VDPFileReader{
 	private ViewManagementData currentVMD;
 	private int currentViewID;
 
-	private String csvName;
 	private Path csvPath;
 
 	private short currentType;
@@ -103,7 +102,6 @@ public class VDPFileReader{
 		} catch (Exception e) {
 			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
 		}
-		//componentRepo.fixupPFExits();
 	}
 
 	private void openCSVFile() {
@@ -111,7 +109,7 @@ public class VDPFileReader{
 			Path trgCsv = csvPath.resolve(filePath.getFileName() + ".csv");
 			csvFile = new FileWriter(trgCsv.toFile());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("OpenCSV File failed",  e.getMessage());
 		}
 	}
 

@@ -58,8 +58,7 @@ public class DBReader {
                 addComponents();
             } 
         } catch (ClassNotFoundException | SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("DBReader addViewsToRepository failed\n%s", e.getMessage());
         }
     }
 

@@ -49,11 +49,14 @@ import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.UserExit;
 
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import j2html.tags.specialized.DivTag;
 
 public class LogicalRecordHTMLWriter {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String filename = "LRs.html";
 	private FileWriter fw;
@@ -78,7 +81,7 @@ public class LogicalRecordHTMLWriter {
 					script(join(toggleScript)).withLang("Javascript")), body(bodyContent())).renderFormatted());
 			fw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("LogicalRecordHTMLWriter writeFromVDP failes %s\n", e.getMessage());
 		}
 	}
 

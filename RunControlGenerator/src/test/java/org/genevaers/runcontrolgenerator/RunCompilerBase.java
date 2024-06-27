@@ -66,8 +66,7 @@ class RunCompilerBase {
             Status retval = rb.run();
             assertEquals(Status.OK, retval);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+			logger.atSevere().log("readConfigAndBuildRepo error %s", e.getMessage());
         }
     }
 

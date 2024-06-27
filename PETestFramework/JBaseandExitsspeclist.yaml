@@ -22,8 +22,13 @@ specFileSets:
       - "PeTests/Token/TOKMU.yaml" 
       - "PeTests/PreviousColumnRefs/PRVCOL.yaml"  
       - "PeTests/RTCs/FIXES.yaml"
+      - "PeTests/Function/JSTRFN.yaml" 
       - "PeTests/FormatReports/ReportZeroSuppress.yaml"
       - "PeTests/FormatReports/ReportHeaderTest.yaml"
       - "PeTests/FormatReports/NEWP2.yaml"
       - "PeTests/Format/NEWP3.yaml"
+  - name: "Error cases"
+    templateSetName: "MR91toPEError.yaml"
+    specs:
+      - "PeTests/Format/OVERFLW.yaml"
 

@@ -53,19 +53,14 @@ public class RunControlWriter {
         LTWriter xltw = new LTWriter();
         LTWriter jltw = new LTWriter();
         try {
-//            if(joinLogicTable.getNumberOfRecords() > 5) {
-                logger.atInfo().log("Write Join Logic Table");
-                jltw.write(joinLogicTable, Paths.get(RunControlConfigration.getJLTFileName()));
-                jltw.close();
-//            } else {
-//                logger.atInfo().log("No Join Logic Table required");
-//            }
+            logger.atInfo().log("Write Join Logic Table");
+            jltw.write(joinLogicTable, Paths.get(RunControlConfigration.getJLTFileName()));
+            jltw.close();
             logger.atInfo().log("Write Extract Logic Table");
             xltw.write(extractLogicTable, Paths.get(RunControlConfigration.getXLTFileName()));
             xltw.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("LT write failed %s", e.getMessage());
         }
         VDPFileWriter vdpw = new VDPFileWriter();
         vdpw.open(RunControlConfigration.getVdpDdname());
@@ -76,8 +71,7 @@ public class RunControlWriter {
             numVDPRecords = vdpw.getNumRecordsWritten();
             logger.atInfo().log("VDP Written");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("VDP write failed %s", e.getMessage());
         }
         return Status.OK;
 	}

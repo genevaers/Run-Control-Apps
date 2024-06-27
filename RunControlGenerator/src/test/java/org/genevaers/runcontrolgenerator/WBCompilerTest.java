@@ -476,8 +476,7 @@ import com.google.common.flogger.FluentLogger;
     try {
       pgCon.connect();
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+			logger.atSevere().log("getTestDatabaseConnection error %s", e.getMessage());
     }
     return pgCon.getConnection();
   }

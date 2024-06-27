@@ -71,8 +71,7 @@ public class GenevaLog
 			});
 			topLogger.addHandler(fh);
 		} catch (SecurityException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Init logger failed", e.getMessage());
 		}  
     }
 

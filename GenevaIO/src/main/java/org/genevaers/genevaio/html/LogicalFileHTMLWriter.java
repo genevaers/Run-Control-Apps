@@ -46,13 +46,16 @@ import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LogicalFile;
 import org.genevaers.repository.components.PhysicalFile;
 
-import j2html.tags.ContainerTag;
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.DomContent;
+import j2html.tags.specialized.DivTag;
+import j2html.tags.specialized.TrTag;
 
 public class LogicalFileHTMLWriter {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	
 	private static final String filename = "LFs.html";
-	private FileWriter fw;
 	private static final String POPUP = "w3-modal-content w3-animate-zoom";
 	static String toggleScript = "function toggleDiv(divname) {" +
 			"var ele = document.getElementById(divname);" +
@@ -65,11 +68,8 @@ public class LogicalFileHTMLWriter {
 			"}";
 
 	public void writeFromVDP(Path cwd) {
-
 		File output = cwd.resolve(filename).toFile();
-		try {
-			
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);) {
 			fw.write(
 					html(
 							head(
@@ -82,14 +82,12 @@ public class LogicalFileHTMLWriter {
 							body(
 									bodyContent()
 							)).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("LogicalFileHTMLWriter error\n%s", e.getMessage());
 		}
 	}
 	
-	private ContainerTag bodyContent() {
+	private DivTag bodyContent() {
 		return div(
 						h2("Logical Files"),
 						table(
@@ -106,7 +104,7 @@ public class LogicalFileHTMLWriter {
 				).withClass("w3-container");
 	}
 	
-	private ContainerTag getLFRow(LogicalFile lf) {
+	private TrTag getLFRow(LogicalFile lf) {
 		return tr(
 				td(Integer.valueOf(lf.getID()).toString()),
 				td(lf.getName()),

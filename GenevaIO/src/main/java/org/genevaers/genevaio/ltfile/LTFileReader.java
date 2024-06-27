@@ -19,7 +19,6 @@ package org.genevaers.genevaio.ltfile;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.genevaers.genevaio.fieldnodes.MetadataNode;
@@ -134,9 +133,9 @@ public class LTFileReader {
     private void determineCharacterSet(FileRecord rec) {
         if(charSetRead == false) {
 			if(rec.bytes.get(34) == 1) {
-				recordReader.setASCIItext(true);;
+				LTRecordReader.setASCIItext(true);;
 			} else {
-				recordReader.setEBCDICText();
+				LTRecordReader.setEBCDICText();
 			}
 			charSetRead = true;
 		}
@@ -225,12 +224,8 @@ public class LTFileReader {
 	public LogicTable makeLT() {
 		try {
 			readLT();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("LRFileReader readLT failed %s", e.getMessage());
 		}
 		return logicTable;
 	}

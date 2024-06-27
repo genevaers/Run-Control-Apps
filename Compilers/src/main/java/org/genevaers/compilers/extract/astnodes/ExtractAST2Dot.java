@@ -32,12 +32,15 @@ import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 
+import com.google.common.flogger.FluentLogger;
+
 /**
  * Generate a dot file of the AST so we can see a pretty picture. <BR>
  * To dot the picture more readable we can filter on views and columns.
  * Filtering defaults to not enabled.
  */
 public class ExtractAST2Dot {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     /**
      *
      */
@@ -90,8 +93,7 @@ public class ExtractAST2Dot {
             fw.write("}\n");
             fw.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("ExtractAST2Dot write failed %s\n", e.getMessage());
         }
     }
 

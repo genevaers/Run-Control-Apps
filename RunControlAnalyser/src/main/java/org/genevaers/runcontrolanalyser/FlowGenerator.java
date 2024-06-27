@@ -131,8 +131,7 @@ public class FlowGenerator {
 				fw.write(col.getColumnCalculation() + "\n\n");
 				fw.write(col.getColumnCalculationStack().toString());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("Cannot write calculation stack\n%s", e.getMessage());
 			}
 		}
 	}
@@ -144,8 +143,7 @@ public class FlowGenerator {
 				fw.write(v.getFormatFilterLogic() + "\n\n");
 				fw.write(v.getFormatFilterCalcStack().toString());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("Cannot write format filter\n%s", e.getMessage());
 			}
 		}
 	}

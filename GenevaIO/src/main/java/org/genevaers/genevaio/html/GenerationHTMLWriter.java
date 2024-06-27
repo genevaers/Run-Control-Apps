@@ -36,20 +36,19 @@ import java.nio.file.Path;
 
 import org.genevaers.genevaio.vdpfile.VDPGenerationRecord;
 
-import j2html.tags.ContainerTag;
+import com.google.common.flogger.FluentLogger;
+
+import j2html.tags.specialized.DivTag;
 
 public class GenerationHTMLWriter {
-
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String filename = "Generation.html";
-	private FileWriter fw;
 	VDPGenerationRecord genrec;
 
 	public void writeFromVDP(Path cwd, VDPGenerationRecord gen) {
 		genrec = gen;
 		File output = cwd.resolve(filename).toFile();
-		try {
-
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);){
 			fw.write(html(head(meta().withContent("text/html; charset=UTF-8"),
 					link().withRel("stylesheet").withType("text/css")
 							.withHref("https://www.w3schools.com/w3css/4/w3.css"),
@@ -58,14 +57,12 @@ public class GenerationHTMLWriter {
 					link().withRel("stylesheet").withType("text/css").withHref(
 							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")),
 					body(bodyContent())).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("GenerationHTMLWriter error\n%s", e.getMessage());
 		}
 	}
 
-	private ContainerTag bodyContent() {
+	private DivTag bodyContent() {
 		return div(
 						div().withClass("w3-card-4"),
 						header(

@@ -21,28 +21,22 @@ package org.genevaers.utilities;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.StreamHandler;
 
+import com.google.common.flogger.FluentLogger;
 import com.ibm.jzos.ZFile;
 import com.ibm.jzos.ZFileException;
 
 
 public class ZFileHandler extends StreamHandler{
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     ZFileHandler(String ddname) {
         try {
             ZFile dd = new ZFile(ddname, "w");
             setOutputStream(dd.getOutputStream());
             setEncoding("IBM-1047");
-        } catch (ZFileException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (ZFileException | SecurityException | UnsupportedEncodingException e) {
+            logger.atSevere().log("ZFileHandler error %s", e.getMessage());
         }
     }
-
     
 }

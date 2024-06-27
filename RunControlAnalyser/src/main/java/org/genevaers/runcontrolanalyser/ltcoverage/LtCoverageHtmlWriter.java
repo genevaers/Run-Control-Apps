@@ -1,5 +1,25 @@
 package org.genevaers.runcontrolanalyser.ltcoverage;
 
+/*
+ * Copyright Contributors to the GenevaERS Project.
+								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
+								2008
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+
 import static j2html.TagCreator.a;
 import static j2html.TagCreator.body;
 import static j2html.TagCreator.div;
@@ -28,6 +48,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.specialized.DivTag;
 import j2html.tags.specialized.TableTag;
 import j2html.tags.specialized.TdTag;
@@ -35,6 +58,7 @@ import j2html.tags.specialized.ThTag;
 import j2html.tags.specialized.TrTag;
 
 public class LtCoverageHtmlWriter {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	public enum HITS_STATE {
 		NONE, SOME, ALL
@@ -114,8 +138,7 @@ public class LtCoverageHtmlWriter {
 					).renderFormatted());
 			testHtml.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("write coverage failed\n%s", e.getMessage());
 		}
 	}
 

@@ -33,12 +33,16 @@ import org.genevaers.compilers.format.astnodes.NumConst;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewNode;
 
+import com.google.common.flogger.FluentLogger;
+
 /**
  * Generate a dot file of the AST so we can see a pretty picture. <BR>
  * To dot the picture more readable we can filter on views and columns.
  * Filtering defaults to not enabled.
  */
 public class FormatAST2Dot {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+
     /**
      *
      */
@@ -84,8 +88,7 @@ public class FormatAST2Dot {
             fw.write("}\n");
             fw.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("FormatAST2Dot write failed %s", e.getMessage());
         }
     }
 

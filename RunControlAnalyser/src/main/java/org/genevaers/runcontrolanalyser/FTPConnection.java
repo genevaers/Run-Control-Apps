@@ -27,7 +27,10 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
+import com.google.common.flogger.FluentLogger;
+
 public class FTPConnection {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	FTPClient ftp = null;
 
@@ -50,7 +53,7 @@ public class FTPConnection {
         try (FileOutputStream fos = new FileOutputStream(localFilePath)) {
             this.ftp.retrieveFile(remoteFilePath, fos);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.atSevere().log("FTP downloadFile failed\n%s", e.getMessage());
         }
     }
 }

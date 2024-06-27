@@ -40,19 +40,19 @@ import java.nio.file.Path;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.UserExit;
 
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.DivTag;
+import j2html.tags.specialized.TrTag;
 
 public class ExitHTMLWriter {
-
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String filename = "Exits.html";
-	private FileWriter fw;
 
 	public void writeFromVDP(Path cwd) {
 		File output = cwd.resolve(filename).toFile();
-		try {
-
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);){
 			fw.write(html(head(meta().withContent("text/html; charset=UTF-8"),
 					link().withRel("stylesheet").withType("text/css")
 							.withHref("https://www.w3schools.com/w3css/4/w3.css"),
@@ -61,10 +61,8 @@ public class ExitHTMLWriter {
 					link().withRel("stylesheet").withType("text/css").withHref(
 							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")),
 					body(bodyContent())).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("ExitHTMLWriter error\n%s", e.getMessage());
 		}
 	}
 
@@ -75,7 +73,7 @@ public class ExitHTMLWriter {
 								.withClass("w3-container");
 	}
 
-	private ContainerTag getExitRow(UserExit ex) {
+	private TrTag getExitRow(UserExit ex) {
 		return tr(
 				td(Integer.valueOf(ex.getComponentId()).toString()),
 				td(ex.getName()),

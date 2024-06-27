@@ -47,13 +47,16 @@ import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.UserExit;
 import org.genevaers.repository.components.enums.AccessMethod;
 
-import j2html.tags.ContainerTag;
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.DomContent;
+import j2html.tags.specialized.DivTag;
+import j2html.tags.specialized.TrTag;
 
 public class PhysicalFileHTMLWriter {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String filename = "PFs.html";
-	private FileWriter fw;
 	private static final String POPUP = "w3-modal-content w3-animate-zoom";
 	static String toggleScript = "function toggleDiv(divname) {" + "var ele = document.getElementById(divname);"
 			+ "if (ele.style.display == \"none\") {" + "ele.style.display = \"block\";" + "}" + "else {"
@@ -62,9 +65,7 @@ public class PhysicalFileHTMLWriter {
 	public void writeFromVDP(Path cwd) {
 
 		File output = cwd.resolve(filename).toFile();
-		try {
-
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);){
 			fw.write(html(head(meta().withContent("text/html; charset=UTF-8"),
 					link().withRel("stylesheet").withType("text/css")
 							.withHref("https://www.w3schools.com/w3css/4/w3.css"),
@@ -73,14 +74,12 @@ public class PhysicalFileHTMLWriter {
 					link().withRel("stylesheet").withType("text/css").withHref(
 							"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"),
 					script(join(toggleScript)).withLang("Javascript")), body(bodyContent())).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("PhysicalFileHTMLWriter failed %s", e.getMessage());
 		}
 	}
 
-	private ContainerTag bodyContent() {
+	private DivTag bodyContent() {
 		return div(h2("Physical Files"),
 				table(tbody(
 						tr(th("ID"), th("Name"), th("File Type"), th("Access Method"), th("Details"), th("Input DD"),
@@ -89,7 +88,7 @@ public class PhysicalFileHTMLWriter {
 								.withClass("w3-container");
 	}
 
-	private ContainerTag getPFRow(PhysicalFile pf) {
+	private TrTag getPFRow(PhysicalFile pf) {
 		return tr(
 				td(Integer.toString(pf.getComponentId())),
 				td(pf.getName()),
@@ -205,48 +204,48 @@ public class PhysicalFileHTMLWriter {
 					);
 	}
 
-	private ContainerTag getLRECL(PhysicalFile pf) {
+	private TrTag getLRECL(PhysicalFile pf) {
 		return tr(
 				td("LRECL"),
 				td(Integer.toString(pf.getLrecl()))
 				);
 	}
 
-	private ContainerTag getRECFM(PhysicalFile pf) {
+	private TrTag getRECFM(PhysicalFile pf) {
 		return tr(
 				td("RECFM"),
 				td(pf.getRecfm().toString())
 				);
 	}
 
-	private ContainerTag getOutputDDName(PhysicalFile pf) {
+	private TrTag getOutputDDName(PhysicalFile pf) {
 		return tr(
 				td("Output DD Name"),
 				td(pf.getOutputDDName())
 				);
 	}
 
-	private ContainerTag getMaxRecordLength(PhysicalFile pf) {
+	private TrTag getMaxRecordLength(PhysicalFile pf) {
 		return tr(
 				td("Maximum Record Length"),
 				td(Integer.toString(pf.getMaximumLength()))
 				);
 	}
 
-	private ContainerTag getMinRecordLength(PhysicalFile pf) {
+	private TrTag getMinRecordLength(PhysicalFile pf) {
 		return tr(
 				td("Minimum Record Length"),
 				td(Integer.toString(pf.getMinimumLength()))
 				);
 	}
 
-	private ContainerTag getDDName(PhysicalFile pf) {
+	private TrTag getDDName(PhysicalFile pf) {
 		return tr(
 				td("Input DD Name"),
 				td(pf.getInputDDName())
 				);
 	}
-	private ContainerTag getDSNName(PhysicalFile pf) {
+	private TrTag getDSNName(PhysicalFile pf) {
 		return tr(
 				td("Input DSN Name"),
 				td(pf.getDataSetName())

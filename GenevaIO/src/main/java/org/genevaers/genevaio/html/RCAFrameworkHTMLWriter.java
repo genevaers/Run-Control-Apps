@@ -40,11 +40,18 @@ import java.nio.file.Path;
 import org.genevaers.genevaio.vdpfile.VDPManagementRecords;
 import org.genevaers.repository.Repository;
 
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
+import j2html.tags.specialized.ATag;
+import j2html.tags.specialized.DivTag;
+import j2html.tags.specialized.H3Tag;
+import j2html.tags.specialized.H4Tag;
 import j2html.tags.specialized.SpanTag;
 
 public class RCAFrameworkHTMLWriter {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String MENU_BADGE = "w3-badge w3-right";
 	private static final String MENU_CLASS = "w3-bar-item w3-button w3-hover-blue w3-flat-silver";
@@ -103,9 +110,7 @@ public class RCAFrameworkHTMLWriter {
 
 	private void writeFamework() {
 		File output = filename.toFile();
-		try {
-			
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);) {
 			fw.write(
 					html(
 							head(
@@ -119,15 +124,12 @@ public class RCAFrameworkHTMLWriter {
 							body(
 									bodyContent()
 							)).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("RCAFrameworkHTMLWriter writeFamework failed %e", e.getMessage());
 		}
 	}
 
-	private ContainerTag bodyContent() {
-		
+	private DivTag bodyContent() {
 		return div( sidebar(), pageContent());
 	}
 
@@ -139,7 +141,7 @@ public class RCAFrameworkHTMLWriter {
 					).withStyle("margin-left:25% ");
 	}
 
-	private ContainerTag sidebar() {
+	private DivTag sidebar() {
 		return div( 
 						div(
 								h3("Run Control Analysis"),
@@ -270,18 +272,18 @@ public class RCAFrameworkHTMLWriter {
 		return span(Integer.toString(Repository.getLogicalRecords().size())).withClass(MENU_BADGE);
 	}
 
-	private ContainerTag componentsSection() {
+	private H3Tag componentsSection() {
 		return h3("Components").withClass("w3-dark-grey");
 	}
 
-	private ContainerTag lookupPaths() {
+	private ATag lookupPaths() {
 		return a(lookupsSpan()).withText("Lookup Paths")
 				.withClass(MENU_CLASS)
 				.withHref("LookupsTable.html")
 				.withTarget(PAGE_IFRAME)				;
 	}
 
-	private ContainerTag<SpanTag> lookupsSpan() {
+	private SpanTag lookupsSpan() {
 		return span(Integer.toString(Repository.getLookups().size())).withClass(MENU_BADGE);
 	}
 
@@ -289,14 +291,14 @@ public class RCAFrameworkHTMLWriter {
 		return span(Integer.toString(Repository.getViews().size())).withClass(MENU_BADGE);	
 	}
 
-	private ContainerTag views() {
+	private ATag views() {
 		return a(viewsSpan()).withText("Views")
 				.withClass(MENU_CLASS)
 				.withHref("ViewsTable.html")
 				.withTarget(PAGE_IFRAME)				;
 	}
 
-	private ContainerTag generationEntry() {
+	private H4Tag generationEntry() {
 		return h4(
 					a("Generation Details")
 					.withClass("w3-bar-item w3-button w3-flat-silver w3-hover-light-green")

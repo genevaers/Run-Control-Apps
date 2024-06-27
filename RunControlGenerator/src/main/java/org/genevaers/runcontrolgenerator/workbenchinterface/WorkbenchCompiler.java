@@ -61,8 +61,11 @@ import org.genevaers.repository.data.LookupRef;
 import org.genevaers.repository.data.ViewLogicDependency;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
 
+import com.google.common.flogger.FluentLogger;
+
 
 public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnalyser {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static DatabaseConnectionParams params = new DatabaseConnectionParams();
 	protected WBCompilerType type;
@@ -84,7 +87,9 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 
 	//Common setup functions
     public static void setSQLConnection(Connection c) {
-		dataProvider.setDatabaseConnection(new WBConnection(c));
+		WBConnection wbc = new WBConnection();
+		wbc.setSQLConnection(c);
+		dataProvider.setDatabaseConnection(wbc);
 		dataProvider.setParams(params);
 		BuildGenevaASTVisitor.setDataProvider(dataProvider);
     }
@@ -376,7 +381,7 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 			properties.load(resourceStream);
 			ver = "RCG" + ": " + properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot opem applicaiton.properties %s", e.getMessage());
 		}
 		return ver;
 	}

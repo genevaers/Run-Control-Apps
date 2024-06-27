@@ -25,7 +25,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.google.common.flogger.FluentLogger;
+
 public class PostgresConnection extends DatabaseConnection {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private DatabaseConnectionParams params;
     private Connection con;
@@ -51,21 +54,18 @@ public class PostgresConnection extends DatabaseConnection {
         try {
             retval =  con.isValid(10);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("isConnected failed\n%s", e.getMessage());
         }
         return retval;
     }
 
     //@Override
     public List<Integer> getExistingFolderIds(String folderIds) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     //@Override
     public List<Integer> getViewIdsFromFolderIds(String folderIds) {
-        // TODO Auto-generated method stub
         return null;
     }
 

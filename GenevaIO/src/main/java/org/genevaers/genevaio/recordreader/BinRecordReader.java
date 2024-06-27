@@ -21,6 +21,7 @@ package org.genevaers.genevaio.recordreader;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import com.google.common.flogger.FluentLogger;
@@ -37,8 +38,7 @@ public class BinRecordReader extends RecordFileReader {
 		try {
 			rFile.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("BinRecordReader close error%s", e.getMessage());
 		}
 	}
 
@@ -48,9 +48,13 @@ public class BinRecordReader extends RecordFileReader {
 
 	@Override
 	public void readRecordsFrom(File file) throws IOException {
-		rFile = new RandomAccessFile(file, "r");
-		filelen = rFile.length();
-		logger.atFine().log("File length %d", filelen);
+		try {
+			rFile = new RandomAccessFile(file, "r");
+			filelen = rFile.length();
+			logger.atFine().log("File length %d", filelen);
+		} catch (FileNotFoundException e) {
+			logger.atSevere().log("BinRecordReader file not found %s", e.getMessage());
+		}
 	}
 
 	@Override

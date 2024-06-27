@@ -19,6 +19,7 @@ package org.genevaers.genevaio.recordreader;
 
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -70,9 +71,13 @@ public class RecordReaderFactory {
 	}
 
 	public void readRecordsFrom(File file) throws IOException {
-		rFile = new RandomAccessFile(file, "r");
-		filelen = rFile.length();
-		logger.atFine().log("File length %d", filelen);
+		try {
+			rFile = new RandomAccessFile(file, "r");
+			filelen = rFile.length();
+			logger.atFine().log("File length %d", filelen);
+		} catch (FileNotFoundException e) {
+			logger.atSevere().log("readRecordsFrom %s error \n%s", file.getName(), e.getMessage());
+		}
 	}
 
 	public void writeRecordsTo(File file) throws IOException {
@@ -129,8 +134,7 @@ public class RecordReaderFactory {
 				rw.close();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("RecordReaderFactory failed to close\n%s", e.getMessage());
 		}
 	}
 

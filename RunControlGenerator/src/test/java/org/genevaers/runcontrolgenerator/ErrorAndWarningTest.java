@@ -269,10 +269,10 @@ class ErrorAndWarningTest extends RunCompilerBase {
     @Test void testInvalidDateComparison() {
         LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.INCOMPATIBLE_DATES, "IF ({ZONED} = {Binary4}) THEN COLUMN=1 ELSE COLUMN=0 ENDIF");
         List<CompilerMessage> warns = Repository.getWarnings();
-        assertEquals(0, warns.size());
+        assertEquals(1, warns.size());
+        assertTrue(warns.get(0).getDetail().contains("Incompatible"));
         List<CompilerMessage> errs = Repository.getCompilerErrors();
-        assertEquals(1, errs.size());
-        assertTrue(errs.get(0).getDetail().contains("Incompatible"));
+        assertEquals(0, errs.size());
     }
 
     @Test void testComparisonFlipLHS() {

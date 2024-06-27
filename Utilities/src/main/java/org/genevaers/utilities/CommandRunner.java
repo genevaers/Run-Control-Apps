@@ -23,10 +23,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Logger;
+
+import com.google.common.flogger.FluentLogger;
 
 
 
 public class CommandRunner {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private StringBuilder cmdOutput = new StringBuilder();
 
 	public StringBuilder getCmdOutput() {
@@ -43,18 +47,16 @@ public class CommandRunner {
 
 		@Override
 		public void run() {
-			try {
+			try (
 				InputStreamReader inpStrd = new InputStreamReader(inpStr);
-				BufferedReader buffRd = new BufferedReader(inpStrd);
+				BufferedReader buffRd = new BufferedReader(inpStrd); ) {
 				String line = null;
 				while((line = buffRd.readLine()) != null) {
 					cmdOutput.append(line);
 					cmdOutput.append('\n');
 				}
-				buffRd.close();
-
 			} catch(Exception e) {
-				System.out.println(e);
+				logger.atSevere().log("Command Runner ProcessHandler error %s", e.getMessage());
 			}
 
 		}

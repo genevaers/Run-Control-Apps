@@ -19,6 +19,7 @@ package org.genevaers.genevaio.recordreader;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -33,9 +34,13 @@ public class BinRecordWriter extends RecordFileWriter {
  
     @Override
 	public void writeRecordsTo(File file) throws IOException {
-		wFile = new RandomAccessFile(file, "rw");
-		wFile.setLength(0);
-		bytesWritten = 0;
+		try {
+			wFile = new RandomAccessFile(file, "rw");
+			wFile.setLength(0);
+			bytesWritten = 0;
+		} catch (FileNotFoundException e) {
+			logger.atSevere().log("BinRecordWriter %s", e.getMessage());
+		}
 	}
 
 	@Override
@@ -67,8 +72,7 @@ public class BinRecordWriter extends RecordFileWriter {
 		try {
 			wFile.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("BinRecordWriter close error\n", e.getMessage());
 		}
 	}
 

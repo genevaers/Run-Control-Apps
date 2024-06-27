@@ -42,17 +42,16 @@ import java.nio.file.Path;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ControlRecord;
 
+import com.google.common.flogger.FluentLogger;
+
 
 public class ControlRecordHTMLWriter {
-	
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String filename = "CRTable.html";
-	private FileWriter fw;
 
 	public void writeFromVDP(Path cwd) {
 		File output = cwd.resolve(filename).toFile();
-		try {
-			
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);){
 			fw.write(
 					html(
 							head(
@@ -64,10 +63,8 @@ public class ControlRecordHTMLWriter {
 							body(
 									bodyContent()
 							)).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("ControlRecordHTMLWriter error\n%s",e.getMessage());
 		}
 	}
 	

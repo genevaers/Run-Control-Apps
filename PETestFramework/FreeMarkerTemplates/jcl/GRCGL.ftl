@@ -22,18 +22,18 @@
 //SYSIN     DD *
 <#macro qualifiedTest>
 ${env["GERS_TEST_HLQ"]}.${test.dataSet}</#macro>
- DELETE  <@qualifiedTest/>.MR91.JLT PURGE
+ DELETE  <@qualifiedTest/>.GRCG.JLT PURGE
  IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
      SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
 
- DELETE  <@qualifiedTest/>.MR91.VDP PURGE
+ DELETE  <@qualifiedTest/>.GRCG.VDP PURGE
  IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
      SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
 
- DELETE  <@qualifiedTest/>.MR91.XLT PURGE
+ DELETE  <@qualifiedTest/>.GRCG.XLT PURGE
  IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
      SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
- DELETE  <@qualifiedTest/>.MR91LOG PURGE
+ DELETE  <@qualifiedTest/>.GRCGLOG PURGE
  IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
      SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
 //*********************************************************************
@@ -105,36 +105,39 @@ export IBM_JAVA_OPTIONS="$IJO "
 //*
 //*        INPUTS
 //*
-//WBXMLI   DD DISP=SHR,DSN=<@qualifiedTest/>.MR91.XMLS
-//MR91PARM DD DISP=SHR,DSN=<@qualifiedTest/>.PARM(MR91PARM) 
+//WBXMLI   DD DISP=SHR,DSN=<@qualifiedTest/>.GRCG.XMLS
+//GRCGPARM DD DISP=SHR,DSN=<@qualifiedTest/>.PARM(GRCGPARM) 
+<#if test.runviews??>
+//RUNVIEWS  DD *  
+${test.runviews}</#if>
 //*
 //*        OUTPUT FILES
 //*
-//VDP      DD DSN=<@qualifiedTest/>.MR91.VDP,
+//VDP      DD DSN=<@qualifiedTest/>.GRCG.VDP,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(CYL,(10,10),RLSE),
 //            DCB=(DSORG=PS,RECFM=VB,LRECL=8192,BLKSIZE=0)
 //*
-//JLT      DD DSN=<@qualifiedTest/>.MR91.JLT,
+//JLT      DD DSN=<@qualifiedTest/>.GRCG.JLT,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(TRK,(10,10),RLSE),
 //            DCB=(DSORG=PS,RECFM=VB,LRECL=4004,BLKSIZE=32036)
 //*
-//XLT      DD DSN=<@qualifiedTest/>.MR91.XLT,
+//XLT      DD DSN=<@qualifiedTest/>.GRCG.XLT,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(CYL,(10,10),RLSE),
 //            DCB=(DSORG=PS,RECFM=VB,LRECL=4004,BLKSIZE=32036)
-//MR91RPT  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
-//MR91LOG  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
+//GRCGRPT  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
+//GRCGLOG  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
 //*
 //*******************************************************************
 //* SUBMIT NEXT JOB
 //*******************************************************************
 <#if test.mr91only?matches("Y")>
-//* MR91 only run - stop here
+//* GRCG only run - stop here
 //
 </#if>
 //*

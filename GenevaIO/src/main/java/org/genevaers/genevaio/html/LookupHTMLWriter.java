@@ -43,14 +43,16 @@ import java.nio.file.Path;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LookupPath;
 
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.DivTag;
 import j2html.tags.specialized.TdTag;
+import j2html.tags.specialized.TrTag;
 
 public class LookupHTMLWriter {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String filename = "LookupsTable.html";
-	private FileWriter fw;
-	private static final String POPUP = "w3-modal-content w3-animate-zoom";
 	static String toggleScript = "function toggleDiv(divname) {" +
 			"var ele = document.getElementById(divname);" +
 			"if (ele.style.display == \"none\") {" +
@@ -64,9 +66,7 @@ public class LookupHTMLWriter {
 	public void writeFromVDP(Path cwd) {
 
 		File output = cwd.resolve(filename).toFile();
-		try {
-			
-			fw = new FileWriter(output);
+		try (FileWriter fw = new FileWriter(output);) {
 			fw.write(
 					html(
 							head(
@@ -79,10 +79,8 @@ public class LookupHTMLWriter {
 							body(
 									bodyContent()
 							)).renderFormatted());
-			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("LookupHTMLWriter failed %s", e.getMessage());
 		}
 	}
 	
@@ -108,7 +106,7 @@ public class LookupHTMLWriter {
 				).withClass("w3-container");
 	}
 	
-	private ContainerTag getLKUPRow(LookupPath lkup) {
+	private TrTag getLKUPRow(LookupPath lkup) {
 		return tr(
 				td(Integer.toString(lkup.getID())),
 				td(lkup.getName()),
