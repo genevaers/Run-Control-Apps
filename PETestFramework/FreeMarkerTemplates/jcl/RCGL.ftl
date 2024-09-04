@@ -71,7 +71,7 @@ export APPGIT=${env["GERS_GIT_REPO_DIR"]}/Run-Control-Apps
 export APPTRG=RCApps                                                        
 export BASE=$APPGIT/$APPTRG                                                     
 export APP_HOME=$BASE/target                                                    
-export APP_NAME=rcapps-1.1.0_RC4-jar-with-dependencies.jar                      
+export APP_NAME=rcapps-latest-jar-with-dependencies.jar                      
 export CLASSPATH=$APP_HOME:"$JAVA_HOME"/lib                                     
                                                                                 
 LIBPATH=/lib:/usr/lib:"$JAVA_HOME"/bin                                          
