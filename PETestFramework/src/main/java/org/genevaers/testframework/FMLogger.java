@@ -55,7 +55,7 @@ public class FMLogger {
 				logger.addHandler(conHandler);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.atSevere().log("Setup Error for logger--but this message probably won't get printed either\n%s", e.getMessage());
 		}
 	}
 } 

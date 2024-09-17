@@ -68,8 +68,7 @@ public class TestRepository  {
             specFileSets = yr.readSpecFileSets(specFileList);
             processSpecFileSets();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO exception on Repo YAML file read\n%s", e.getMessage());
         }
     }
 
@@ -97,8 +96,7 @@ public class TestRepository  {
             spec = yr.readSpec("spec/" + s);
             readPassViewsIfNeeded(spec);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO exception on Test Repository Spec read\n%s", e.getMessage());
         }
         return spec;
     }
@@ -120,8 +118,7 @@ public class TestRepository  {
         try {
             return yr.readPassViews(passViewsPath.toFile());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO Exception on Test Repository PassView file read\n%s", e.getMessage());
             return null;
         } 
     }
@@ -168,8 +165,7 @@ public class TestRepository  {
         try {
             templateSet = yr.yaml2TemplateSet(new File("templateSets/" + tempSet));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO exception on Test Repository template set create\n%s", e.getMessage());
         }
         return templateSet;
     }

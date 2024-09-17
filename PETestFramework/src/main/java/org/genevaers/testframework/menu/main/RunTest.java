@@ -24,9 +24,11 @@ import org.fusesource.jansi.Ansi;
 import org.genevaers.testframework.TestDriver;
 import org.genevaers.utilities.menu.Menu;
 import org.genevaers.utilities.menu.MenuItem;
+import com.google.common.flogger.FluentLogger;
 
 public class RunTest extends MenuItem {
 
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     public RunTest() {
         color = Ansi.Color.GREEN;
         header = "Run";
@@ -40,8 +42,7 @@ public class RunTest extends MenuItem {
             try {
                 TestDriver.runTest(MainTestData.getTestToRun());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.atSevere().log("IO exception on Run Test parameter input\n%s", e.getMessage());
             }
             Menu.promptedRead("Enter to continue");
         } else if(MainTestData.getSpecToRun() != null) {

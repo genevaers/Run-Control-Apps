@@ -43,7 +43,7 @@ public class ZosRecordWriter extends RecordFileWriter {
                 writer = com.ibm.jzos.RecordWriter.newWriterForDD(ddname);
             }
         } catch (com.ibm.jzos.ZFileException e) {
-            e.printStackTrace();
+            logger.atSevere().log("jzos file exception in open\n%s", e.getMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class ZosRecordWriter extends RecordFileWriter {
                 writer.write(bytes.array(), 4, bytes.position() - 4);
             }
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+            logger.atSevere().log("jzos file exception in write to file\n%s", e.getMessage());
             close();
 		}
     }
@@ -77,7 +77,7 @@ public class ZosRecordWriter extends RecordFileWriter {
             System.out.println("Close dataset");
             writer.close();
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+            logger.atSevere().log("jzos file exception in file close\n%s", e.getMessage());
 		}
     }
 

@@ -44,7 +44,7 @@ public class RecordWriter {
             System.out.println("Open DD Name = " + ddname);
             writer = com.ibm.jzos.RecordWriter.newWriterForDD(ddname);
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot open the DD Name\n%s", e.getMessage());
 		}
 	}
 
@@ -62,7 +62,7 @@ public class RecordWriter {
                 writer.write(bytes.array(), 4, bytes.position() - 4);
             }
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot write to file\n%s", e.getMessage());
             close();
 		}
     }
@@ -74,7 +74,7 @@ public class RecordWriter {
             System.out.println("Close dataset");
             writer.close();
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot close file\n%s", e.getMessage());
 		}
     }
 

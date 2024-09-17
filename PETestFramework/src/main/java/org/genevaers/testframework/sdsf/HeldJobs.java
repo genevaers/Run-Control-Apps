@@ -479,8 +479,7 @@ public class HeldJobs {
                     totalJobSteps.add(s);
                 }
             } catch (ISFException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.atSevere().log("ISPF Exception on held jobs\n%s", e.getMessage());
             }
         }
         return totalJobSteps;

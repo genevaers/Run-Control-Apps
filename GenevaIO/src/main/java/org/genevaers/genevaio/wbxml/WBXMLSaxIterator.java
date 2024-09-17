@@ -100,8 +100,7 @@ public class WBXMLSaxIterator {
         try {
            reader = xmlInputFactory.createXMLStreamReader(xmlReader);
         } catch (XMLStreamException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+			logger.atSevere().log("XML stream exception\n%s", e.getMessage());
         }
     }
 

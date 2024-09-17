@@ -269,8 +269,7 @@ public class TestReporter {
 	        logger.atInfo().log("Write to " + reportHTMLFile.toString());
 			generateTemplatedOutput(template, nodeMap, reportHTMLFile);
 		} catch (IOException | TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception on HTML test set results\n%s", e.getMessage());
 		}
 	}
 	
@@ -397,8 +396,7 @@ public class TestReporter {
 			dummyWriter = new FileWriter(tr.jltPath.toFile());
 			dummyWriter.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception on no JLT Log file\n%s", e.getMessage());
 		}
 	}
 
@@ -436,8 +434,7 @@ public class TestReporter {
 	        }
 			reader.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception on MR91 Test HTML file close\n%s", e.getMessage());
 		}
 	}
 

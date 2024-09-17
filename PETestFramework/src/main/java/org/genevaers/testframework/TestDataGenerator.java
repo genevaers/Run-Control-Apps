@@ -58,8 +58,7 @@ public class TestDataGenerator  {
     //             //generateJUnit();
     //         }
     //     } catch (IOException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
+    //         logger.atSevere().log("IO exception in Template to Spec Process\n%s", e.getMessage());
     //     }
     // }
 
@@ -174,8 +173,7 @@ public class TestDataGenerator  {
                             outputPath.resolve(targetStr));
                 }
             } catch (IOException | TemplateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.atSevere().log("IO exception in Test Data Generator outputs\n%s", e.getMessage());
             }
         }
     }

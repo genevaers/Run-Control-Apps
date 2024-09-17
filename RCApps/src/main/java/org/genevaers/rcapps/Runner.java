@@ -88,7 +88,7 @@ public class Runner {
 			properties.load(resourceStream);
 			ver = properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.atSevere().log("IO exception on Test Runner get version\n%s", e.getMessage());
 		}
 		return ver;
 	}

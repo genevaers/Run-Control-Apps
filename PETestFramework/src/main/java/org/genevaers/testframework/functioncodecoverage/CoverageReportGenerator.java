@@ -49,11 +49,12 @@ import org.genevaers.utilities.GersEnvironment;
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.ThTag;
 import j2html.tags.specialized.TrTag;
+import com.google.common.flogger.FluentLogger;
 
 public class CoverageReportGenerator {
 
 	private static final String HITS_STYLE = "text-align: right; border-style: solid; border-width: 1px;padding: 3;";
-
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static final String TH_STYLE = "w3-green";
 	
 	private static final String POPUP = "w3-modal-content w3-animate-zoom";
@@ -122,8 +123,7 @@ public class CoverageReportGenerator {
 								)).renderFormatted());
 				testHtml.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("IO error on coverage HTML write\n%s", e.getMessage());
 			}
 			return output.getName();
 		} else {

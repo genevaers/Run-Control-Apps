@@ -55,11 +55,9 @@ public class FlowComparator {
 			    cmd.run(fullcommand, youngestPath.toFile());
 		        cmd.clear();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on compare text report\n%s", e.getMessage());
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Interrupt exception on compare text report\n%s", e.getMessage());
 		}
 		
 	}

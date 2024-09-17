@@ -108,8 +108,7 @@ public class AnalyserDriver {
 				generateJLTDiffReport(root, xlt1, xlt2);
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("Exception on test of VDP, XLT or JLT Report\n%s", e.getMessage());
 		}
 	}
 
