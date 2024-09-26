@@ -45,7 +45,7 @@ public class FlipColumnChecker extends AssignmentRulesChecker {
     public RuleResult verifyOperands(ColumnAST column, FormattedASTNode rhs) {
         RuleResult result = RuleResult.RULE_WARNING;
         //We already know the column is Alphanumeric otherwise we would not be here
-        column.setOverrideDataType(DataType.ZONED);
+        column.overrideDataType(DataType.ZONED);
         ViewColumn vc = column.getViewColumn();
         updateResult(result, apply(column, rhs));
         CompilerMessage warn = ExtractBaseAST.makeCompilerMessage(String.format("Treating column %d as ZONED.", column.getViewColumn().getColumnNumber()));

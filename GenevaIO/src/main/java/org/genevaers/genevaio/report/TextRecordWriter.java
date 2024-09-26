@@ -51,7 +51,7 @@ public abstract class TextRecordWriter {
 		logger.atInfo().log("Report written for %s", filename);
 	}
 
-	protected void writeField(FieldNodeBase f, Writer fw) throws IOException {
+	protected void writeField(FieldNodeBase f, Writer fw, boolean compareMode) throws IOException {
 		switch(f.getFieldNodeType()) {
 			case FUNCCODE:
 				break;
@@ -60,7 +60,7 @@ public abstract class TextRecordWriter {
 			case NOCOMPONENT:
 				break;
 			case NUMBERFIELD:
-			fw.write(String.format("%s    %-19s: %s\n", highlightDiff(f), f.getName(),((NumericFieldNode) f).getValueString()));
+			fw.write(String.format("%s    %-19s: %s\n", highlightDiff(f, compareMode), f.getName(),((NumericFieldNode) f).getValueString()));
 			break;
 			case RECORD:
 				break;
@@ -69,7 +69,7 @@ public abstract class TextRecordWriter {
 			case ROOT:
 				break;
 			case STRINGFIELD:
-			fw.write(String.format("%s    %-19s: %s\n", highlightDiff(f), f.getName(),((StringFieldNode) f).getValue( )));
+			fw.write(String.format("%s    %-19s: %s\n", highlightDiff(f, compareMode), f.getName(),((StringFieldNode) f).getValue( )));
 				break;
 			case VIEW:
 				break;
@@ -82,17 +82,19 @@ public abstract class TextRecordWriter {
 		}
 	}
 
-	private String highlightDiff(FieldNodeBase f) {
+	private String highlightDiff(FieldNodeBase f, boolean compareMode) {
 		String retval = "       ";
 		switch(f.getState()) {
 			case DIFF:
 			retval = "***    ";
 			break;
 			case ORIGINAL:
-			retval = "Missing";
+			if(compareMode) {
+				retval = "New    ";
+			}
 			break;
 			case NEW:
-			retval = "Added  ";
+			retval = "Old    ";
 			break;
 			case CHANGED:
 				break;

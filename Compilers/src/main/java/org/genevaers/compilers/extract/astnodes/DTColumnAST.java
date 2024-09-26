@@ -3,8 +3,11 @@ package org.genevaers.compilers.extract.astnodes;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.LTFileObject;
+import org.genevaers.repository.RepoHelper;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.components.enums.DateCode;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -58,6 +61,30 @@ public class DTColumnAST extends ColumnAST {
     public LTFileObject getConstLtEntry(String value) {
         LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
         return fcf.getDTC(value, vc);
+    }
+
+    @Override
+    public DataType getDataType() {
+        if(vc != null) {
+            return overriddenDataType != DataType.INVALID ? overriddenDataType : vc.getDataType();
+        } else {
+            return overriddenDataType;
+        }
+    }
+
+    @Override
+    public DateCode getDateCode() {
+        return (overriddenDateCode != null) ? overriddenDateCode : vc.getDateCode();
+    }
+
+    @Override
+    public int getMaxNumberOfDigits() {
+         return RepoHelper.getMaxNumberOfDigitsForType(vc.getDataType(), vc.getFieldLength());
+    }
+
+    @Override
+    public String getMessageName() {
+        return vc.getName();
     }
 
 }

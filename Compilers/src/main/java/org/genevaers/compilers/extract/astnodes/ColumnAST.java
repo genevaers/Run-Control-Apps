@@ -27,12 +27,11 @@ import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 
-public abstract class ColumnAST extends ExtractBaseAST implements EmittableASTNode{
+public abstract class ColumnAST extends FormattedASTNode implements EmittableASTNode{
 
     protected ViewColumn vc;
-    private DateCode workingCode;
     private DateCode originalCode;
-    private DataType overrideDataType;
+    private DataType originalDataType;
 
     public ColumnAST() {
     }
@@ -68,18 +67,12 @@ public abstract class ColumnAST extends ExtractBaseAST implements EmittableASTNo
         return null;
     }
 
-    public void setWorkingCode(DateCode workingCode) {
-        originalCode = vc.getDateCode();
-        this.workingCode = workingCode;
-    }
-
-    public DateCode getWorkingCode() {
-        return workingCode != null ? workingCode : vc.getDateCode();
-    }
-
     public void restoreDateCode() {
-        if(workingCode != null) {
+        if(overriddenDateCode != null) {
             vc.setDateCode(originalCode);
+        }
+        if(originalDataType != null) {
+            vc.setDataType(originalDataType);
         }
     }
 
@@ -87,16 +80,8 @@ public abstract class ColumnAST extends ExtractBaseAST implements EmittableASTNo
         return vc.getDataType() == DataType.ALPHANUMERIC ? false : true;
     }
 
-    public void setOverrideDataType(DataType overrideDataType) {
-        this.overrideDataType = overrideDataType;
-    }
-
-    public DataType getWorkingDataType() {
-        return (overrideDataType != null) ? overrideDataType : vc.getDataType();
-    }
-
-    public int getMaxNumberOfDigits() {
-        return RepoHelper.getMaxNumberOfDigitsForType(getWorkingDataType(), vc.getFieldLength());
+    protected void saveOriginalDataType() {
+        originalDataType = vc.getDataType();
     }
 
 }

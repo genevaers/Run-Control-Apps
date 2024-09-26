@@ -54,7 +54,7 @@ public class SameTypeChecker extends AssignmentRulesChecker {
          } else {
             //need to strip here as well but know which side and generate warning
             if(vc.getDateCode() != DateCode.NONE) {
-                column.setWorkingCode(DateCode.NONE);
+                column.overrideDateCode(DateCode.NONE);
             }
             if(frhs.getDateCode() != DateCode.NONE) {
                 frhs.overrideDateCode(DateCode.NONE);
@@ -81,7 +81,7 @@ public class SameTypeChecker extends AssignmentRulesChecker {
                 // If the lengths are the same as well then just strip off the content codes
             //}
         frhs.overrideDateCode(DateCode.NONE);
-        column.setWorkingCode(DateCode.NONE);
+        column.overrideDateCode(DateCode.NONE);
     }
 
     @Override

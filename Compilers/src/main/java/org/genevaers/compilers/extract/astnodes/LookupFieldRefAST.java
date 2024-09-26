@@ -1,5 +1,7 @@
 package org.genevaers.compilers.extract.astnodes;
 
+import java.util.Set;
+
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.Cookie;
@@ -39,7 +41,9 @@ import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
 import org.genevaers.repository.components.enums.JustifyId;
+import org.genevaers.repository.jltviews.ExitJoin;
 import org.genevaers.repository.jltviews.JLTView;
+import org.genevaers.repository.jltviews.JLTViewMap;
 import org.genevaers.repository.jltviews.JoinViewsManager;
 import org.genevaers.repository.jltviews.ReferenceJoin;
 
@@ -120,7 +124,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             arg1.setFieldContentId(getDateCode());
             LogicTableArg arg2 = dtl.getArg2();
             flipDataTypeIfFieldAlphanumeric(arg1, arg2);
-            arg2.setFieldContentId(lhs.getWorkingCode());
+            arg2.setFieldContentId(lhs.getDateCode());
             ltEmitter.addToLogicTable((LTRecord)dtl);
         }else if(currentViewColumn.getExtractArea() == ExtractArea.AREACALC) {
             LogicTableF1 ctl = (LogicTableF1) fcf.getCTL(redField, currentViewColumn);
@@ -169,8 +173,21 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     }
 
     private void argFixup(LogicTableArg arg) {
-        ReferenceJoin refJoin = Repository.getJoinViews().getReferenceJLTViews().getJLTView(ref.getLrID(), false);
-        LRField redField = refJoin.getRedLR().findFromFieldsByName(ref.getName());
+        LRField redField = null;
+        //Look in the ref joins 
+        if(Repository.getJoinViews().getReferenceJLTViews() != null) {
+            ReferenceJoin refJoin = Repository.getJoinViews().getReferenceJLTViews().getJLTView(ref.getLrID(), false);
+            if(refJoin != null) {
+                redField = refJoin.getRedLR().findFromFieldsByName(ref.getName());
+            }
+        }
+        if(redField == null) {
+                JLTViewMap<ExitJoin> exitJoins = Repository.getJoinViews().getExitJLTViews();
+                ExitJoin exitj = exitJoins.getJLTView(ref.getLrID(), false);
+                redField = exitj.getRefFields().stream().filter(ele -> ele.getName().equals(ref.getName()))
+                .findFirst()
+                .orElse(null);
+        }
         JoinViewsManager jvm = Repository.getJoinViews();
         arg.setStartPosition(redField.getStartPosition());
         arg.setLogfileId(lookup.getTargetLFID());

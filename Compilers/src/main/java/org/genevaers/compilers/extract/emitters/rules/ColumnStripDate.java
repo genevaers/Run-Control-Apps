@@ -34,7 +34,7 @@ public class ColumnStripDate extends Rule{
         final ViewColumn vc = ((ColumnAST)op1).getViewColumn();
         FormattedASTNode frhs = (FormattedASTNode) op2;
         if(vc.getDateCode() != DateCode.NONE && frhs.getDateCode() == DateCode.NONE) {
-            ((ColumnAST)op1).setWorkingCode(DateCode.NONE);
+            ((ColumnAST)op1).overrideDateCode(DateCode.NONE);
             Repository.addWarningMessage(ExtractBaseAST.makeCompilerMessage(String.format("Removing date from column %d.",vc.getColumnNumber())));
             return RuleResult.RULE_WARNING;
         } else {

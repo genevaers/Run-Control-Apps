@@ -71,7 +71,7 @@ export APPGIT=${env["GERS_GIT_REPO_DIR"]}/Run-Control-Apps
 export APPTRG=RCApps                                                        
 export BASE=$APPGIT/$APPTRG                                                     
 export APP_HOME=$BASE/target                                                    
-export APP_NAME=rcapps-1.1.0_RC3-jar-with-dependencies.jar                      
+export APP_NAME=rcapps-1.1.0_RC4-jar-with-dependencies.jar                      
 export CLASSPATH=$APP_HOME:"$JAVA_HOME"/lib                                     
                                                                                 
 LIBPATH=/lib:/usr/lib:"$JAVA_HOME"/bin                                          
@@ -113,19 +113,19 @@ ${test.runviews}</#if>
 //*
 //*        OUTPUT FILES
 //*
-//VDP      DD DSN=<@qualifiedTest/>.RCG.VDP,
+//VDPNEW   DD DSN=<@qualifiedTest/>.RCG.VDP,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(CYL,(10,10),RLSE),
 //            DCB=(DSORG=PS,RECFM=VB,LRECL=8192,BLKSIZE=0)
 //*
-//JLT      DD DSN=<@qualifiedTest/>.RCG.JLT,
+//JLTNEW   DD DSN=<@qualifiedTest/>.RCG.JLT,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(TRK,(10,10),RLSE),
 //            DCB=(DSORG=PS,RECFM=VB,LRECL=4004,BLKSIZE=32036)
 //*
-//XLT      DD DSN=<@qualifiedTest/>.RCG.XLT,
+//XLTNEW   DD DSN=<@qualifiedTest/>.RCG.XLT,
 //            DISP=(NEW,CATLG,DELETE),
 //            UNIT=SYSDA,
 //            SPACE=(CYL,(10,10),RLSE),

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.astnodes.ASTFactory;
 import org.genevaers.compilers.extract.astnodes.BetweenFunc;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
@@ -150,6 +151,20 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         SkipIfAST sfn = (SkipIfAST)ASTFactory.getNodeOfType(ASTFactory.Type.SKIPIF);
         sfn.addChildIfNotNull(visit(ctx.getChild(2)));
         return sfn; 
+    }
+
+	@Override public ExtractBaseAST visitCastColumnAssignment(GenevaERSParser.CastColumnAssignmentContext ctx) { 
+        //replace the column node with a cast column node
+        CastAST cn = (CastAST) ASTFactory.getNodeOfType(ASTFactory.Type.CAST);
+        DataTypeAST dtn = (DataTypeAST) ASTFactory.getNodeOfType(ASTFactory.Type.DATATYPE);
+        String datattype = ctx.getChild(0).getText();
+        datattype = datattype.substring(1, datattype.length()-1);
+        dtn.setDatatype(datattype);
+        cn.addChildIfNotNull(dtn);
+        
+        ColumnAssignmentASTNode casnode = (ColumnAssignmentASTNode) visit(ctx.columnAssignment());
+        casnode.getChild(1).addChildIfNotNull(cn);
+        return casnode;
     }
 
     //Let's just visit a column node
@@ -703,7 +718,8 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
     }
 
     @Override public ExtractBaseAST visitProcedure(GenevaERSParser.ProcedureContext ctx) {
-        if(ctx.getChild(0).getText().equalsIgnoreCase("PROCEDURE")) {
+        if(ctx.getChild(0).getText().equalsIgnoreCase("PROCEDURE") 
+           || ctx.getChild(0).getText().equalsIgnoreCase("PROC")) {
             procedure = true;
         }
         return visitChildren(ctx); 

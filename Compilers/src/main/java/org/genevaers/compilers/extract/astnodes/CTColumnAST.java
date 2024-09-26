@@ -3,8 +3,13 @@ package org.genevaers.compilers.extract.astnodes;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.LTFileObject;
+import org.genevaers.repository.RepoHelper;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.components.enums.DateCode;
+
+import com.google.common.flogger.FluentLogger;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -24,6 +29,7 @@ import org.genevaers.repository.components.ViewColumn;
  */
 
 public class CTColumnAST extends ColumnAST {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public CTColumnAST(ViewColumn vc) {
         type = ASTFactory.Type.CT_COLUMN;
@@ -60,4 +66,23 @@ public class CTColumnAST extends ColumnAST {
         return fcf.getCTC(value, vc);
     }
 
+    @Override
+    public DataType getDataType() {
+        return DataType.PACKED; //CT cannot be changed
+    }
+
+    @Override
+    public DateCode getDateCode() {
+        return DateCode.NONE;
+    }
+
+    @Override
+    public String getMessageName() {
+        return "CT Column " + vc.getColumnNumber();
+    }
+
+    @Override
+    public int getMaxNumberOfDigits() {
+        return 23;
+    }
 }

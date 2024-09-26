@@ -35,10 +35,15 @@ public class ConstStringToDateColumnError extends Rule{
     public RuleResult apply(final ExtractBaseAST op1, final ExtractBaseAST op2) {
         final ViewColumn vc = ((ColumnAST)op1).getViewColumn();
         FormattedASTNode frhs = (FormattedASTNode) op2;
-        if(vc.getDateCode() != DateCode.NONE && op2.getType() == Type.STRINGATOM) {
-            CompilerMessage err = ExtractBaseAST.makeCompilerMessage(String.format("Cannot assign %s to column %s which has a date code.", frhs.getMessageName(), vc.getColumnNumber()));
+        ColumnAST colAST = (ColumnAST)op1;
+        if(colAST.isNumeric() && op2.getType() == Type.STRINGATOM) {
+            CompilerMessage err = ExtractBaseAST.makeCompilerMessage(String.format("Assign %s to numeric column %s which has a date code.", frhs.getMessageName(), vc.getColumnNumber()));
             Repository.addErrorMessage(err);
-            return RuleResult.RULE_ERROR;
+            return RuleResult.RULE_WARNING;
+        } else if(colAST.getDateCode() != DateCode.NONE && op2.getType() == Type.STRINGATOM) {
+            CompilerMessage warn = ExtractBaseAST.makeCompilerMessage(String.format("Assign %s to column %s which has a date code.", frhs.getMessageName(), vc.getColumnNumber()));
+            Repository.addWarningMessage(warn);
+            return RuleResult.RULE_WARNING;
         } else {
             return RuleResult.RULE_PASSED;
         }

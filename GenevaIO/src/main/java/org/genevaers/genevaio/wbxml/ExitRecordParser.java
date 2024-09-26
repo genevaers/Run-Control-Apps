@@ -59,6 +59,7 @@ public class ExitRecordParser extends RecordParser {
 					break;
 				case "MODULEID":
 					userExit.setExecutable(text);
+					Repository.getProcedures().add(userExit, componentID, text.trim());
 					break;
 				case "EXITTYPECD":
 					userExit.setExitType(ExitType.fromdbcode(text.trim()));

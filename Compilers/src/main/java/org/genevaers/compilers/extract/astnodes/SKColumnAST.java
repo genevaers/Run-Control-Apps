@@ -1,16 +1,19 @@
 package org.genevaers.compilers.extract.astnodes;
 
+import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LogicTableArg;
 import org.genevaers.genevaio.ltfile.LogicTableF1;
 import org.genevaers.genevaio.ltfile.LogicTableF2;
+import org.genevaers.repository.RepoHelper;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.components.enums.DateCode;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -44,8 +47,11 @@ public class SKColumnAST extends ColumnAST {
         currentViewColumn = vc;
         if(getNumberOfChildren() > 0) {
             //Must have a sort title
-            SortTitleAST st = (SortTitleAST)getChildIterator().next();
-            st.emit();
+            ExtractBaseAST c = (ExtractBaseAST)getChild(0);
+            if(c.getType() == ASTFactory.Type.SORTTITLE ) {
+                SortTitleAST st = (SortTitleAST)c;
+                st.emit();
+            }
         }
     }
 
@@ -82,5 +88,24 @@ public class SKColumnAST extends ColumnAST {
         skc.getArg().setFieldLength(sk.getSkFieldLength());
         return skc;
     }
+
+    @Override
+    public DataType getDataType() {
+        return overriddenDataType != DataType.INVALID ? overriddenDataType : skc.getSortKeyDataType();
+    }
+
+    @Override
+    public DateCode getDateCode() {
+        return (overriddenDateCode != null) ? overriddenDateCode : skc.getSortKeyDateTimeFormat();
+    }
+
+    @Override
+    public String getMessageName() {
+        return "Sort Key" + skc.getSequenceNumber();
+    }
     
+    @Override
+    public int getMaxNumberOfDigits() {
+        return RepoHelper.getMaxNumberOfDigitsForType(skc.getSortKeyDataType(), skc.getSkFieldLength());
+    }
 }

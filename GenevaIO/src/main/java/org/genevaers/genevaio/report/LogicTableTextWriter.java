@@ -89,7 +89,7 @@ public class LogicTableTextWriter extends TextRecordWriter {
 			if(n.getFieldNodeType() == FieldNodeType.RECORDPART){
 				writeArg(n, fw);
 			} else {
-				writeField(n, fw);
+				writeField(n, fw, false);
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class LogicTableTextWriter extends TextRecordWriter {
 			if(n.getFieldNodeType() == FieldNodeType.RECORDPART){
 				writeRecord(n, fw);
 			} else {
-				writeField(n, fw);
+				writeField(n, fw, false);
 			}
 		}
 	}

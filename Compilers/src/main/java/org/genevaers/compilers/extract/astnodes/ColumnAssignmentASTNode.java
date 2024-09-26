@@ -76,12 +76,12 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
 
             Iterator<ASTBase> ci = children.iterator();
             ExtractBaseAST rhs = (ExtractBaseAST) ci.next();
-            ColumnAST col = (ColumnAST) ci.next();
+            ColumnAST colnode = (ColumnAST) ci.next();
 
             LookupFieldRefAST lkref = checkForJOINandEmitIfRequired();
 
             rhs = decastRHS(rhs);
-            col = decastColumn(col);
+            ColumnAST col = decastColumn(colnode);
             
             ltEmitter.setSuffixSeqNbr((short) col.getViewColumn().getColumnNumber());
             emitIfNeeded(rhs);
@@ -100,7 +100,6 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
             }
 
             col.emit(); // In case there is a sort title emit
-            //restore in the flipper if needed
             col.restoreDateCode();
         } else {
             //Badly constructed AST - should not get here
@@ -122,12 +121,19 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
             ((EmittableASTNode) rhs).emit();
     }
 
-    private ColumnAST decastColumn(ColumnAST col) {
+    private ColumnAST decastColumn(ColumnAST colnode) {
         // Code does not support casting the column?
-        // if (col instanceof CastAST) {
-        //     col = ((CastAST) col).decast();
-        // }
-        return col;
+        if (colnode.getNumberOfChildren() > 0) {
+            ExtractBaseAST c = (ExtractBaseAST) colnode.getChild(0);
+            if(c.getType() == ASTFactory.Type.CAST) {
+                CastAST castNode = (CastAST)c ;
+                DataTypeAST dtnode = (DataTypeAST) castNode.getChild(0);
+                colnode.saveOriginalDataType();
+                colnode.getViewColumn().setDataType(dtnode.getDatatype());
+                colnode.overrideDataType(dtnode.getDatatype());
+            }
+        }
+        return colnode;
     }
 
     private ExtractBaseAST decastRHS(ExtractBaseAST rhs) {

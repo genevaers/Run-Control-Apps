@@ -190,9 +190,9 @@ public class VDPTextWriter extends TextRecordWriter {
 			case INSTANCE:
 				break;
 			case NEW:
-				return "Added";
+				return "Old    ";
 			case ORIGINAL:
-				return "Missing";
+				return "New    ";
 			case RECIGNORE:
 				return "RCGOnly";
 			case CPPONLY:
@@ -471,7 +471,7 @@ public class VDPTextWriter extends TextRecordWriter {
 			if(n.getParent().getState() == ComparisonState.CPPONLY) {
 				n.setState(ComparisonState.CPPONLY);
 			}
-			writeField(n, fw);
+			writeField(n, fw, compareMode);
 		}
 	}
 

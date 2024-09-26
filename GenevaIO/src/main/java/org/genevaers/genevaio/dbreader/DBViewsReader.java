@@ -178,8 +178,8 @@ public class DBViewsReader extends DBReaderBase {
         vd.setName(rs.getString("NAME"));
         vd.setStatus(ViewStatus.fromdbcode(rs.getString("VIEWSTATUSCD")));
         // + "OUTPUTLRID, "
-        // + "PAGESIZE, "
-        // + "LINESIZE, "
+        vd.setOutputPageSizeMax((short)rs.getInt("PAGESIZE"));
+        vd.setOutputLineSizeMax((short)rs.getInt("LINESIZE"));
         // + "FILEFLDDELIMCD, "
         // + "FILESTRDELIMCD, "
         // + "DELIMHEADERROWIND, "

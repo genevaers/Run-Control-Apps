@@ -124,7 +124,7 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
                 arg.setOrdinalPosition(ref.getOrdinalPosition());
                 LogicTableArg arg2 = ((LogicTableF2)ltEntry).getArg2();
                 flipDataTypeIfFieldAlphanumeric(arg, arg2);
-                arg2.setFieldContentId(lhs.getWorkingCode());
+                arg2.setFieldContentId(lhs.getDateCode());
             }
             arg.setLogfileId(getLtEmitter().getFileId());        
             arg.setFieldContentId(getDateCode());

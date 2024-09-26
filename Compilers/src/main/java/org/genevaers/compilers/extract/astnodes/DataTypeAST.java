@@ -34,7 +34,11 @@ public class DataTypeAST extends ExtractBaseAST {
     }
 
     public DataType getDatatype() {
-        return DataType.fromValue(datatype);
+        if(datatype.equals("ALPHA")) {
+            return DataType.ALPHANUMERIC;
+        } else {
+            return DataType.fromValue(datatype);
+        }
     }    
 
 }

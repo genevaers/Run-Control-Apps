@@ -35,6 +35,7 @@ public class DBReader {
     private DBViewSourceReader viewSourceReader = new DBViewSourceReader();
     private DBViewColumnSourceReader viewColumnSourceReader = new DBViewColumnSourceReader();
     private DBSortKeyReader sortKeyReader = new DBSortKeyReader();
+    private DBHeaderFooter headerFooterReader = new DBHeaderFooter();
     private DBControlRecordReader controlRecordReader = new DBControlRecordReader();
     private DBLookupsReader lookupsReader = new DBLookupsReader();
     private DBLogicalRecordReader logicalRecordReader = new DBLogicalRecordReader();
@@ -76,6 +77,8 @@ public class DBReader {
             logger.atFine().log("View column sources read");
             hasErrors |= sortKeyReader.addToRepo(dbConnection, params);
             logger.atFine().log("Sortkeys read");
+            hasErrors |= headerFooterReader.addToRepo(dbConnection, params);
+            logger.atFine().log("Headers and Footers read");
             hasErrors |= controlRecordReader.addToRepo(dbConnection, params);
             logger.atFine().log("Control records read");
             hasErrors |= lookupsReader.addToRepo(dbConnection, params);
