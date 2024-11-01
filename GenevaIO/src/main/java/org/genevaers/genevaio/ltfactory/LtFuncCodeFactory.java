@@ -1594,11 +1594,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         arg.setValue(new Cookie(v));
         arg.setLogfileId(logFileId);
         arg.setOrdinalPosition(vc.getOrdinalPosition());
-        // if(vc.getDataType() == DataType.ALPHANUMERIC) {
-        //     arg.setJustifyId(JustifyId.LEFT);
-        // } else {
-            arg.setJustifyId(vc.getJustifyId() == null ? JustifyId.NONE : vc.getJustifyId());
-        // }
+        arg.setJustifyId(vc.getJustifyId() == null ? JustifyId.NONE : vc.getJustifyId());
         return arg;
     }
 

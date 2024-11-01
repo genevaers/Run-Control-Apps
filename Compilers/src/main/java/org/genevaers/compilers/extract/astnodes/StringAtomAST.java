@@ -63,7 +63,9 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
             ltr = (LTRecord)fcf.getCTC(value, lhs.getViewColumn());
         } else if(vc.getExtractArea() == ExtractArea.AREADATA) {
             if(lhs.getViewColumn().getFieldLength() > 0) {
-                ltr = (LTRecord)fcf.getDTC(value, lhs.getViewColumn());
+                LogicTableF1 dtc = (LogicTableF1) fcf.getDTC(value, lhs.getViewColumn());
+                dtc.getArg().setFieldContentId(DateCode.NONE);
+                ltr = (LTRecord)dtc;
             }
         } else {
             ViewSortKey sk = Repository.getViews().get(lhs.getViewColumn().getViewId()).getViewSortKeyFromColumnId(lhs.getViewColumn().getComponentId());

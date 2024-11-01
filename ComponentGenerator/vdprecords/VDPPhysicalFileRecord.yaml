@@ -174,8 +174,10 @@ fields:
   component_field: accessMethod
 - name: minimum_length
   type: short
+  component_field: minimumLength
 - name: maximum_length
   type: short
+  component_field: maximumLength
 - name: alloc_dsorg 
   type: integer
   component_field: none

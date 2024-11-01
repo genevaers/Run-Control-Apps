@@ -122,11 +122,12 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             arg1.setLogfileId(lookup.getTargetLFID());
             arg1.setLrId(lookup.getTargetLRID());
             arg1.setFieldId(ref.getComponentId());
-            arg1.setFieldFormat(getDataType());
-            arg1.setFieldContentId(getDateCode());
+            // arg1.setFieldFormat(getDataType());
+            // arg1.setFieldContentId(getDateCode());
             LogicTableArg arg2 = dtl.getArg2();
             flipDataTypeIfFieldAlphanumeric(arg1, arg2);
-            arg2.setFieldContentId(lhs.getDateCode());
+//            arg2.setFieldContentId(lhs.getDateCode());
+            stripDatesIfSame(dtl);
             ltEmitter.addToLogicTable((LTRecord)dtl);
         }else if(currentViewColumn.getExtractArea() == ExtractArea.AREACALC) {
             LogicTableF1 ctl = (LogicTableF1) fcf.getCTL(redField, currentViewColumn);
@@ -253,13 +254,11 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
                         dtc = (LogicTableF1)fcf.getDTC("0", currentViewColumn);
                     }
                     dtc.getArg().setFieldFormat(dtlDataType);
-                    if(currentViewColumn.getDateCode() == ref.getDateTimeFormat()) {
-                        dtc.getArg().setFieldContentId(DateCode.NONE);
-                    } 
                 } else if(lkEntry.getFunctionCode().equals("DTA")) {
                     dtc = (LogicTableF1)fcf.getDTC("0", currentViewColumn);
                     dtc.getArg().setSignedInd(true); //Force signed
                 }
+                dtc.getArg().setFieldContentId(DateCode.NONE);
                 ltEmitter.addToLogicTable((LTRecord)dtc );
                 break;
 
@@ -414,6 +413,12 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
         if(lte.getArg1().getFieldFormat() == lte.getArg2().getFieldFormat() && lte.getArg1().getFieldContentId() == lte.getArg2().getFieldContentId()) {
            lte.getArg1().setFieldContentId(DateCode.NONE);
            lte.getArg2().setFieldContentId(DateCode.NONE);
+        }
+        if(lte.getArg1().getFieldContentId() != DateCode.NONE && lte.getArg2().getFieldContentId() == DateCode.NONE) {
+            lte.getArg1().setFieldContentId(DateCode.NONE);
+        }
+        if(lte.getArg1().getFieldContentId() == DateCode.NONE && lte.getArg2().getFieldContentId() != DateCode.NONE) {
+            lte.getArg2().setFieldContentId(DateCode.NONE);
         }
     }
 }

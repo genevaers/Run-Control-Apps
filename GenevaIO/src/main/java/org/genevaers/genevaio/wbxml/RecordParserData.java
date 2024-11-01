@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.Map.Entry;
 
 import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalFile;
 import org.genevaers.repository.components.LogicalRecord;
@@ -36,6 +37,7 @@ import org.genevaers.repository.components.LookupPathStep;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.ViewSource;
 
 // import com.ibm.safr.we.constants.DateFormat;
@@ -89,14 +91,45 @@ public class RecordParserData {
 					}
 				}
 			}
+			fixupSortKeyTitles(v);
+		}
+	}
+			
+	private static void fixupSortKeyTitles(ViewNode v) {
+		int startPos = 1;
+		Iterator<ViewSortKey> ski = v.getSortKeyIterator();
+		while (ski.hasNext()) {
+			ViewSortKey sk = ski.next();
+			int sktfid = sk.getRtdLrFieldId();
+			if (sktfid > 0) {
+				LRField sktField = Repository.getFields().get(sktfid);
+				sk.setSktStartPosition((short) startPos); // if there is more than one how do we increment this?
+				LogicalRecord sktLr = Repository.getLogicalRecords().get(sktField.getLrID());
+				int indexLength = getIndexLength(sktLr) + 8; //Magic number supposedly for LR and LR id
+				sk.setSktFieldLength((short)indexLength );
+				startPos += indexLength;
+				sk.setDescStartPosition((short) 1);
+				sk.setDescFieldLength(sktField.getLength());
+			}
+		}
+	}
+				
+	private static void fixViewColumnSources(ViewSource vs, int lrid) {
+		Iterator<ViewColumnSource> csi = vs.getIteratorForColumnSourcesByNumber();
+		while (csi.hasNext()) {
+			csi.next().setViewSrcLrId(lrid);
 		}
 	}
 
-	private static void fixViewColumnSources(ViewSource vs, int lrid) {
-		Iterator<ViewColumnSource> csi = vs.getIteratorForColumnSourcesByNumber();
-		while(csi.hasNext()) {
-			csi.next().setViewSrcLrId(lrid);
+	private static int getIndexLength(LogicalRecord sktLr) {
+		int indexLength = 0;
+		Iterator<LRIndex> ndxi = sktLr.getIteratorForIndexBySeq();
+		while (ndxi.hasNext()) {
+			LRIndex ndx = ndxi.next();
+			LRField ndxField = Repository.getFields().get(ndx.getFieldID());
+			indexLength += ndxField.getLength();
 		}
+		return indexLength;
 	}
 
 	public static void lookupfixups() {

@@ -366,7 +366,7 @@ public class LookupEmitter extends CodeEmitter {
             if(key.getDatatype() == DataType.ALPHANUMERIC) {
                 arg.setValue(new Cookie(key.getValue()));
             } else {
-                if(StringUtils.isNumeric(key.getValue())) {
+                if(StringUtils.containsOnly(key.getValue(), "0") == false && StringUtils.isNumeric(key.getValue())) {
                     arg.setValue(new Cookie(key.getValue()));
                 } else {
                     arg.setValue(new Cookie("0"));
