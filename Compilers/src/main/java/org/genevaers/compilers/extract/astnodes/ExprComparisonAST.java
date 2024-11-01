@@ -171,6 +171,7 @@ public class ExprComparisonAST extends ExtractBaseAST implements EmittableASTNod
         emitters.put(new ComparisonKey(ASTFactory.Type.LRFIELD, ASTFactory.Type.LOOKUPFIELDREF), new CFELEmitter());
         emitters.put(new ComparisonKey(ASTFactory.Type.LRFIELD, ASTFactory.Type.PRIORLRFIELD), new CFEPEmitter());
         emitters.put(new ComparisonKey(ASTFactory.Type.LRFIELD, ASTFactory.Type.COLUMNREF), new CFEXEmitter());
+        emitters.put(new ComparisonKey(ASTFactory.Type.LRFIELD, ASTFactory.Type.ALL), new CFECEmitter());
 
         //LHS Lookup
         emitters.put(new ComparisonKey(ASTFactory.Type.LOOKUPFIELDREF, ASTFactory.Type.CALCULATION), new CFLAEmitter());
@@ -183,6 +184,7 @@ public class ExprComparisonAST extends ExtractBaseAST implements EmittableASTNod
         emitters.put(new ComparisonKey(ASTFactory.Type.LOOKUPFIELDREF, ASTFactory.Type.LOOKUPFIELDREF), new CFLLEmitter());
         emitters.put(new ComparisonKey(ASTFactory.Type.LOOKUPFIELDREF, ASTFactory.Type.PRIORLRFIELD), new CFLPEmitter());
         emitters.put(new ComparisonKey(ASTFactory.Type.LOOKUPFIELDREF, ASTFactory.Type.COLUMNREF), new CFLXEmitter());
+        emitters.put(new ComparisonKey(ASTFactory.Type.LOOKUPFIELDREF, ASTFactory.Type.ALL), new CFLCEmitter());
 
         //LHS PRIOR
         emitters.put(new ComparisonKey(ASTFactory.Type.PRIORLRFIELD, ASTFactory.Type.CALCULATION), new CFPAEmitter());
@@ -319,6 +321,7 @@ public class ExprComparisonAST extends ExtractBaseAST implements EmittableASTNod
                 ((LogicTableF2)ltfo).getArg2().setFieldFormat(DataType.ZONED);
                 //flip RHS to Zoned
             }
+            stripDatesIfSame(frmtLhs, frmtRhs);
         }
         //Date mamangement
         //Strip off if equal or only one sided
@@ -362,11 +365,19 @@ public class ExprComparisonAST extends ExtractBaseAST implements EmittableASTNod
                     lhsDate = ((LogicTableF1)ltfo).getArg().getFieldContentId();
                 }
             }
-            if(lhsDate == rhsDate || lhsDate == DateCode.NONE || rhsDate == DateCode.NONE) {
-                ((LogicTableF1)ltfo).getArg().setFieldContentId(DateCode.NONE);
+            //if(lhsDate == rhsDate || lhsDate == DateCode.NONE || rhsDate == DateCode.NONE) {
+            if(lhsDate == DateCode.NONE || rhsDate == DateCode.NONE) {
+                    ((LogicTableF1)ltfo).getArg().setFieldContentId(DateCode.NONE);
             } else if(ds.length() > 0) {
                 ((LogicTableF1)ltfo).getArg().setValue(new Cookie(ds.length(), ds));
             }
+        }
+    }
+
+    private void stripDatesIfSame(FormattedASTNode frmtLhs, FormattedASTNode frmtRhs) {
+        if(frmtLhs.getDataType() == frmtRhs.getDataType() && frmtLhs.getDateCode() == frmtRhs.getDateCode()) {
+           ((LogicTableF2)ltfo).getArg1().setFieldContentId(DateCode.NONE);
+           ((LogicTableF2)ltfo).getArg2().setFieldContentId(DateCode.NONE);
         }
     }
 

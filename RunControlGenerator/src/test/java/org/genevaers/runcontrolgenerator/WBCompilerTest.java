@@ -37,7 +37,6 @@ import org.genevaers.repository.components.enums.ViewType;
 import org.genevaers.repository.data.CompilerMessageSource;
 import org.genevaers.repository.data.ViewLogicDependency.LogicType;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 import org.genevaers.runcontrolgenerator.workbenchinterface.ColumnData;
 import org.genevaers.runcontrolgenerator.workbenchinterface.LRData;
 import org.genevaers.runcontrolgenerator.workbenchinterface.LRFieldData;
@@ -53,6 +52,7 @@ import org.genevaers.runcontrolgenerator.workbenchinterface.WBFormatCalculationC
 import org.genevaers.runcontrolgenerator.workbenchinterface.WBFormatFilterCompiler;
 import org.genevaers.runcontrolgenerator.workbenchinterface.WorkbenchCompiler;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -108,7 +108,7 @@ import com.google.common.flogger.FluentLogger;
 
   @BeforeEach
   public void initEach(TestInfo info) {
-    new RunControlConfigration();
+    GersConfigration.initialise();
     Repository.setGenerationTime(Calendar.getInstance().getTime());
     RecordParser.clearAndInitialise();
     LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
@@ -351,7 +351,6 @@ import com.google.common.flogger.FluentLogger;
 
   @Test  @Disabled
   void testFormatCalculationBad() throws IOException {
-    // new RunControlConfigration();
     ViewData view = makeView(999, "TestView");
     ColumnData cd = makeColumnData(view, 111, 3);
     ViewSourceData vsd = makeViewSource(lrid, view);
@@ -370,7 +369,6 @@ import com.google.common.flogger.FluentLogger;
 
   @Test  @Disabled
   void testFormatFilterBad() throws IOException {
-    new RunControlConfigration();
     ViewData view = makeView(999, "TestView");
     view.setFormatFilter("SKIPIF(COL.1 < ! and COL.3 > 5)");
     ViewSourceData vsd = makeViewSource(lrid, view);

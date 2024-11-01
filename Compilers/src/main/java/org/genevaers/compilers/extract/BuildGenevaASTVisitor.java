@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.astnodes.ASTFactory;
+import org.genevaers.compilers.extract.astnodes.AllAST;
 import org.genevaers.compilers.extract.astnodes.BetweenFunc;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 import org.genevaers.genevaio.dataprovider.CompilerDataProvider;
@@ -39,13 +39,11 @@ import org.genevaers.compilers.extract.astnodes.ColumnRefAST;
 import org.genevaers.compilers.extract.astnodes.DataTypeAST;
 import org.genevaers.compilers.extract.astnodes.DateFunc;
 import org.genevaers.compilers.extract.astnodes.EffDateValue;
-import org.genevaers.compilers.extract.astnodes.ErrorAST;
 import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.compilers.extract.astnodes.FiscaldateAST;
 import org.genevaers.compilers.extract.astnodes.IfAST;
-import org.genevaers.compilers.extract.astnodes.IsFoundAST;
 import org.genevaers.compilers.extract.astnodes.LFAstNode;
 import org.genevaers.compilers.extract.astnodes.LeftASTNode;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
@@ -76,12 +74,12 @@ import org.genevaers.compilers.extract.astnodes.WriteSourceArg;
 import org.genevaers.compilers.extract.astnodes.WriteSourceNode;
 import org.genevaers.grammar.GenevaERSBaseVisitor;
 import org.genevaers.grammar.GenevaERSParser;
-import org.genevaers.grammar.GenevaERSParser.EffDateContext;
+import org.genevaers.grammar.GenevaERSParser.ArithExprContext;
 import org.genevaers.grammar.GenevaERSParser.ExprArithFactorContext;
 import org.genevaers.grammar.GenevaERSParser.ExprArithTermContext;
 import org.genevaers.grammar.GenevaERSParser.LrFieldContext;
 import org.genevaers.grammar.GenevaERSParser.StmtContext;
-import org.genevaers.grammar.GenevaERSParser.SymbollistContext;
+import org.genevaers.grammar.GenevaERSParser.StringExprContext;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
@@ -176,7 +174,14 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         casnode.setCharPostionInLine(eq.getSymbol().getCharPositionInLine());
         TerminalNode c = ctx.COLUMN();
         if(c.getSymbol().getType() == GenevaERSParser.COLUMN) {
-            casnode.addChildIfNotNull(visitChildren(ctx));
+            ArithExprContext ae = ctx.arithExpr();
+            StringExprContext se = ctx.stringExpr();
+            if(ae != null) {
+                casnode.addChildIfNotNull(visit(ae));
+            }
+            if(se != null) {
+                casnode.addChildIfNotNull(visit(se));
+            }
             ViewNode view = dataProvider.getView(viewColumnSource.getViewId());
             ColumnAST colNode = (ColumnAST)ASTFactory.getColumnNode(view.getColumnByID(viewColumnSource.getColumnID())); // Change this to make column type more specific
             colNode.setViewColumn(view.getColumnByID(viewColumnSource.getColumnID()));
@@ -200,7 +205,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             String[] bits = col.split("\\.");
             ViewNode view = dataProvider.getView(viewSource.getViewId());
             int colnum = Integer.parseInt(bits[1]);
-            if(colnum > 0 && colnum < viewColumnSource.getColumnNumber()) {
+            if(colnum > 0 && colnum <= viewColumnSource.getColumnNumber()) {
                 ViewColumn vc = view.getColumnNumber(colnum); 
                 ColumnAST colNode = (ColumnAST)ASTFactory.getColumnNode(vc); // Change this to make column type more specific
                 colNode.setViewColumn(vc);
@@ -289,8 +294,6 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         return fnd;
      }
   
-  
-
     public ExtractBaseAST visitADataSource(GenevaERSParser.ADataSourceContext ctx) {
         return this.visitChildren(ctx);
      }
@@ -879,6 +882,13 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         btw.addChildIfNotNull(visit(ctx.getChild(4)));
         return btw;
      }
+
+     @Override public ExtractBaseAST  visitAll(GenevaERSParser.AllContext ctx) { 
+        AllAST allAst = null;
+        allAst = (AllAST) ASTFactory.getNodeOfType(ASTFactory.Type.ALL);
+        allAst.setValue(ctx.string().getText().replace("\"", ""));
+        return allAst ; 
+    }
 
     public void setViewColumnSource(ViewColumnSource viewColumnSource) {
         this.viewColumnSource = viewColumnSource;

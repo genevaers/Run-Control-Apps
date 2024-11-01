@@ -1,4 +1,4 @@
 name: "Regression Tests"
-templateSet: "gvbrcgtoPE.yaml"
+templateSet: "gvbrcatoPE.yaml"
 specs:
   - "PeTests/Format/SELIF.yaml"

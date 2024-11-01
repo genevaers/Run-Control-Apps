@@ -1,6 +1,6 @@
 specFileSets:
   - name: "Regression Tests"
-    templateSetName: "gvbrcgtoPE.yaml"
+    templateSetName: "gvbrcatoPE.yaml"
     specs:
       - "PeTests/Assignment/BIGASS.yaml"
       - "PeTests/Comparison/Integer/CMIALL.yaml"
@@ -28,7 +28,7 @@ specFileSets:
       - "PeTests/FormatReports/NEWP2.yaml"
       - "PeTests/Format/NEWP3.yaml"
   - name: "Error cases"
-    templateSetName: "gvbrcgtoPEError.yaml"
+    templateSetName: "gvbrcatoPEError.yaml"
     specs:
       - "PeTests/Format/OVERFLW.yaml"
 

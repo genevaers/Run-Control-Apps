@@ -8,23 +8,21 @@ import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.logging.Level;
 
-import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.format.FormatAST2Dot;
 import org.genevaers.compilers.format.astnodes.FormatBaseAST;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
-import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.calculationstack.CalcStack;
 import org.genevaers.repository.calculationstack.CalcStackEntry;
 import org.genevaers.repository.calculationstack.CalcStack.CalcStackOpcode;
 import org.genevaers.repository.components.ViewNode;
-import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
 import org.genevaers.runcontrolgenerator.compilers.FormatRecordsBuilder;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
+
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -62,6 +60,8 @@ class RunFormatCompilerTest extends RunCompilerBase {
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(RunFormatCompilerTest.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
 

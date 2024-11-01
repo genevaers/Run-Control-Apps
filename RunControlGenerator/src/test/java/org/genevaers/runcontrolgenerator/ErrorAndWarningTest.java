@@ -22,8 +22,8 @@ import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.data.CompilerMessage;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -68,6 +68,8 @@ class ErrorAndWarningTest extends RunCompilerBase {
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(ErrorAndWarningTest.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
 

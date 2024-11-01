@@ -24,13 +24,12 @@ package org.genevaers.runcontrolgenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Set;
 
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.IdsReader;
 import org.genevaers.utilities.ParmReader;
 import org.genevaers.utilities.IdsReader.IDS_RESULT;
@@ -38,41 +37,37 @@ import org.genevaers.utilities.IdsReader.IDS_RESULT;
 public class ParmReaderTest {
 
     @Test public void testReadParm() throws IOException {
+        GersConfigration.clear();;
+        GersConfigration.initialise();
         ParmReader pr = new ParmReader();
-        RunControlConfigration rcc = new RunControlConfigration();
-        //Maybe allow overwrite from args later
-        pr.setConfig(rcc);
-        pr.populateConfigFrom(TestHelper.getTestParmName());
+        pr.populateConfigFrom(TestHelper.TEST_PARM);
         assertEquals(ParmReader.PARM_RESULT.OK,  pr.getResult());
     }
 
     @Test public void testWBXMLInput() throws IOException {
-        TestHelper.writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n");
+        GersConfigration.clear();;
+        GersConfigration.initialise();
+        TestHelper.writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n");
         ParmReader pr = new ParmReader();
-        RunControlConfigration rcc = new RunControlConfigration();
-        //Maybe allow overwrite from args later
-        pr.setConfig(rcc);
-        pr.populateConfigFrom(TestHelper.getTestParmName());
-        assertEquals("WBXML", rcc.getInputType());
+        pr.populateConfigFrom(GersConfigration.getParmFileName());
+        assertEquals("WBXML", GersConfigration.getValue(GersConfigration.INPUT_TYPE));
     }
 
     @Test public void testWBXMLInputWithComment() throws IOException {
-        TestHelper.writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML     #Cam be WBXML, DB2, VDPXML\n");
+        GersConfigration.clear();;
+        GersConfigration.initialise();
+        TestHelper.writeToParm(GersConfigration.INPUT_TYPE + "=WBXML     #Cam be WBXML, DB2, VDPXML\n");
         ParmReader pr = new ParmReader();
-        RunControlConfigration rcc = new RunControlConfigration();
-        //Maybe allow overwrite from args later
-        pr.setConfig(rcc);
-        pr.populateConfigFrom(TestHelper.getTestParmName());
-        assertEquals("WBXML", rcc.getInputType());
+        pr.populateConfigFrom(GersConfigration.getParmFileName());
+        assertEquals("WBXML", GersConfigration.getValue(GersConfigration.INPUT_TYPE));
     }
 
     @Test public void testWBXMLInputWithIgnoreParm() throws IOException {
+        GersConfigration.clear();;
+        GersConfigration.initialise();
         TestHelper.writeToParm("Banana=WBXML     #Cam be WBXML, DB2, VDPXML\n");
         ParmReader pr = new ParmReader();
-        RunControlConfigration rcc = new RunControlConfigration();
-        //Maybe allow overwrite from args later
-        pr.setConfig(rcc);
-        pr.populateConfigFrom(TestHelper.getTestParmName());
+        pr.populateConfigFrom(GersConfigration.getParmFileName());
         assertEquals(ParmReader.PARM_RESULT.WARN_IGNORED,  pr.getResult());
     }
 

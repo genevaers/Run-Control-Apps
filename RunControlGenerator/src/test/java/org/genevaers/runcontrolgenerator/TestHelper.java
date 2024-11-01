@@ -17,7 +17,8 @@ import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.FileType;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
+import org.genevaers.utilities.ParmReader;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -40,7 +41,8 @@ public class TestHelper {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	public static final String TEST_RESOURCES = "./src/test/resources";
-	public static final String TEST_PARMNAME = "./src/test/resources/MR91ParmTest";
+	public static final String TEST_PARMNAME = "target/RCAPARM";
+	public static final String TEST_PARM = "./src/test/resources/MR91ParmTest";
 	public static final String TEST_DBVIEWS = "./src/test/resources/DBVIEWS";
 	public static final String TEST_DB2PARM = "./src/test/resources/MR91ParmDB2";
 	public static final String TEST_REPORTNAME = "./target/MR91Report";
@@ -105,14 +107,15 @@ public class TestHelper {
     public static final String SKT_LOOKUP = "SKTandExtractRef[9977].xml";
 
 	private static Path resoucesPath = Paths.get(TEST_RESOURCES);
-	private static Path targetPath = Paths.get("target");
+	private static Path targetPath = Paths.get("target/test");
 
-	private static Path wbxmliPath = resoucesPath.resolve("WBXMLI");
+	private static Path wbxmliPath = targetPath.resolve("WBXMLI");
 
 	private static int vcscompid = 1;
 
 	public static void writeToParm(String parms) {
-		writeStringToFile(parms, TEST_PARMNAME);
+        GersConfigration.setCurrentWorkingDirectory(TestHelper.targetPath.toString());
+		writeStringToFile(parms, GersConfigration.getParmFileName());
 	}
 
 	public static void writeToIds(String parms) {
@@ -132,31 +135,32 @@ public class TestHelper {
 	}
 
 	public static File getReport() {
-		return new File(TEST_REPORTNAME);
+		return new File(GersConfigration.getReportFileName());
 	}
 
 	public static File getLog() {
-		return new File(TEST_LOGNAME);
+		return new File(GersConfigration.getLogFileName());
 	}
 
 	public static File getXLT() {
-		return new File(TEST_XLT);
+		return new File(GersConfigration.getXLTFileName());
 	}
 
 	public static File getJLT() {
-		return new File(TEST_JLT);
+		return new File(GersConfigration.getXLTFileName());
 	}
 
 	public static void setupWithBaseView() {
 		try {
+			GersConfigration.setCurrentWorkingDirectory(TestHelper.targetPath.toString());
 			wbxmliPath.toFile().mkdirs();
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(TEST_BASEFILE).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
-			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
-			gendir.mkdirs();
+			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n"
+					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+			ParmReader pr = new ParmReader();
+			pr.populateConfigFrom(GersConfigration.getParmFileName());
 		} catch (IOException e) {
 			logger.atSevere().log("setupWithBaseView failed %s", e.getMessage());
 		}
@@ -168,8 +172,8 @@ public class TestHelper {
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(ONE_COL).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n"
+					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
 		} catch (IOException e) {
@@ -183,8 +187,8 @@ public class TestHelper {
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(SELECTIF).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
+			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n"
+					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
 		} catch (IOException e) {
@@ -195,16 +199,16 @@ public class TestHelper {
 	public static void setupWithView(String xml) {
 		try {
 			deleteOutputFiles();
+			GersConfigration.setCurrentWorkingDirectory(TestHelper.targetPath.toString());
 			wbxmliPath.toFile().mkdirs();
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(xml).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n"
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n"
-					+ RunControlConfigration.EMIT_ENABLED + "=Y" + "\n"
-					+ RunControlConfigration.DOT_JLT + "=Y" + "\n");
-			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
-			gendir.mkdirs();
+			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n"
+					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n"
+					+ GersConfigration.DOT_JLT + "=Y" + "\n");
+			ParmReader pr = new ParmReader();
+			pr.populateConfigFrom(GersConfigration.getParmFileName());
 		} catch (IOException e) {
 			logger.atSevere().log("setupWithView failed %s", e.getMessage());
 		}
@@ -217,13 +221,12 @@ public class TestHelper {
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(xml).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(RunControlConfigration.INPUT_TYPE + "=WBXML\n" 
-					+ RunControlConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n" 
-					+ RunControlConfigration.EMIT_ENABLED + "=N" + "\n" 
-					+ RunControlConfigration.DOT_XLT + "=Y" + "\n" 
-					+ RunControlConfigration.DOT_JLT + "=Y" + "\n" 
-					+ RunControlConfigration.VIEW_DOTS + "=" + views + "\n" 
-					+ RunControlConfigration.COLUMN_DOTS + "=" + columnFilter + "\n");
+			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n" 
+					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n" 
+					+ GersConfigration.DOT_XLT + "=Y" + "\n" 
+					+ GersConfigration.DOT_JLT + "=Y" + "\n" 
+					+ GersConfigration.VIEW_DOTS + "=" + views + "\n" 
+					+ GersConfigration.COLUMN_DOTS + "=" + columnFilter + "\n");
 			File gendir = new File(TEST_RUNCONTROLS_RCGGEN);
 			gendir.mkdirs();
 		} catch (IOException e) {
@@ -376,11 +379,11 @@ public class TestHelper {
     }
 
 	public static void deleteOutputFiles() {
-		File xlt = new File(TEST_XLT);
+		File xlt = new File(GersConfigration.getXLTFileName());
 		xlt.delete();
-		File vdp = new File(TEST_VDP);
+		File vdp = new File(GersConfigration.getVDPFileName());
 		vdp.delete();
-		File jlt = new File(TEST_JLT);
+		File jlt = new File(GersConfigration.getJLTFileName());
 		jlt.delete();
 	}
 

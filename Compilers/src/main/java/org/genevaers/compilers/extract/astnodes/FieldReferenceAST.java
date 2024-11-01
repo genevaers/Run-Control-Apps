@@ -118,18 +118,29 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
             if(vc.getExtractArea() == ExtractArea.AREACALC) {
                 arg = ((LogicTableF1)ltEntry).getArg();
                 arg.setFieldFormat(getDataType());
+                arg.setFieldContentId(getDateCode());
+            } else if(vc.getExtractArea() == ExtractArea.SORTKEY) {
+                arg = ((LogicTableF2)ltEntry).getArg1();
+                stripDatesIfSame(((LogicTableF2)ltEntry));
             } else {
                 arg = ((LogicTableF2)ltEntry).getArg1();
                 arg.setFieldFormat(getDataType());
+                arg.setFieldContentId(getDateCode());
                 arg.setOrdinalPosition(ref.getOrdinalPosition());
                 LogicTableArg arg2 = ((LogicTableF2)ltEntry).getArg2();
                 flipDataTypeIfFieldAlphanumeric(arg, arg2);
                 arg2.setFieldContentId(lhs.getDateCode());
             }
             arg.setLogfileId(getLtEmitter().getFileId());        
-            arg.setFieldContentId(getDateCode());
         }
         return ltEntry;
+    }
+
+    private void stripDatesIfSame(LogicTableF2 lte) {
+        if(lte.getArg1().getFieldFormat() == lte.getArg2().getFieldFormat() && lte.getArg1().getFieldContentId() == lte.getArg2().getFieldContentId()) {
+           lte.getArg1().setFieldContentId(DateCode.NONE);
+           lte.getArg2().setFieldContentId(DateCode.NONE);
+        }
     }
 
     @Override

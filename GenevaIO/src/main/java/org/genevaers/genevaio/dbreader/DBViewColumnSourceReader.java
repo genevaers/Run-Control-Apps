@@ -60,6 +60,7 @@ public class DBViewColumnSourceReader extends DBReaderBase{
             vcs.setViewId(rs.getInt("VIEWID"));
             vcs.setSourceType(ColumnSourceType.values()[rs.getInt("SOURCETYPEID")]);
             vcs.setSrcValue(rs.getString("CONSTVAL"));
+            vcs.setValueLength(rs.getString("CONSTVAL").length());
             vcs.setSrcJoinId(rs.getInt("LOOKUPID"));
             vcs.setViewSrcLrFieldId(rs.getInt("LRFIELDID"));
             //We now need to support sort key titles

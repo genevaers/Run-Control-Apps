@@ -169,9 +169,9 @@ public class RCAFrameworkHTMLWriter {
 
 
 	private DomContent grcgreport() {
-		return a().withText("RCGRPT")
+		return a().withText("RCARPT")
 				.withClass(MENU_CLASS)
-				.withHref("../RCGRPT")
+				.withHref("../RCARPT")
 				.withTarget(PAGE_IFRAME);
 	}
 

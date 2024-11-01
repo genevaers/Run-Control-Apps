@@ -76,11 +76,11 @@ public class LookupRecordParser extends BaseParser {
 			case "KEYFIELD":
 				seqNum = Integer.parseInt(attributes.getValue("seq"));
 				lookupKey = new LookupPathKey();
-				lookupKey.setStepNumber((short)stepNumber);
+				lookupKey.setStepNumber(stepNumber);
 				lookupKey.setComponentId(lookup.getID());
 				lookupKey.setDateTimeFormat(DateCode.NONE);
 				lookupKey.setJustification(JustifyId.LEFT);
-				lookupKey.setKeyNumber(seqNum);
+				lookupKey.setKeyNumber((short)seqNum);
 				lookupStep.addKey(lookupKey);
 				break;
 			case "FIELDREF":

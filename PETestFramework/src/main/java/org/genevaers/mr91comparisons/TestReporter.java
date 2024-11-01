@@ -68,7 +68,7 @@ public class TestReporter {
 	 */
 	private static final String LOCALROOT = "LOCALROOT";
 	private static final String COMPARISON_SOURCE = "MR91CMPSRC"; // DB or WBXML
-	private static final String COMPARISON_TARGET = "MR91CMPTRG"; // MR91DBXML, MR91WBXMLXML, or gvbrcg
+	private static final String COMPARISON_TARGET = "MR91CMPTRG"; // MR91DBXML, MR91WBXMLXML, or gvbrca
 	private static final String TEST_MR91REPORT_FTL = "test/mr91report.ftl";
 	
 	// These should really be done view view source!!!!
@@ -191,7 +191,7 @@ public class TestReporter {
 
 	/**
 	 * Take the (WBXML or DB) view(or flow) 
-	 * and compare it to the target (MR91XML (or gvbrcg) Generated data) <p>
+	 * and compare it to the target (MR91XML (or gvbrca) Generated data) <p>
 	 * Compare the VDP/XLT/JLT <p>
 	 * A pass is generated if all items match.
 	*/

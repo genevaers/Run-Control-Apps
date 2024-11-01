@@ -2,7 +2,7 @@
 name: "MyView"
 title: "Big Bang Assignment Tests"
 description: "Assignment tests to a type by row"
-category: "gvbrcg"
+category: "gvbrca"
 cq: ""
 note: ""
 tests:
@@ -11,4 +11,4 @@ tests:
   description: "Let's see what it does"
   source: "WBXML"
   xmlfiles:
-  - name: "gvbrcg/blah[12076].xml"
+  - name: "gvbrca/blah[12076].xml"

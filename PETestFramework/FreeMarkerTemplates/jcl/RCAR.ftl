@@ -76,10 +76,10 @@ THRUCOL=${env.THRUCOL}
 //REFRENVV DD DSN=<@qualifiedTest/>.PARM(REGRR95E),
 //            DISP=SHR
 //*
-//MR95VDP  DD DSN=<@qualifiedTest/>.RCG.VDP,
+//MR95VDP  DD DSN=<@qualifiedTest/>.RCA.VDP,
 //            DISP=SHR
 //*
-//REFRLTBL DD DSN=<@qualifiedTest/>.RCG.JLT,
+//REFRLTBL DD DSN=<@qualifiedTest/>.RCA.JLT,
 //            DISP=SHR
 //*
 //*        INPUT REFERENCE FILES

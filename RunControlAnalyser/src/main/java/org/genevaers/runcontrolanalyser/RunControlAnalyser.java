@@ -47,7 +47,6 @@ public class RunControlAnalyser {
 	private LogicTable jlt;
 	private Path trg;
 	private VDPManagementRecords vmrs;
-	private ReportWriter report = new ReportWriter();
 	private FlowGenerator flowGen;
 
 	private Path viewsPath;

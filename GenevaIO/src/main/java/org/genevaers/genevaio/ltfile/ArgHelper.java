@@ -20,8 +20,7 @@ import java.lang.reflect.Array;
  */
 
 
-import java.nio.ByteBuffer;
-
+import org.apache.commons.lang3.StringUtils;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
@@ -67,11 +66,22 @@ public class ArgHelper {
         arg.setLogfileId(key.getTargetlfid());
         arg.setLrId(key.getSourceLrId());
         arg.setSignedInd(key.isSigned());
-        //TODO the start pos is dependent on extract type
         arg.setStartPosition(key.getStartPosition());
         arg.setFieldLength(key.getFieldLength());
         arg.setJustifyId(key.getJustification());
-        arg.setValue(new Cookie(key.getValue()));
+        //Should check if the key value is compatible with the field data type
+        //if all spaces correct to a 0 for numeric and generate a warning
+        if(key.getValue().startsWith(" ") && key.getDatatype() != DataType.ALPHANUMERIC) {
+            arg.setValue(new Cookie("0"));
+        } else {
+            //Strip leading 0s for numeric data types
+            //This should be a more general function
+            if(key.getDatatype() != DataType.ALPHANUMERIC && key.getValue().startsWith("0")) {
+                arg.setValue(new Cookie(StringUtils.stripStart(key.getValue(), "0")));
+            } else {
+                arg.setValue(new Cookie(key.getValue()));
+            }
+        }
         arg.setPadding2("");  //This seems a little silly
     }
 

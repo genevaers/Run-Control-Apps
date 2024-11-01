@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.base.EmittableASTNode;
+import org.genevaers.genevaio.ltfile.Cookie;
 import org.genevaers.genevaio.ltfile.LogicTableF0;
 import org.genevaers.genevaio.ltfile.LogicTableGeneration;
 import org.genevaers.genevaio.ltfile.LogicTableHD;
@@ -135,13 +136,11 @@ public class GenevaERSJoinsRoot extends ExtractBaseAST implements EmittableASTNo
     public void zeroRecordCount() {
         LogicTableNameValue setc = new LogicTableNameValue();
         setc.setTableName("lRecordCount");
-        setc.setValue("0");
+        setc.setValue(new Cookie("0"));
         setc.setRecordType(LtRecordType.NAMEVALUE);
         setc.setFunctionCode("SETC");
         ltEmitter.setSuffixSeqNbr((short)1);
         setc.setCompareType(LtCompareType.EQ);
-        setc.setValue("0");
-        setc.setValueLength(1);
         ltEmitter.addToLogicTable(setc);
     }
 

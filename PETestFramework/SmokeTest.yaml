@@ -1,5 +1,5 @@
 specFileSets:
   - name: "Regression Tests"
-    templateSetName: "gvbrcgtoPE.yaml"
+    templateSetName: "gvbrcatoPE.yaml"
     specs:
       - "PeTests/Arithmetic/BIGART.yaml" 

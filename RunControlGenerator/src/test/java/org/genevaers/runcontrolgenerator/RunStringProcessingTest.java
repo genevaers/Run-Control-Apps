@@ -14,14 +14,15 @@ import org.genevaers.compilers.extract.astnodes.ASTFactory;
 import org.genevaers.compilers.extract.astnodes.ErrorAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
+import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
 import org.genevaers.genevaio.ltfile.LogicTableF1;
-import org.genevaers.genevaio.ltfile.LogicTableNameValue;
 import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.enums.LtCompareType;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -67,6 +68,8 @@ class RunStringProcessingTest extends RunCompilerBase {
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(RunCompilerTest.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
 
@@ -260,6 +263,15 @@ class RunStringProcessingTest extends RunCompilerBase {
         String[] expected = new String[]{ "SFXP" };
         int expectedGotos[][] = {{4,5,7}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+    }
+
+    @Test void testAll() {
+        LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, 
+        "IF {Description} = ALL(\"\\xFF\")  THEN COLUMN = 9 ELSE COLUMN = 3 ENDIF");
+        String[] expected = new String[]{ "CFEC" };
+        int expectedGotos[][] = {{4,5,7}};
+        TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+        System.out.println(LTLogger.logRecords(xlt));
     }
 
     //Note there is no col.2 - so this will fail once we get there

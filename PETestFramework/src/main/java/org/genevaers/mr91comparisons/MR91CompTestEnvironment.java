@@ -85,7 +85,7 @@ public class MR91CompTestEnvironment {
 		getEnvVarOrDefault("MR91ENV", "308");
 		getEnvVarOrDefault("MR91SCHEMA", "SAFRWBGD");
 		getEnvVarOrDefault("MR91CMPSRC", "CPPMR91");
-		getEnvVarOrDefault("MR91CMPTRG", "gvbrcg");
+		getEnvVarOrDefault("MR91CMPTRG", "gvbrca");
 		getEnvVarOrDefault("EXTRACT_TRACE", "N");
 	}
 

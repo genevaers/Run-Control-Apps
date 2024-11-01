@@ -23,7 +23,7 @@ package org.genevaers.runcontrolgenerator.repositorybuilders;
 import org.genevaers.genevaio.dbreader.DBReader;
 import org.genevaers.genevaio.dbreader.DatabaseConnection.DbType;
 import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.Status;
 
 public class PostgresBuilder implements RepositoryBuilder{
@@ -34,12 +34,12 @@ public class PostgresBuilder implements RepositoryBuilder{
     @Override
     public Status run() {
 		DatabaseConnectionParams conParams = new DatabaseConnectionParams();
-		conParams.setDatabase(RunControlConfigration.getParm(RunControlConfigration.DB_DATABASE));
+		conParams.setDatabase(GersConfigration.getParm(GersConfigration.DB_DATABASE));
 		conParams.setDbType(DbType.POSTGRES);
-		conParams.setEnvironmentID(RunControlConfigration.getParm(RunControlConfigration.ENVIRONMENT_ID));
-		conParams.setPort(RunControlConfigration.getParm(RunControlConfigration.DB_PORT));
-		conParams.setServer(RunControlConfigration.getParm(RunControlConfigration.DB_SERVER));
-		conParams.setSchema(RunControlConfigration.getParm(RunControlConfigration.DB_SCHEMA));
+		conParams.setEnvironmentID(GersConfigration.getParm(GersConfigration.ENVIRONMENT_ID));
+		conParams.setPort(GersConfigration.getParm(GersConfigration.DB_PORT));
+		conParams.setServer(GersConfigration.getParm(GersConfigration.DB_SERVER));
+		conParams.setSchema(GersConfigration.getParm(GersConfigration.DB_SCHEMA));
 		conParams.setUsername(System.getenv("PG_USERID"));
 		conParams.setPassword(System.getenv("PG_PASSWORD"));
 		DBReader dbr = new DBReader();

@@ -21,6 +21,7 @@ package org.genevaers.compilers.extract.astnodes;
 import org.genevaers.compilers.extract.emitters.arithmeticemitters.ArithDataTypeCheckerFactory;
 import org.genevaers.compilers.extract.emitters.arithmeticemitters.ArithEmitter;
 import org.genevaers.compilers.extract.emitters.arithmeticemitters.ArithEmitterFactory;
+import org.genevaers.genevaio.ltfile.Cookie;
 import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.ltfile.LogicTableName;
@@ -110,8 +111,7 @@ public class NumericAccumulator extends AccumulatorAST{
         LogicTableNameValue addc = new LogicTableNameValue();
         addc.setRecordType(LtRecordType.NAMEVALUE);
         addc.setFunctionCode("ADDC");
-        addc.setValue("1");
-        addc.setValueLength(1);
+        addc.setValue(new Cookie("1"));
         addc.setTableName(getAccumulatorName());
         addc.setCompareType(LtCompareType.EQ);
         addc.setSuffixSeqNbr((short)accumNumber);

@@ -96,7 +96,8 @@ public class ASTFactory {
         LEFT("Left"),
         SUBSTR("Substring"), 
         ISFOUND("Is Found"),
-        ISNOTFOUND("Is Not Found"),
+        ISNOTFOUND("Is Not Found"), 
+        ALL("ALL")
         ;
 
         private String name;
@@ -250,6 +251,8 @@ public class ASTFactory {
                 return new StatementList();
             case STATEMENT:
                 return new Statement();
+            case ALL:
+                return new AllAST();
             default:
                 return null;
         }

@@ -23,7 +23,7 @@ package org.genevaers.runcontrolgenerator.repositorybuilders;
 
 import org.genevaers.genevaio.vdpxml.VDPXMLSaxIterator;
 import org.genevaers.repository.data.InputReport;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.Status;
 
 import com.google.common.flogger.FluentLogger;
@@ -52,7 +52,7 @@ public class VDPXMLBuilder extends XMLBuilder{
 
     @Override
     protected String getXMLDirectory() {
-        return RunControlConfigration.getVDPXMLDirectory();
+        return GersConfigration.VDP_XML_FILES_SOURCE;
     }
     
 }

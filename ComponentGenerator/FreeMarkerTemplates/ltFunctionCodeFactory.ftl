@@ -13,6 +13,7 @@ import org.genevaers.genevaio.ltfile.LogicTableArg;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewSortKey;
 
 /**
  * Factory functions to get the left and right hand side Arithmetic Emitters

@@ -37,6 +37,8 @@ import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LogicalFile;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
+import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
@@ -139,22 +141,23 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             arg1.setFieldFormat(redField.getDatatype());
             arg1.setStartPosition(redField.getStartPosition());
             arg1.setFieldLength(redField.getLength());
+            arg1.setSignedInd(redField.isSigned());
             arg1.setDecimalCount(redField.getNumDecimalPlaces());
             arg1.setOrdinalPosition(currentViewColumn.getOrdinalOffset());
             arg1.setJustifyId(JustifyId.RIGHT);
             arg1.setValue(new Cookie(""));
             ltEmitter.addToLogicTable((LTRecord)ctl);
         } else {
-            LogicTableF2 skl = (LogicTableF2) fcf.getSKL(redField, currentViewColumn);
+            ViewSortKey sk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+            LogicTableF2 skl = (LogicTableF2) fcf.getSKL(redField, currentViewColumn, sk);
             skl.getArg1().setLogfileId(lookup.getTargetLFID());
             LogicTableArg arg1 = skl.getArg1();
             arg1.setLogfileId(lookup.getTargetLFID());
             arg1.setLrId(lookup.getTargetLRID());
             arg1.setFieldId(ref.getComponentId());
-            arg1.setFieldFormat(getDataType());
-            arg1.setFieldContentId(getDateCode());
             LogicTableArg skarg2 = skl.getArg2();
             flipDataTypeIfFieldAlphanumeric(arg1, skarg2);
+            stripDatesIfSame(skl);
             ltEmitter.addToLogicTable((LTRecord)skl);
         }
         return null;
@@ -255,6 +258,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
                     } 
                 } else if(lkEntry.getFunctionCode().equals("DTA")) {
                     dtc = (LogicTableF1)fcf.getDTC("0", currentViewColumn);
+                    dtc.getArg().setSignedInd(true); //Force signed
                 }
                 ltEmitter.addToLogicTable((LTRecord)dtc );
                 break;
@@ -269,11 +273,16 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             case INVALID:
                 break;
             case SORTKEY:
-                if (currentViewColumn.getDataType() == DataType.ALPHANUMERIC) {
-                    ltEmitter.addToLogicTable((LTRecord) fcf.getSKC(" ", currentViewColumn));
+                ViewSortKey sk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+                DataType dtlDataType = ((LogicTableF2)lkEntry).getArg2().getFieldFormat();
+                LogicTableF1 skc;
+                if (dtlDataType == DataType.ALPHANUMERIC) {
+                    skc = (LogicTableF1) fcf.getSKC(" ", currentViewColumn, sk);
                 } else {
-                    ltEmitter.addToLogicTable((LTRecord) fcf.getSKC("0", currentViewColumn));
+                    skc = (LogicTableF1) fcf.getSKC("0", currentViewColumn, sk);
                 }
+                skc.getArg().setFieldFormat(((LogicTableF2)lkEntry).getArg2().getFieldFormat());
+                ltEmitter.addToLogicTable((LTRecord) skc);
                 break;
             case SORTKEYTITLE:
                 break;
@@ -399,5 +408,12 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     @Override
     public int getMaxNumberOfDigits() {
         return RepoHelper.getMaxNumberOfDigitsForType(getDataType(), ref.getLength());
+    }
+
+    private void stripDatesIfSame(LogicTableF2 lte) {
+        if(lte.getArg1().getFieldFormat() == lte.getArg2().getFieldFormat() && lte.getArg1().getFieldContentId() == lte.getArg2().getFieldContentId()) {
+           lte.getArg1().setFieldContentId(DateCode.NONE);
+           lte.getArg2().setFieldContentId(DateCode.NONE);
+        }
     }
 }

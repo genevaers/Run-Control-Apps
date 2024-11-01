@@ -17,14 +17,11 @@ package org.genevaers.genevaio.ltfile;
  * under the License.
  */
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Iterator;
 
 import org.genevaers.repository.components.enums.DataType;
-import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.GersFile;
 
 import com.google.common.flogger.FluentLogger;
@@ -155,7 +152,7 @@ public class LTLogger {
 				LogicTableF1 j = (LogicTableF1) ltr;
 				LogicTableArg arg = j.getArg();
 				return(String.format(LEAD2GOTOS,
-										leadin + String.format(JOIN, j.getColumnId(), arg.getValue().getString(), arg.getLogfileId(), arg.getLrId()),
+										leadin + String.format(JOIN, j.getColumnId(), arg.getValue().getPrintString(), arg.getLogfileId(), arg.getLrId()),
 										getGotos(ltr)));
 			case "LUSM":
 				return(String.format(LEAD2GOTOS, leadin, getGotos(ltr)));
@@ -213,19 +210,22 @@ public class LTLogger {
 			case "MULC":
 			case "DIVC":
 				LogicTableNameValue setc = (LogicTableNameValue) ltr;
-				return(String.format(ACCUMASSIGNMENT, leadin, setc.getTableName(), setc.getValue()));
+				return(String.format(ACCUMASSIGNMENT, leadin, setc.getTableName(), setc.getValue().getPrintString()));
 			case "SETA":
 				LogicTableNameValue seta = (LogicTableNameValue) ltr;
-				return(String.format(ACCUMAOP, leadin, seta.getTableName(), "<-", seta.getValue()));
+				return(String.format(ACCUMAOP, leadin, seta.getTableName(), "<-", seta.getValue().getPrintString()));
 			case "ADDA":
 				LogicTableNameValue adda = (LogicTableNameValue) ltr;
-				return(String.format(ACCUMAOP, leadin, adda.getTableName(), "/", adda.getValue()));
+				return (String.format(ACCUMAOP, leadin, adda.getTableName(), "/", adda.getValue().getPrintString()));
+			case "SUBA":
+				LogicTableNameValue suba = (LogicTableNameValue) ltr;
+				return (String.format(ACCUMAOP, leadin, suba.getTableName(), "-", suba.getValue().getPrintString()));
 			case "DIVA":
 				LogicTableNameValue diva = (LogicTableNameValue) ltr;
-				return(String.format(ACCUMAOP, leadin, diva.getTableName(), "/", diva.getValue()));
+				return(String.format(ACCUMAOP, leadin, diva.getTableName(), "/", diva.getValue().getPrintString()));
 			case "MULA":
 				LogicTableNameValue mula = (LogicTableNameValue) ltr;
-				return(String.format(ACCUMAOP, leadin, mula.getTableName(), "*", mula.getValue()));
+				return(String.format(ACCUMAOP, leadin, mula.getTableName(), "*", mula.getValue().getPrintString()));
 			case "SETE":
 			case "ADDE":
 			case "DIVE":
@@ -235,16 +235,16 @@ public class LTLogger {
 				return(String.format(ARITHOP, leadin, getFullArg(se.getArg()), se.getAccumulatorName()));
 			case "DTA":
 				LogicTableNameF1 dta = (LogicTableNameF1) ltr;
-				return(String.format(ACCUM2COLUMN, leadin, dta .getAccumulatorName(), getArgDetails(dta.getArg())));
+				return(String.format(ACCUM2COLUMN, leadin, dta .getAccumulatorName(), getColArgDetails(dta.getArg())));
 			case "CTA":
 				LogicTableNameF1 ct = (LogicTableNameF1) ltr;
 				return(String.format(CTASSIGNMENT, leadin, ct.getAccumulatorName()));
 			case "CTC":
 				LogicTableF1 ctc = (LogicTableF1) ltr;
-				return(String.format(CTASSIGNMENT, leadin, ctc.getArg().getValue().getString()));
+				return(String.format(CTASSIGNMENT, leadin, ctc.getArg().getValue().getPrintString()));
 			case "CTE":
 				LogicTableF1 cte = (LogicTableF1) ltr;
-				return(String.format(CTASSIGNMENT, leadin, getArgDetails(cte.getArg()) ));
+				return(String.format(CTASSIGNMENT, leadin, getColArgDetails(cte.getArg()) ));
 			case "WRSU": {
 				LogicTableWR wr = (LogicTableWR) ltr;
 				if(wr.getOutputFileId() == 0) {
@@ -273,10 +273,10 @@ public class LTLogger {
 			case "DTC":
 			case "SKC":
 				LogicTableF1 dtc = (LogicTableF1) ltr;
-				return(String.format(CONSTASSIGNMENT, leadin, getArgConst(dtc.getArg()), getArgDetails(dtc.getArg())));
+				return(String.format(CONSTASSIGNMENT, leadin, getArgConst(dtc.getArg()), getColArgDetails(dtc.getArg())));
 			case "FNCC":
 				LogicTableNameF2 nf2 = (LogicTableNameF2) ltr;
-				return(String.format(FNCC, leadin, nf2.getArg1().getValue().getString(), nf2.getArg2().getValue().getString(), "DaysBetween", nf2.getAccumulatorName()));
+				return(String.format(FNCC, leadin, nf2.getArg1().getValue().getPrintString(), nf2.getArg2().getValue().getPrintString(), "DaysBetween", nf2.getAccumulatorName()));
 			default: {
 				switch (ltr.getRecordType()) {
 					case RE:
@@ -291,7 +291,7 @@ public class LTLogger {
 						return(leadin + " \"" + f1.getArg().getValue().getPrintString() + "\"");
 					case F2:
 						LogicTableF2 f2 = (LogicTableF2) ltr;
-						return(String.format(ASSIGNMENT, leadin, getFullArg(f2.getArg1()), getArgDetails(f2.getArg2())));
+						return(String.format(ASSIGNMENT, leadin, getFullArg(f2.getArg1()), getColArgDetails(f2.getArg2())));
 					default:
 						return(leadin + " More details?");
 				}
@@ -301,7 +301,7 @@ public class LTLogger {
 
 	private static Object getLKLRInfo(LTRecord ltr) {
 		LogicTableF1 lklr = (LogicTableF1) ltr;
-		return String.format("%d/%d %d -> \"%s\"", lklr.getArg().getLogfileId(), lklr.getArg().getLrId(), lklr.getColumnId(), lklr.getArg().getValue().getString());
+		return String.format("%d/%d %d -> \"%s\"", lklr.getArg().getLogfileId(), lklr.getArg().getLrId(), lklr.getColumnId(), lklr.getArg().getValue().getPrintString());
 	}
 
 	private static String getViewLine(LTRecord ltr) {
@@ -359,6 +359,26 @@ public class LTLogger {
 	private static String getArgDetails(LogicTableArg a) {
 		return String.format(ARGVALUES, a.getStartPosition(), a.getFieldLength(), getDataTypeLetter(a.getFieldFormat()),
 				a.isSignedInd() ? "S" : "U", a.getRounding(), a.getDecimalCount(), a.getFieldContentId());
+	}
+
+	private static String getColArgDetails(LogicTableArg a) {
+		return String.format(ARGVALUES, a.getStartPosition(), a.getFieldLength(), getDataTypeLetter(a.getFieldFormat()),
+				a.isSignedInd() ? "S" : "U", a.getRounding(), a.getDecimalCount(), a.getFieldContentId() + getAlignmentLetter(a));
+	}
+
+	private static String getAlignmentLetter(LogicTableArg a) {
+		switch (a.getJustifyId()) {
+			case LEFT:
+				return " L";
+			case CENTER:
+				return " C";
+			case NONE:
+				return " N";
+			case RIGHT:
+				return " R";
+			default:
+				return " N";
+		}
 	}
 
 	private static String getArgKeyDetails(LogicTableArg a) {

@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 
 
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,13 +35,13 @@ import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewSource;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 import org.genevaers.runcontrolgenerator.repositorybuilders.RepositoryBuilder;
 import org.genevaers.runcontrolgenerator.repositorybuilders.RepositoryBuilderFactory;
 import org.genevaers.runcontrolgenerator.singlepassoptimiser.LogicGroup;
 import org.genevaers.runcontrolgenerator.singlepassoptimiser.SinglePassOptimiser;
 import org.genevaers.runcontrolgenerator.singlepassoptimiser.ViewSourceWrapper;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.ParmReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +76,8 @@ public class SPOTests {
         RecordParser.clearAndInitialise();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(RunCompilerTest.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
     
@@ -220,15 +221,14 @@ public class SPOTests {
 
     private void readConfigAndBuildRepo() {
         pr = new ParmReader();
-        pr.setConfig(new RunControlConfigration());
-        try {
-            pr.populateConfigFrom(TestHelper.getTestParmName());
+        // try {
+            pr.populateConfigFrom(GersConfigration.getParmFileName());
             Repository.clearAndInitialise();
             RepositoryBuilder rb = RepositoryBuilderFactory.get();
             rb.run();
-        } catch (IOException e) {
-			logger.atSevere().log("readConfigAndBuildRepo error %s", e.getMessage());
-        }
+        // } catch (IOException e) {
+		// 	logger.atSevere().log("readConfigAndBuildRepo error %s", e.getMessage());
+        // }
     }
 
     private void assertLogicGroupViewSourceNumber(LogicGroup lg, int vsNumber) {

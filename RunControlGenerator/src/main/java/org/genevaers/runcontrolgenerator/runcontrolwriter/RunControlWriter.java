@@ -31,8 +31,8 @@ import org.genevaers.genevaio.vdpfile.VDPGenerationRecord;
 import org.genevaers.genevaio.vdpfile.VDPManagementRecords;
 import org.genevaers.genevaio.vdpfile.record.VDPRecord;
 import org.genevaers.repository.Repository;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.Status;
 
 import com.google.common.flogger.FluentLogger;
@@ -41,6 +41,7 @@ public class RunControlWriter {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private LogicTable extractLogicTable;
     private LogicTable joinLogicTable;
+    private Status status = Status.OK;
 
     private int numVDPRecords;
 
@@ -54,16 +55,17 @@ public class RunControlWriter {
         LTWriter jltw = new LTWriter();
         try {
             logger.atInfo().log("Write Join Logic Table");
-            jltw.write(joinLogicTable, Paths.get(RunControlConfigration.getJLTFileName()));
+            jltw.write(joinLogicTable, Paths.get(GersConfigration.getJLTFileName()));
             jltw.close();
             logger.atInfo().log("Write Extract Logic Table");
-            xltw.write(extractLogicTable, Paths.get(RunControlConfigration.getXLTFileName()));
+            xltw.write(extractLogicTable, Paths.get(GersConfigration.getXLTFileName()));
             xltw.close();
         } catch (IOException e) {
             logger.atSevere().log("LT write failed %s", e.getMessage());
+            status = Status.ERROR;
         }
         VDPFileWriter vdpw = new VDPFileWriter();
-        vdpw.open(RunControlConfigration.getVdpFileName());
+        vdpw.open(GersConfigration.getVDPFileName());
         VDPManagementRecords vmrs = makeVDPManagementRecords();
         try {
             vdpw.writeVDPFrom(vmrs);
@@ -72,8 +74,9 @@ public class RunControlWriter {
             logger.atInfo().log("VDP Written");
         } catch (Exception e) {
             logger.atSevere().log("VDP write failed %s", e.getMessage());
+            status = Status.ERROR;
         }
-        return Status.OK;
+        return status;
 	}
 
     private VDPManagementRecords makeVDPManagementRecords() {
@@ -107,7 +110,7 @@ public class RunControlWriter {
         gen.setDate(dateFormat.format(dt));
         gen.setRunDate(dateFormat1.format(dt));
         gen.setTime(timeFormat.format(dt));
-        gen.setDescription("Java MR91 via " + RunControlConfigration.getInputType());
+        gen.setDescription("Java MR91 via " + GersConfigration.getInputType());
         gen.setPadding4("");
         gen.setPadding5("");
         setNumberNode(gen);
@@ -130,7 +133,7 @@ public class RunControlWriter {
     }
 
     private void setNumberNode(VDPGenerationRecord gen) {
-        if(RunControlConfigration.isNumberModeStandard()) {
+        if(GersConfigration.isNumberModeStandard()) {
             gen.setMaxDecimalDigits((byte)23);
             gen.setMaxDecimalPlaces((byte)8);
         } else {

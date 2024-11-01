@@ -68,9 +68,7 @@ public abstract class ColumnAST extends FormattedASTNode implements EmittableAST
     }
 
     public void restoreDateCode() {
-        if(overriddenDateCode != null) {
-            vc.setDateCode(originalCode);
-        }
+
         if(originalDataType != null) {
             vc.setDataType(originalDataType);
         }

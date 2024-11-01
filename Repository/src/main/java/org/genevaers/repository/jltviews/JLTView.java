@@ -36,6 +36,7 @@ import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupType;
+import org.genevaers.repository.components.OutputFile;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewDefinition;
@@ -44,6 +45,7 @@ import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.ColumnSourceType;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
+import org.genevaers.repository.components.enums.FileType;
 import org.genevaers.repository.components.enums.JustifyId;
 import org.genevaers.repository.components.enums.OutputMedia;
 import org.genevaers.repository.components.enums.ViewStatus;
@@ -195,10 +197,12 @@ public class JLTView {
     }
 
     private void setupViewOutputFile(ViewNode vn, String ddname) {
-        vn.getOutputFile().setComponentId(vn.getID());
-        vn.getOutputFile().setName("PF Generated for " + ddname);
-        vn.getOutputFile().setOutputDDName(ddname);
-        vn.getOutputFile().setLogicalFilename("LF Generated for " + ddname);
+        OutputFile vnopf = vn.getOutputFile();
+        vnopf.setComponentId(vn.getID());
+        vnopf.setName("PF Generated for " + ddname);
+        vnopf.setOutputDDName(ddname);
+        vnopf.setLogicalFilename("LF Generated for " + ddname);
+        vnopf.setFileType(FileType.DISK);
     }
 
     private void addPaddingIfNeeded(short genStartPos, ViewSource vs) {

@@ -1,5 +1,7 @@
 package org.genevaers.genevaio.ltfactory;
 
+import java.text.DateFormat;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008
  * 
@@ -92,6 +94,10 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         accumMap.clear();
     }
 
+    public void setAccumName(String accumName) {
+        this.accumName = accumName;
+    }
+
     @Override
     public LTFileObject getADDA(String accum, String rhsAccum) {
         LogicTableNameValue adda = makeNameValueFromAccum(rhsAccum, "ADDA");
@@ -141,8 +147,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
     @Override
     public LTFileObject getCFAA(String accum, String rhsAccum, String op) {
         LogicTableNameValue cfac = makeNameValueFromAccum(accum, "CFAA");
-        cfac.setValue(rhsAccum);
-        cfac.setValueLength(rhsAccum.length());
+        cfac.setValue(new Cookie(rhsAccum));
         cfac.setTableName(accum);
         cfac.setCompareType(getCompareType(op));
         return cfac; 
@@ -151,8 +156,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
     @Override
     public LTFileObject getCFAC(String accum, String rhs, String op) {
         LogicTableNameValue cfac = makeNameValueFromAccum(accum, "CFAC");
-        cfac.setValue(rhs);
-        cfac.setValueLength(rhs.length());
+        cfac.setValue(new Cookie(rhs));
         cfac.setTableName(accum);
         cfac.setCompareType(getCompareType(op));
         return cfac; 
@@ -193,8 +197,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
     @Override
     public LTFileObject getCFCA(String accum, String val, String op) {
         LogicTableNameValue cfca = makeNameValueFromAccum(accum, "CFCA");
-        cfca.setValue(val);
-        cfca.setValueLength(val.length());
+        cfca.setValue(new Cookie(val));
         cfca.setTableName(accum);
         cfca.setCompareType(getCompareType(op));
         return cfca; 
@@ -685,9 +688,6 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         dtc.setFunctionCode("DTC");
         LogicTableArg arg = getArgFromValueAndColumn(v, vc);
         dtc.setRecordType(LtRecordType.F1);
-        //TODO this can rise as a common function
-        //These may be at adder level
-        //Prefix is not a separate object so each record type needs the set
         dtc.setViewId(vc.getViewId());
         dtc.setColumnId(vc.getComponentId());
         dtc.setSuffixSeqNbr((short)vc.getColumnNumber());
@@ -969,6 +969,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         lkc.setRecordType(LtRecordType.F1);
         lkc.setFunctionCode("LKC");
         LogicTableArg arg = new LogicTableArg();
+        arg.setFieldContentId(DateCode.NONE);
         lkc.setArg(arg);
         return lkc;
     }
@@ -1397,50 +1398,43 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
     }
 
     @Override
-    public LTFileObject getSKC(String v, ViewColumn vc) {
-        LogicTableF1 dtc = new LogicTableF1();
-        dtc.setFunctionCode("SKC");
-        LogicTableArg arg = getArgFromValueAndColumn(v, vc);
-        dtc.setRecordType(LtRecordType.F1);
-        //TODO this can rise as a common function
-        //These may be at adder level
-        //Prefix is not a separate object so each record type needs the set
-        dtc.setViewId(vc.getViewId());
-        dtc.setColumnId(vc.getComponentId());
-        dtc.setSuffixSeqNbr((short)vc.getColumnNumber());
-        dtc.setArg(arg);
-        dtc.setCompareType(LtCompareType.EQ);
-        return dtc;
+    public LTFileObject getSKC(String v, ViewColumn vc, ViewSortKey sk) {
+        LogicTableF1 skc = new LogicTableF1();
+        skc.setFunctionCode("SKC");
+        LogicTableArg arg = getArgFromValueAndSortkKey(v, sk);
+        skc.setRecordType(LtRecordType.F1);
+        skc.setViewId(vc.getViewId());
+        skc.setColumnId(vc.getComponentId());
+        skc.setSuffixSeqNbr((short)vc.getColumnNumber());
+        skc.setArg(arg);
+        skc.setCompareType(LtCompareType.EQ);
+        arg.setFieldContentId(DateCode.NONE);
+        return skc;
     }
 
     @Override
-    public LTFileObject getSKE(LRField f, ViewColumn vc) {
-        LogicTableF2 ske = makeF2FromFieldAndColumn(f, vc);
+    public LTFileObject getSKE(LRField f, ViewColumn vc, ViewSortKey sk) {
+        LogicTableF2 ske = makeF2FromFieldAndSortkey(f, vc, sk);
         ske.setFunctionCode("SKE");
-        ViewSortKey sk = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
-        LogicTableArg arg2 = ske.getArg2();
-        arg2.setFieldLength(sk.getSkFieldLength());
-        arg2.setFieldFormat(sk.getSortKeyDataType());
-        arg2.setJustifyId(JustifyId.NONE);
         return ske;
     }
 
     @Override
-    public LTFileObject getSKL(LRField f, ViewColumn vc) {
-        LogicTableF2 skl = makeF2FromFieldAndColumn(f, vc);
+    public LTFileObject getSKL(LRField f, ViewColumn vc, ViewSortKey sk) {
+        LogicTableF2 skl = makeF2FromFieldAndSortkey(f, vc, sk);
         skl.setFunctionCode("SKL");
         return skl;
     }
 
     @Override
-    public LTFileObject getSKP(LRField f, ViewColumn vc) {
+    public LTFileObject getSKP(LRField f, ViewColumn vc, ViewSortKey sk) {
         LogicTableF2 skp = makeF2FromFieldAndColumn(f, vc);
         skp.setFunctionCode("SKP");
         return skp;
     }
 
     @Override
-    public LTFileObject getSKX(ViewColumn c, ViewColumn v) {
+    public LTFileObject getSKX(ViewColumn c, ViewColumn v, ViewSortKey sk) {
         LogicTableF2 skx = new LogicTableF2();
         skx.setArg1(getColumnArg(c));
         skx.setArg2(getColumnArg(v));
@@ -1572,11 +1566,11 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         colarg.setFieldContentId(vc.getDateCode());
         colarg.setFieldFormat(vc.getDataType());
         colarg.setFieldId(0);
-        //TODO the start pos is dependent on extract type
         colarg.setStartPosition(vc.getExtractAreaPosition());
+        //TODO the start pos is dependent on extract type
         colarg.setOrdinalPosition(vc.getOrdinalPosition());
         if(vc.getExtractArea() == ExtractArea.AREACALC) {
-            colarg.setFieldLength((short)12);
+             colarg.setFieldLength((short)12);
         } else {
             colarg.setFieldLength(vc.getFieldLength());
         }
@@ -1600,12 +1594,38 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         arg.setValue(new Cookie(v));
         arg.setLogfileId(logFileId);
         arg.setOrdinalPosition(vc.getOrdinalPosition());
-        if(vc.getDataType() == DataType.ALPHANUMERIC) {
-            arg.setJustifyId(JustifyId.LEFT);
-        } else {
+        // if(vc.getDataType() == DataType.ALPHANUMERIC) {
+        //     arg.setJustifyId(JustifyId.LEFT);
+        // } else {
             arg.setJustifyId(vc.getJustifyId() == null ? JustifyId.NONE : vc.getJustifyId());
-        }
+        // }
         return arg;
+    }
+
+    private LogicTableArg getArgFromValueAndSortkKey(String v, ViewSortKey sk) {
+        LogicTableArg skarg = getArgFromSortkKey(sk);
+        skarg.setValue(new Cookie(v));
+        return skarg;
+    }
+
+    private LogicTableArg getArgFromSortkKey(ViewSortKey sk) {
+        LogicTableArg skarg = new LogicTableArg(); //This is the column data
+        skarg.setDecimalCount(sk.getSkDecimalCount());
+        skarg.setFieldContentId(sk.getSortKeyDateTimeFormat());
+        skarg.setFieldFormat(sk.getSortKeyDataType());
+        skarg.setFieldId(0);
+        skarg.setStartPosition(sk.getSkStartPosition());
+        skarg.setOrdinalPosition(sk.getSkOrdinalPosition());
+        skarg.setFieldLength(sk.getSkFieldLength());
+        skarg.setSignedInd(sk.isSortKeySigned());
+        skarg.setPadding2("");  //This seems a little silly
+        skarg.setLogfileId(0);
+        if(sk.getSortKeyDataType() == DataType.ALPHANUMERIC) {
+            skarg.setJustifyId(JustifyId.LEFT);
+        } else {
+            skarg.setJustifyId(sk.getSkJustifyId() == null ? JustifyId.NONE : sk.getSkJustifyId());
+        }
+        return skarg;
     }
 
     private LogicTableF2 makeF2FromFieldAndColumn(LRField f, ViewColumn vc) {
@@ -1624,6 +1644,27 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         dte.setArg2(getColumnArg(vc));
         dte.setCompareType(LtCompareType.EQ);
         return dte;
+    }
+
+    private LogicTableF2 makeF2FromFieldAndSortkey(LRField f, ViewColumn vc, ViewSortKey sk) {
+        LogicTableF2 f2 = new LogicTableF2();
+        // want a function to get a populated arg from the field
+        LogicTableArg arg1 = getArgFromField(f);
+        f2.setRecordType(LtRecordType.F2);
+        //TODO this can rise as a common function
+        //These may be at adder level
+        f2.setViewId(vc.getViewId());
+        f2.setColumnId(vc.getComponentId());
+        f2.setSuffixSeqNbr((short)vc.getColumnNumber());
+
+        f2.setArg1(arg1);
+        
+        LogicTableArg arg2 = getArgFromSortkKey(sk);
+        f2.setArg2(arg2);
+        f2.setCompareType(LtCompareType.EQ);
+        arg2.setValue(new Cookie(""));
+
+        return f2;
     }
 
     private LogicTableF2 makeF2FromColumnAndField(ViewColumn vc, LRField f) {
@@ -1709,8 +1750,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
         arithfn.setRecordType(LtRecordType.NAMEVALUE);
         arithfn.setFunctionCode(fc);
         arithfn.setTableName(accumName);
-        arithfn.setValue(accum);
-        arithfn.setValueLength(accum.length()); //More to think of here for Cookies
+        arithfn.setValue(new Cookie(accum));
         arithfn.setCompareType(LtCompareType.EQ);
         return arithfn;
     }

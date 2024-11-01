@@ -31,13 +31,16 @@ import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
 
-public class CalculationAST  extends FormattedASTNode implements Assignable, CalculationSource, EmittableASTNode{
+public class CalculationAST  extends FormattedASTNode implements Assignable, CalculationSource, EmittableASTNode{   
 
     private String accName;
     private int accumulatorNumber;
 
     public CalculationAST() {
         type = ASTFactory.Type.CALCULATION;
+        if(accName == null) {
+            generateAccumulatorName();
+        }
     }
 
     @Override
@@ -51,10 +54,11 @@ public class CalculationAST  extends FormattedASTNode implements Assignable, Cal
         
         // Need to recurse here without the name if our children are Calculation nodes
         checkAndRecursIfCalcluationChildrenFound();
-        if(accName == null) {
-            generateAccumulatorName();
-            ltEmitter.addToLogicTable((LTRecord)LtFactoryHolder.getLtFunctionCodeFactory().getDIMN());
-        }
+//        if(accName == null) {
+//            generateAccumulatorName();
+        LtFactoryHolder.getLtFunctionCodeFactory().setAccumName(accName);
+        ltEmitter.addToLogicTable((LTRecord)LtFactoryHolder.getLtFunctionCodeFactory().getDIMN());
+//        }
         emitChildNodes();
     }
 

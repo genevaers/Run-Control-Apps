@@ -8,7 +8,9 @@ import org.genevaers.genevaio.ltfile.LogicTableArg;
 import org.genevaers.genevaio.ltfile.LogicTableF2;
 import org.genevaers.genevaio.ltfile.LogicTableNameF1;
 import org.genevaers.repository.RepoHelper;
+import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
@@ -107,7 +109,8 @@ public class ColumnRefAST extends FormattedASTNode implements CalculationSource,
                 arg1.setJustifyId(JustifyId.LEFT);
             }
         } else {
-            ltEmitter.addToLogicTable((LTRecord)fcf.getSKX(vc, currentViewColumn));
+            ViewSortKey sk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+            ltEmitter.addToLogicTable((LTRecord)fcf.getSKX(vc, currentViewColumn, sk));
         }
         return null;
     }

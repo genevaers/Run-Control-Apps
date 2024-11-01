@@ -1,8 +1,6 @@
 package org.genevaers.runcontrolgenerator;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -17,7 +15,6 @@ import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.FileType;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.

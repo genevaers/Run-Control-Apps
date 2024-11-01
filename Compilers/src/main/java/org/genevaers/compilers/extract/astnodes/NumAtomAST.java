@@ -20,6 +20,9 @@ package org.genevaers.compilers.extract.astnodes;
 
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
+
+import java.math.BigDecimal;
+
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.LTFileObject;
@@ -40,13 +43,9 @@ public class NumAtomAST extends FormattedASTNode  implements GenevaERSValue, Ass
     }
 
     public void setValue(String numString) {
-        if(numString.equals("0.00000000")) {
-            numStr = numString; //Just to keep the C++ comparison sweet for the moment
-        } else {
-            numStr = stripLeadingingZeros(numString);
-            numStr = stripTrailingZeros(numStr);
-            value = Float.parseFloat(numString);
-        }
+        BigDecimal strippedVal = new BigDecimal(numString).stripTrailingZeros();
+        value = strippedVal.floatValue();
+        numStr = strippedVal.toPlainString();
     }
 
     private String stripLeadingingZeros(String numString) {
@@ -105,11 +104,8 @@ public class NumAtomAST extends FormattedASTNode  implements GenevaERSValue, Ass
         } else if(col.getViewColumn().getExtractArea() == ExtractArea.AREADATA) {
             ltEmitter.addToLogicTable((LTRecord)fcf.getDTC(numStr, col.getViewColumn()));
         } else {
-            LTRecord ltr = (LTRecord)fcf.getSKC(numStr, col.getViewColumn());
             ViewSortKey sk = Repository.getViews().get(col.getViewColumn().getViewId()).getViewSortKeyFromColumnId(col.getViewColumn().getComponentId());
-            LogicTableArg arg = ((LogicTableF1)ltr).getArg();
-            arg.setFieldLength(sk.getSkFieldLength());
-            arg.setStartPosition(sk.getSkStartPosition());
+            LTRecord ltr = (LTRecord)fcf.getSKC(numStr, col.getViewColumn(), sk);
             ltEmitter.addToLogicTable(ltr);
         }
         return null;

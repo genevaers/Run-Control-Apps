@@ -20,7 +20,7 @@ under the License.
 	<Name>RUN</Name>
 	<Title>Test Java MR91</Title>
 	<Description>Keep making the underlying XML more complicated</Description>
-	<Category>PeTests/gvbrcg</Category>
+	<Category>PeTests/gvbrca</Category>
 	<CQ>Ignore me</CQ>
 	<Note>Add something if you want</Note>
 	<Tests>

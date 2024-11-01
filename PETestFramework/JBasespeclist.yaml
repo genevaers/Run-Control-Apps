@@ -1,6 +1,6 @@
 specFileSets:
   - name: "Regression Tests"
-    templateSetName: "gvbrcgtoPE.yaml"
+    templateSetName: "gvbrcatoPE.yaml"
     specs:
       - "PeTests/Assignment/BIGASS.yaml"
       - "PeTests/Comparison/Integer/CMIALL.yaml"

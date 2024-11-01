@@ -25,6 +25,7 @@ import java.util.List;
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
+import org.genevaers.genevaio.report.ReportWriter;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.data.CompilerMessage;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
@@ -35,16 +36,14 @@ import org.genevaers.runcontrolgenerator.runcontrolwriter.RunControlWriter;
 import org.genevaers.runcontrolgenerator.singlepassoptimiser.LogicGroup;
 import org.genevaers.runcontrolgenerator.singlepassoptimiser.SinglePassOptimiser;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
+import org.genevaers.utilities.IdsReader;
 import org.genevaers.utilities.Status;
 
 import com.google.common.flogger.FluentLogger;
 
 public class RunControlGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-
-	//RunControlConfigration rcc;
-	private FileWriter reportWriter;
-	private ReportWriter report = new ReportWriter();
 
 	private Status status = Status.OK;
 
@@ -57,7 +56,7 @@ public class RunControlGenerator {
 
 	public Status runFromConfig() {
 		GenevaLog.writeHeader("Run Control Generator");
-
+        Repository.setRunviews(IdsReader.getIdsFrom(GersConfigration.RUNVIEWS));
 		if(buildComponentRepositoryFromSelectedInput() != Status.ERROR) {
 			logger.atInfo().log("Repository populated");
 			Repository.fixupMaxHeaderLines();
@@ -71,7 +70,7 @@ public class RunControlGenerator {
 			Repository.addErrorMessage(new CompilerMessage(0, null, 0, 0, 0, "Failed to build the component repository"));
 			logger.atSevere().log("Failed to build the component repository. No run control files will be written");
 		}
-		report.write();
+		ReportWriter.setRCGStatus(status);
 		return status;
 	}
 
@@ -85,9 +84,9 @@ public class RunControlGenerator {
 			rcw.setExtractLogicTable(extractLogicTable);
 			rcw.setJoinLogicTable(joinLogicTable);
 			status = rcw.run();
-			report.setNumJLTRecordsWritten(joinLogicTable.getNumberOfRecords());
-			report.setNumXLTRecordsWritten(extractLogicTable.getNumberOfRecords());
-			report.setNumVDPRecordsWritten(rcw.getNumVDPRecordsWritten());
+			ReportWriter.setNumJLTRecordsWritten(joinLogicTable.getNumberOfRecords());
+			ReportWriter.setNumXLTRecordsWritten(extractLogicTable.getNumberOfRecords());
+			ReportWriter.setNumVDPRecordsWritten(rcw.getNumVDPRecordsWritten());
 		} else {
 			logger.atSevere().log("There were errors. No run control files will be written");
 		}

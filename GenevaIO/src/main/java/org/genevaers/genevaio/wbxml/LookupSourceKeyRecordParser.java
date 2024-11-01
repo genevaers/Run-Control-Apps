@@ -93,7 +93,7 @@ public class LookupSourceKeyRecordParser extends RecordParser {
 					lookupKey.setDateTimeFormat(DateCode.NONE);
 					lookupKey.setJustification(JustifyId.NONE);
 					lookupKey.setFieldId(lrfieldid);
-					lookupKey.setKeyNumber(seqNum);
+					lookupKey.setKeyNumber((short)seqNum);
 					if(lookupStepId != currentStepId) {
 						currentKeyList = new ArrayList<LookupPathKey>();
 						currentStepId = lookupStepId;

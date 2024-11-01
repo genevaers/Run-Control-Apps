@@ -1,22 +1,22 @@
 <#assign aDateTime = .now>
 <#assign aDate = aDateTime?date>
 <#assign aTime = aDateTime?time>
-~RCGRPT
+~RCARPT
  
 GenevaERS - The Single-Pass Optimization Engine
 (https://genevaers.org)
 Licensed under the Apache License, Version 2.0
 Performance Engine for z/OS - Base Product
-Release PM PM4.18.00 D
+Release PM ${peversion}
  
-Program ID:      GVBRCG
-Program Title:   Run-Control File Generator
-Built:           ${rcgversion}
+Program ID:      GVBRCA (${rcaversion})
+Program Title:   Run-Control App
+Built:           ${buildtimestamp}
  
 Executed:        ${aDate} : ${aTime}
  
-Report DD Name:  RCGRPT
-Report Title:    GVBRCG Control Report
+Report DD Name:  RCARPT
+Report Title:    GVBRCA Control Report
  
  
 ================
@@ -25,24 +25,26 @@ Report Sections:
  
     Tag    Section name
     -----  ------------------------------------------------------
-    ~PARM  Contents of RCGPARM file
+    ~PARM  Contents of RCAPARM file
     ~OPTS  Options in effect
+<#if generate> 
     ~DFOL  Contents of DBFLDRS file
-    ~RUNV  Contents of RUNVIEWS file
     ~DVWS  Contents of DBVIEWS file
-    ~OINI  Contents of DSNAOINI file
     ~RUNV  Contents of RUNVIEWS file
     ~VIEW  Views selected
+</#if>
     ~IFIL  Input files
     ~OFIL  Output files
+<#if generate> 
     ~REFW  Reference Work Files
     ~WRNS  SAFR compiler warnings
     ~ERRS  SAFR compiler errors
+</#if>
     ~EXEC  Execution summary
  
  
 ==================================
-~PARM - Contents of RCGPARM file:
+~PARM - Contents of RCAPARM file:
 ==================================
 
 <#list parmsRead as parm>
@@ -58,6 +60,8 @@ ${parm}
 ${opt}
 </#list>
  
+<#if generate> 
+
 ==================================
 ~DFOL - Contents of DBFLDRS file:
 ==================================
@@ -167,19 +171,51 @@ ${err.viewid?c?left_pad(7)} ${err.source?right_pad(12)} ${err.srcLR?c?left_pad(7
 </#list>
 </#if>
 
+</#if>
  
  
 ==========================
 ~EXEC - Execution summary:
 ==========================
  
+<#if generate> 
+Run Control Generation
+----------------------
+
 Number of warnings:              ${warnings?size!0?c?left_pad(11)}
 Number of errors:                ${compErrs?size!0?c?left_pad(11)}
 Number of reference-phase views: ${numrefviews!0?c?left_pad(11)}
 Number of extract-phase views:   ${numextviews!0?c?left_pad(11)}
  
 <#if compErrs?size == 0> 
-Process completed successfully
+Compilation completed successfully
 <#else>
-There were errors. No Run Control Files written.
+There were compilation errors. No Run Control Files written.
 </#if>
+</#if>
+
+<#if analyse> 
+Run Control Analysis
+--------------------
+<#if compare> 
+Comparison Mode
+
+VDP difference count = ${numVDPDiffs}
+XLT difference count = ${numXLTDiffs}
+JLT difference count = ${numJLTDiffs}
+
+</#if>
+<#if vdpreport>
+VDP Report written
+</#if>
+<#if xltreport>
+XLT Report written
+</#if>
+<#if jltreport>
+JLT Report written
+</#if>
+</#if>
+
+
+Overall Status: ${status}
+See log file for details.

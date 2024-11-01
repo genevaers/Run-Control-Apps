@@ -8,6 +8,7 @@ import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.ltfile.LogicTableArg;
 import org.genevaers.genevaio.ltfile.LogicTableF1;
 import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
@@ -34,7 +35,7 @@ import org.genevaers.repository.components.enums.ExtractArea;
 
 public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, Assignable, Concatable {
 
-    private String value = "";
+    protected String value = "";
 
     public StringAtomAST() {
         type = ASTFactory.Type.STRINGATOM;
@@ -57,18 +58,16 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
     public LTFileObject getAssignmentEntry(ColumnAST lhs, ExtractBaseAST rhs) {
         LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
         LTRecord ltr = null;
-        if(currentViewColumn.getExtractArea() == ExtractArea.AREACALC) {
+        ViewColumn vc = lhs.getViewColumn();
+        if(vc.getExtractArea() == ExtractArea.AREACALC) {
             ltr = (LTRecord)fcf.getCTC(value, lhs.getViewColumn());
-        } else if(currentViewColumn.getExtractArea() == ExtractArea.AREADATA) {
+        } else if(vc.getExtractArea() == ExtractArea.AREADATA) {
             if(lhs.getViewColumn().getFieldLength() > 0) {
                 ltr = (LTRecord)fcf.getDTC(value, lhs.getViewColumn());
             }
         } else {
-            ltr = (LTRecord)fcf.getSKC(value, lhs.getViewColumn());
             ViewSortKey sk = Repository.getViews().get(lhs.getViewColumn().getViewId()).getViewSortKeyFromColumnId(lhs.getViewColumn().getComponentId());
-            LogicTableArg arg = ((LogicTableF1)ltr).getArg();
-            arg.setFieldLength(sk.getSkFieldLength());
-            arg.setStartPosition(sk.getSkStartPosition());
+            ltr = (LTRecord)fcf.getSKC(value, lhs.getViewColumn(), sk);
         }
         if(ltr != null) {
             ltr.setSourceSeqNbr((short) (ltEmitter.getLogicTable().getNumberOfRecords()));

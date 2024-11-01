@@ -160,7 +160,7 @@ public class RecordParserData {
 			PhysicalFile pf = Repository.getPhysicalFiles().get(lfpf.pfid);
 			pf.setLogicalFileId(lfpf.lfid);
 			pf.setLogicalFilename(logFile.getName());
-			logFile.addPF(pf);
+			logFile.addPF(pf, lfpf.seq);
 		}
 	}
 

@@ -15,14 +15,14 @@ fields:
   component_field: targetlfid
 - name: prefix.sequenceNbr
   type: mappingOnly
-  component_field: stepNumber
+  component_field: keyNumber
 - name: join_name
   type: string
   maxlength: 48
   component_field: joinName
 - name: step_nbr
   type: integer
-  component_field: keyNumber
+  component_field: stepNumber
 - name: target_lr_id
   type: integer
   component_field: targetLrId

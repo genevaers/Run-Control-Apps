@@ -4,36 +4,19 @@
 package org.genevaers.runcontrolgenerator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.logging.Level;
 
-import org.genevaers.compilers.extract.astnodes.ASTFactory;
-import org.genevaers.compilers.extract.astnodes.ErrorAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
-import org.genevaers.genevaio.ltfile.LTLogger;
-import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.ltfile.LogicTable;
-import org.genevaers.genevaio.ltfile.LogicTableArg;
-import org.genevaers.genevaio.ltfile.LogicTableF0;
-import org.genevaers.genevaio.ltfile.LogicTableF1;
-import org.genevaers.genevaio.ltfile.LogicTableF2;
-import org.genevaers.genevaio.ltfile.LogicTableNV;
-import org.genevaers.genevaio.ltfile.LogicTableNameF1;
 import org.genevaers.genevaio.ltfile.LogicTableNameValue;
-import org.genevaers.genevaio.ltfile.LogicTableRE;
-import org.genevaers.genevaio.ltfile.LogicTableWR;
 import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
-import org.genevaers.repository.components.ViewNode;
-import org.genevaers.repository.components.enums.DataType;
-import org.genevaers.repository.components.enums.DateCode;
-import org.genevaers.repository.data.ComponentCollection;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -77,6 +60,8 @@ class RunArithCompTest extends RunCompilerBase {
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(RunCompilerTest.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
 
@@ -92,7 +77,7 @@ class RunArithCompTest extends RunCompilerBase {
         int expectedGotos[][] = {{7,8,10},{9,11,0}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue cfac = (LogicTableNameValue) xlt.getFromPosition(7);
-        assertEquals("0", cfac.getValue());
+        assertEquals("0", cfac.getValue().getPrintString());
         
     }
 
@@ -142,7 +127,7 @@ class RunArithCompTest extends RunCompilerBase {
         int expectedGotos[][] = {{7,8,10},{9,11,0}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue cfac = (LogicTableNameValue) xlt.getFromPosition(7);
-        assertEquals("72", cfac.getValue());
+        assertEquals("72", cfac.getValue().getPrintString());
     }
 
     @Test void testCFEA() {

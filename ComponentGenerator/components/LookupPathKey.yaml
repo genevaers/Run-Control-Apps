@@ -5,13 +5,13 @@ members:
   type: integer
   vdp_source: prefix.recordId
 - name: stepNumber 
-  type: short
-  vdp_source: prefix.sequenceNbr
+  type: integer
+  vdp_source: StepNbr
 - name: joinName
   type: string
 - name: keyNumber 
-  type: integer
-  vdp_source: StepNbr
+  type: short
+  vdp_source: prefix.sequenceNbr
 - name: targetlfid 
   type: integer
   vdp_source: prefix.inputFileId

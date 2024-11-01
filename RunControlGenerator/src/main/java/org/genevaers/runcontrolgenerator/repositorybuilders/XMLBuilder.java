@@ -27,7 +27,7 @@ import java.util.Collection;
 
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.data.InputReport;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.GersFile;
 import org.genevaers.utilities.GersFilesUtils;
 import org.genevaers.utilities.Status;
@@ -55,8 +55,8 @@ public abstract class XMLBuilder implements RepositoryBuilder{
 
 	protected void readXMLs() {
 		//GersFilesUtils.clear();
-		Collection<GersFile> gfs = new GersFilesUtils().getGersFiles(RunControlConfigration.getWBXMLWinDirectory());
-		logger.atInfo().log("found %d files in %s", gfs.size(), RunControlConfigration.getWBXMLWinDirectory());
+		Collection<GersFile> gfs = new GersFilesUtils().getGersFiles(GersConfigration.getWBXMLDirectory());
+		logger.atInfo().log("found %d files in %s", gfs.size(), GersConfigration.getWBXMLDirectory());
 		for (GersFile gf : gfs) {
 			logger.atFine().log("Read XML file from %s", gf.getName());
 			try {

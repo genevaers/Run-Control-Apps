@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -32,7 +33,7 @@ import org.genevaers.repository.components.enums.FileType;
 public class LogicalFile extends ComponentNode {
 
 	private int id = 0;
-	List<PhysicalFile> pfs = new ArrayList<>();
+	Map<Integer, PhysicalFile> pfsBySeq = new TreeMap<>();
 	Map<String, PhysicalFile> pfsByName = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	String name;
 
@@ -43,7 +44,12 @@ public class LogicalFile extends ComponentNode {
 	// }
 
 	public void addPF(PhysicalFile ourPF) {
-		pfs.add(ourPF);
+		pfsBySeq.put(getNumberOfPFs()+1, ourPF);
+		pfsByName.put(ourPF.getName(), ourPF);
+	}
+
+	public void addPF(PhysicalFile ourPF, int seq) {
+		pfsBySeq.put(seq, ourPF);
 		pfsByName.put(ourPF.getName(), ourPF);
 	}
 
@@ -53,12 +59,12 @@ public class LogicalFile extends ComponentNode {
 
 	public String getName() {
 		if(name == null)
-		  name = pfs.get(0).getLogicalFilename();
+		  name = pfsBySeq.values().iterator().next().getLogicalFilename();
 		return name;
 	}
 
 	public int getNumberOfPFs() {
-		return pfs.size();
+		return pfsBySeq.size();
 	}
 
 	public void setID(int recordID) {
@@ -66,11 +72,15 @@ public class LogicalFile extends ComponentNode {
 	}
 
 	public Collection<PhysicalFile> getPFs() {
-		return pfs;
+		return pfsBySeq.values();
 	}
 
 	public Iterator<PhysicalFile> getPFIterator() {
-		return pfsByName.values().iterator();
+		return pfsBySeq.values().iterator();
+	}
+
+	public Iterator<Entry<Integer, PhysicalFile>> getPFSeqIterator() {
+		return pfsBySeq.entrySet().iterator();
 	}
 
 	public void setName(String name) {
@@ -79,16 +89,16 @@ public class LogicalFile extends ComponentNode {
 
 	public Set<Integer> getSetOfPFIDs() {
 		Set<Integer> pfids = new HashSet<>();
-		pfs.stream().forEach(pf -> pfids.add(pf.getComponentId()));
+		pfsBySeq.values().stream().forEach(pf -> pfids.add(pf.getComponentId()));
 		return pfids;
 	}
 
 	public boolean isToken() {
-		return pfs.get(0).getFileType().equals(FileType.TOKEN); //There should be only one for a token
+		return pfsBySeq.values().iterator().next().getFileType().equals(FileType.TOKEN); //There should be only one for a token
 	}
 
 	public boolean isNotToken() {
-		return !pfs.get(0).getFileType().equals(FileType.TOKEN);
+		return !isToken();
 	}
 
 	public PhysicalFile getPhysicalFile(String name) {
@@ -96,7 +106,7 @@ public class LogicalFile extends ComponentNode {
 	}
 
     public void makePFsNotRequired() {
-		for(PhysicalFile pf : pfs) {
+		for(PhysicalFile pf : pfsBySeq.values()) {
 			pf.setRequired(false);
 		}
     }

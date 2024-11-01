@@ -21,7 +21,11 @@ package org.genevaers.compilers.extract.emitters.assignmentemitters;
 import org.genevaers.compilers.extract.astnodes.ColumnAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FormattedASTNode;
+import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewSortKey;
+import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.components.enums.ExtractArea;
 
 public class AssignmentRulesCheckerFactory {
 
@@ -43,11 +47,19 @@ public class AssignmentRulesCheckerFactory {
     // can't assign to a const... but compiler should not all this anyway?
     public static AssignmentRulesChecker getChecker(ColumnAST column, FormattedASTNode rhs) {
         ViewColumn vc = column.getViewColumn();
-
-        if (sameDataTypes(vc, rhs)) {
+        DataType colDataType;
+        if(vc.getExtractArea() == ExtractArea.SORTKEY) {
+            ViewSortKey sk = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
+            column.overrideDataType(sk.getSortKeyDataType());
+            column.overrideDateCode(sk.getSortKeyDateTimeFormat());
+            colDataType = sk.getSortKeyDataType();
+        } else {
+            colDataType = vc.getDataType();
+        }
+        if (sameDataTypes(colDataType, rhs)) {
             return sameTypesChecker;
         } else {
-            if(column.isNumeric() && rhs.isNumeric()) {
+            if(colDataType != DataType.ALPHANUMERIC && rhs.isNumeric()) {
                 return dateChecker;
             } else {
                 if(!column.isNumeric()) {
@@ -57,11 +69,10 @@ public class AssignmentRulesCheckerFactory {
                 }
             }
         }
-
     }
 
-    private static boolean sameDataTypes(ViewColumn vc, ExtractBaseAST rhs) {
-        return vc.getDataType() == ((FormattedASTNode)rhs).getDataType();
+    private static boolean sameDataTypes(DataType colDataType, ExtractBaseAST rhs) {
+        return colDataType == ((FormattedASTNode)rhs).getDataType();
     }
 
 }

@@ -29,7 +29,7 @@ import org.genevaers.utilities.CommandRunner;
 public class WinJavaMR91Runner implements MR91Runner {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-	private static final String MR91_EXE = "gvbrcg.bat";
+	private static final String MR91_EXE = "gvbrca.bat";
 
     @Override
     public void runFrom(Path runDir) {

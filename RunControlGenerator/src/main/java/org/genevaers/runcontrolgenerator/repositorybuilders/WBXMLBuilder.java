@@ -22,7 +22,8 @@ package org.genevaers.runcontrolgenerator.repositorybuilders;
 
 import org.genevaers.genevaio.wbxml.WBXMLSaxIterator;
 import org.genevaers.repository.data.InputReport;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
+
 import com.google.common.flogger.FluentLogger;
 import com.google.common.flogger.StackSize;
 
@@ -47,7 +48,7 @@ public class WBXMLBuilder extends XMLBuilder{
 
     @Override
     protected String getXMLDirectory() {
-        return RunControlConfigration.getWBXMLWinDirectory();
+        return GersConfigration.getWBXMLDirectory();
     }
 
 

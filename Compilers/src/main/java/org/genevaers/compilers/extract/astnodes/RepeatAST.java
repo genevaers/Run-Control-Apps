@@ -4,6 +4,8 @@ import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
 import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LTRecord;
+import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
@@ -55,7 +57,8 @@ public class RepeatAST extends FormattedASTNode implements GenevaERSValue, Assig
         } else if(currentViewColumn.getExtractArea() == ExtractArea.AREADATA) {
             ltEmitter.addToLogicTable((LTRecord)fcf.getDTC(getRepeatString(), currentViewColumn));
         } else {
-            ltEmitter.addToLogicTable((LTRecord)fcf.getSKC(getRepeatString(), currentViewColumn));
+            ViewSortKey sk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+            ltEmitter.addToLogicTable((LTRecord)fcf.getSKC(getRepeatString(), currentViewColumn, sk));
         }
         return null;
     }

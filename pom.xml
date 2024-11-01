@@ -16,7 +16,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<!-- our apps -->
-		<revision>1.1.0_RC4</revision>
+		<revision>1.1.0_RC5</revision>
 	</properties>
 
 	<licenses>
@@ -54,6 +54,7 @@
 		<module>GenevaIO</module>
 		<module>RunControlGenerator</module>
 		<module>RunControlAnalyser</module>
+		<module>WinIO</module>
 		<module>RCApps</module>
 	</modules>
 
@@ -93,6 +94,11 @@
 			<dependency>
 				<groupId>org.genevaers</groupId>
 				<artifactId>utilities</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.genevaers</groupId>
+				<artifactId>winio</artifactId>
 				<version>${revision}</version>
 			</dependency>
 			<dependency>
@@ -300,26 +306,6 @@
 					<version>2.4.8</version>
 				</dependency>
 			</dependencies>
-		</profile>
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<modules>
-				<module>WinIO</module>
-			</modules>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>org.genevaers</groupId>
-						<artifactId>winio</artifactId>
-						<version>${revision}</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
 	</profiles>
 

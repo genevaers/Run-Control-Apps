@@ -1,5 +1,7 @@
 package org.genevaers.compilers.format.astnodes;
 
+import java.math.BigDecimal;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008
  * 
@@ -32,7 +34,9 @@ public class NumConst extends FormatBaseAST{
     }
 
     public void setValue(String text) {
-        value = text;
+        //strip trailing decimal zeros
+        BigDecimal strippedVal = new BigDecimal(text).stripTrailingZeros();
+        value = strippedVal.toPlainString();
     }
 
     public String getValue() {

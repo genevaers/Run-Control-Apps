@@ -141,16 +141,32 @@ public class ArrayField extends Field {
     public String getFieldNodeEntry(boolean prefix, boolean arrayValue) {
         StringBuilder fieldNodeEntry = new StringBuilder();
         String ccName = NameUtils.getCamelCaseName(name, false);
-        fieldNodeEntry.append(DBLINDENT + "StringBuilder " + ccName+"Str = new StringBuilder();\n");
-        fieldNodeEntry.append(DBLINDENT + "for (int i = 0; i<" + arraySize + "; i += 1) {\n");
-        if (arrayType.startsWith("VDP")) {
-            fieldNodeEntry.append(DBLINDENT + "    " + ccName + ".get(i).addRecordNodes(rn, i, compare);\n");
+        if(name.equals("stack")) {
+            generateStackDump(ccName, fieldNodeEntry);
         } else {
-            fieldNodeEntry.append(DBLINDENT + "    " + ccName+"Str" + ".append(" + ccName + ".get(i)+\",\");\n");
+            fieldNodeEntry.append(DBLINDENT + "StringBuilder " + ccName+"Str = new StringBuilder();\n");
+            fieldNodeEntry.append(DBLINDENT + "for (int i = 0; i<" + arraySize + "; i += 1) {\n");
+            if (arrayType.startsWith("VDP")) {
+                fieldNodeEntry.append(DBLINDENT + "    " + ccName + ".get(i).addRecordNodes(rn, i, compare);\n");
+            } else {
+                fieldNodeEntry.append(DBLINDENT + "    " + ccName+"Str" + ".append(" + ccName + ".get(i)+\",\");\n");
+            }
+            fieldNodeEntry.append(DBLINDENT + "}\n");
+            fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + ccName+"Str.toString()), compare);");  
         }
-        fieldNodeEntry.append(DBLINDENT + "}\n");
-        fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + ccName+"Str.toString()), compare);");  
         return fieldNodeEntry.toString();
+    }
+
+    private void generateStackDump(String ccName, StringBuilder fieldNodeEntry) {
+        fieldNodeEntry.append(DBLINDENT + "StringBuilder " + ccName+"Str = new StringBuilder();\n");
+           fieldNodeEntry.append(DBLINDENT + "ByteBuffer newBuffer = ByteBuffer.allocate(stackLength);\n" + //
+        "        for(int i = 0 ; i < stack.size() ; i++) {\r\n" + //
+        "            newBuffer.put(stack.get(i));\r\n" + //
+        "        }\r\n" + //
+        "        CalcStack cs = new CalcStack(newBuffer, columnId, columnId);\r\n" + //
+        "        cs.buildEntriesArrayFromTheBuffer();\r\n" + //
+        "");
+        fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(ccName, false) + "\"," + "cs.toString()), compare);");  
     }
 
 }

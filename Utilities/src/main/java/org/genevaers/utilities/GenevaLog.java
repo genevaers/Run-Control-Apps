@@ -119,8 +119,10 @@ public class GenevaLog
     	jdkLogger.setUseParentHandlers(true);
 		Logger topLogger = jdkLogger.getParent();
 		Handler[] hndlrs = topLogger.getHandlers();
-		hndlrs[hndlrs.length-1].close();
-		topLogger.removeHandler(hndlrs[hndlrs.length-1]);
+		if(hndlrs.length > 0) {
+			hndlrs[hndlrs.length-1].close();
+			topLogger.removeHandler(hndlrs[hndlrs.length-1]);
+		}
     }
 
     public static void writeHeader(String hdr) {

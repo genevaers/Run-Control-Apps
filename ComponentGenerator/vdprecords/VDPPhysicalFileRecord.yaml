@@ -61,7 +61,7 @@ fields:
 - name: alloc_device_type 
   type: string
   maxlength: 48
-  component_field: sqlText
+  component_field: none
 - name: alloc_space_unit 
   type: integer
   component_field: none

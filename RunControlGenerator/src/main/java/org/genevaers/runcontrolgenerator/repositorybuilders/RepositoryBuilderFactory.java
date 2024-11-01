@@ -22,7 +22,7 @@ import com.google.common.flogger.FluentLogger;
 import java.sql.Connection;
 
 import org.genevaers.genevaio.dbreader.WBConnection;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 
 public class RepositoryBuilderFactory {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
@@ -30,7 +30,7 @@ public class RepositoryBuilderFactory {
 
 	public static RepositoryBuilder get() {
 
-		switch (RunControlConfigration.getInputType()) {
+		switch (GersConfigration.getInputType()) {
 			case "WBXML":
 				return new WBXMLBuilder();
 			case "VDPXML":
@@ -42,7 +42,7 @@ public class RepositoryBuilderFactory {
 			case "WBCONNECTION":
 				return new WBConnectionBuilder();
 			default:
-				logger.atSevere().log("Unknown Input Type %s", RunControlConfigration.getInputType());
+				logger.atSevere().log("Unknown Input Type %s", GersConfigration.getInputType());
 				return null;
 		}
 	}

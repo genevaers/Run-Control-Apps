@@ -112,6 +112,7 @@ public class REHHeader {
         rehPF.setExtractDDName(DDNAME);
         rehPF.setDataSetName("");
         rehPF.setOutputDDName(DDNAME);
+        rehPF.setFileType(FileType.DISK);
         rehPF.setDatabase("");
         rehPF.setDatabaseTable("");
         rehPF.setSqlText("");
@@ -188,6 +189,7 @@ public class REHHeader {
         vn.getOutputFile().setComponentId(rehViewNum);
         vn.getOutputFile().setName(Repository.getPhysicalFiles().get(rehViewNum).getName());
         vn.getOutputFile().setOutputDDName(Repository.getPhysicalFiles().get(rehViewNum).getOutputDDName());
+        vn.getOutputFile().setFileType(FileType.DISK);
         vsnode.setViewSource(vs);
         lfNode.getLogicalFile().getPFIterator().next().setRequired(true); //There should be only one
         lfNode.getLogicalFile().setRequired(true);

@@ -1,5 +1,7 @@
 package org.genevaers.rcapps;
 
+import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.ParmReader;
 import org.genevaers.utilities.Status;
 
@@ -25,42 +27,51 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.genevaers.genevaio.report.ReportWriter;
 import org.genevaers.runcontrolanalyser.RCAApp;
 import org.genevaers.runcontrolgenerator.RCGApp;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
-
-
 
 public class Runner {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-	private static Status status = Status.ERROR;
+	private static Status status = Status.OK;
 
     public static void main(String[] args) {
 		System.out.printf("GenevaERS RunControls version %s\n", Runner.getVersion());
 		System.out.printf("Java Vendor %s\n", System.getProperty("java.vendor"));
 		System.out.printf("Java Version %s\n", System.getProperty("java.version"));
-        Runner.choose();
+        GersConfigration.initialise();
+        Runner.run();
         exitWithRC();
     } 
+
+    public static void runFrom(String path) {
+        GersConfigration.initialise();
+        GersConfigration.setCurrentWorkingDirectory(path);
+        run();
+    }
      
-    private static void choose() {
-        new RunControlConfigration();
+    private static void run() {
         ParmReader pr = new ParmReader();
-        if(pr.generatorParmExists()) {
-            System.out.printf("Running Run Control Generator\n");
-            RCGApp.run("", "", RunControlConfigration.LOG_FILE, "", "", "");
-            status = RCGApp.getResult();
+        if(pr.RCAParmExists()) {
+            System.out.printf("Reading Run Control Parm\n");
+            pr.populateConfigFrom(GersConfigration.getParmFileName());
+            GenevaLog.initLogger(Runner.class.getName(), GersConfigration.getLogFileName(), GersConfigration.getLogLevel());
+            GersConfigration.setLinesRead(pr.getLinesRead());
+            if(GersConfigration.generatorRunRequested()) {
+                RCGApp.run();
+                status = RCGApp.getResult();
+            }
+            if(status != Status.ERROR && GersConfigration.analyserRunRequested())  {
+                RCAApp.run();
+                status = status == Status.OK ? RCAApp.ranOkay() : status;    
+            }
         } else {
             System.out.printf("Unable to find generator parm file\n");
         }
-        if(pr.analyserParmExists()) {
-            RCAApp.run();
-            status = RCAApp.ranOkay();
-        } else {
-            System.out.printf("Unable to find analyser arm file\n");
-        }
+        ReportWriter.write(status);
         String res = status == Status.OK ? "OK" : "with issues";
         System.out.printf("GenevaERS RunControls completed %s\n", res);
+        GenevaLog.closeLogger(Runner.class.getName());
     }
 
     private static void exitWithRC() {

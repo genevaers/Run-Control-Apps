@@ -169,9 +169,9 @@ public class Tester {
 		runner = MR91RunnerFactory.getRunner("Windows");
 		Path cppMr91OutPath = testResultsPath.resolve("CPPMR91");
 		xmlrun(cppMr91OutPath, xmlFiles);
-		Path gvbrcgOutPath = testResultsPath.resolve("gvbrcg");
+		Path gvbrcaOutPath = testResultsPath.resolve("gvbrca");
 		runner = MR91RunnerFactory.getRunner("Java");
-		xmlrun(gvbrcgOutPath, xmlFiles);
+		xmlrun(gvbrcaOutPath, xmlFiles);
 	}
 
 	private boolean outputDoesNotExistFor(Path src) {

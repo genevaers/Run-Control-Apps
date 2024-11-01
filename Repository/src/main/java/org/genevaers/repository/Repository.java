@@ -253,8 +253,9 @@ public class Repository {
 		if(vn == null) {
 			vn = new ViewNode();
 			vn.setDefinition(vd);
-			if(maxViewID < vd.getComponentId())
+			if(maxViewID < vd.getComponentId()) {
 				maxViewID = vd.getComponentId();
+			}
 			views.add(vn, vd.getComponentId(), vd.getName());
 		}
 		return vn;

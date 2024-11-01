@@ -274,6 +274,9 @@ public class ExtractAST2Dot {
                 case EXTRFILTER:
                     doExtractFilter(node);
                     break;
+                case ALL:
+                    doAll(node);
+                    break;
                 default:
                     dotDefaultNode(node);
                     break;
@@ -284,6 +287,15 @@ public class ExtractAST2Dot {
             }
         }
         return idString;
+    }
+
+    private static void doAll(ExtractBaseAST node) {
+        AllAST allNode = (AllAST) node;
+        label = allNode.getType().toString() + " (" + dotEscape(allNode.getValue()) + ")";
+        label = label.replace("\\", "\\\\");
+        colour = STRINGCONST;
+        idString = "All_" + nodeNum++;
+        reverseArrow = true;
     }
 
     private static void doExtractFilter(ExtractBaseAST node) {

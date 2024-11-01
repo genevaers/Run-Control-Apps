@@ -8,11 +8,8 @@ fields:
 - name: table_name
   type: string
   maxlength: 48
-- name: value_length
-  type: integer
 - name: value
-  type: string
-  maxlength: 256
+  type: cookie
 - name: compare_type
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.LtCompareType 

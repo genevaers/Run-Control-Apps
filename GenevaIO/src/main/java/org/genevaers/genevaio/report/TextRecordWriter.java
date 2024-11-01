@@ -107,6 +107,8 @@ public abstract class TextRecordWriter {
 				return "CPPOnly";
 			case INSTANCE:
 				break;
+			case MAPPED:
+				return "Mapped ";
 			default:
 				break;
 		}

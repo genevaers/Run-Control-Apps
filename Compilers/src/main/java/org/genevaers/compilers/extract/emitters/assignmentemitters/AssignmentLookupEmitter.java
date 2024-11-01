@@ -29,6 +29,7 @@ import org.genevaers.genevaio.ltfile.LogicTableF2;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
 import org.genevaers.repository.jltviews.JLTView;
@@ -51,7 +52,8 @@ public class AssignmentLookupEmitter extends AssignmentEmitter{
         LRField redFld = jv.getRedFieldFromLookupField(lkf.getRef().getComponentId());
         if(redFld != null) {
             if(vc.getExtractArea() == ExtractArea.SORTKEY) {
-                ltEntry = (LogicTableF2)(fcf.getSKL(redFld, vc));
+                ViewSortKey sk = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
+                ltEntry = (LogicTableF2)(fcf.getSKL(redFld, vc, sk));
             } else {
                 ltEntry = (LogicTableF2)(fcf.getDTL(redFld, vc));
             }

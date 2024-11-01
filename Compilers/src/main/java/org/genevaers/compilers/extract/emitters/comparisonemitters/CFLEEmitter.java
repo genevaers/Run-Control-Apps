@@ -49,7 +49,6 @@ public class CFLEEmitter extends ComparisonEmitter{
         arg.setLrId(lkf.getRef().getLrID());
         arg.setFieldId(lkf.getRef().getComponentId());
         arg.setStartPosition(redFld.getStartPosition());
-        arg.setFieldContentId(DateCode.NONE); //TODO unsure is this is always the case?
         cfle.setArg1(arg);
         return cfle;
     }

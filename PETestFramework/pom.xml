@@ -49,6 +49,11 @@
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.genevaers</groupId>
+			<artifactId>winio</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>

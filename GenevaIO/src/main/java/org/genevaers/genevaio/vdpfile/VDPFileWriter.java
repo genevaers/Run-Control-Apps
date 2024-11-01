@@ -20,6 +20,7 @@ package org.genevaers.genevaio.vdpfile;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.genevaers.genevaio.recordreader.RecordFileReaderWriter;
 import org.genevaers.genevaio.recordreader.RecordFileWriter;
@@ -51,6 +52,7 @@ import org.genevaers.repository.components.enums.FileRecfm;
 import org.genevaers.repository.components.enums.FileType;
 import org.genevaers.repository.components.enums.RecordDelimiter;
 import org.genevaers.repository.components.enums.TextDelimiter;
+import org.genevaers.repository.components.enums.ViewType;
 import org.genevaers.repository.jltviews.JoinViewsManager.JoinTargetEntry;
 
 import com.google.common.flogger.FluentLogger;
@@ -118,6 +120,7 @@ public class VDPFileWriter {
 	    logger.atInfo().log("------------------");
 	    logger.atInfo().log("Write View %d", view.getID());
 		writeViewDefinition(view.getViewDefinition());
+		
 		ViewManagementData vmd = vdpMgmtRecs.getViewManagmentData(view.getViewDefinition().getComponentId());
 		// if(vmd.getFormatFile() == null) {
 		// 	makeViewFormatRecord(view);  //This is a silly name for the view output record (basically its DDname)
@@ -172,6 +175,7 @@ public class VDPFileWriter {
 			String ddname = String.format("F%07d", view.getID());
 			vof.setOutputDDName(ddname);
 			vof.setName("Auto-generated Name for Extract Phase Output ");
+			vof.setFileType(FileType.DISK);
 	}
 
 	private void writeTheOutputFile(ViewNode view) {
@@ -195,7 +199,6 @@ public class VDPFileWriter {
 			//Keep the writer happy
 			ff.setServerId(1);
 			ff.setDbmsRowFmtOptId(1);
-			ff.setAllocFileType(FileType.DISK);
 			ff.setFieldDelimId(FieldDelimiter.INVALID);
 			ff.setRecordDelimId(RecordDelimiter.INVALID);
 			ff.setTextDelimId(TextDelimiter.INVALID);
@@ -349,37 +352,42 @@ public class VDPFileWriter {
 	private void writeViewColumns(ViewNode view) {
 		Iterator<ViewColumn> ci = view.getColumnIterator();
 		while (ci.hasNext()) {
-			writeViewColumn(ci.next());
+			writeViewColumn(ci.next(), view);
 		}
 	}
 
-	private void writeViewColumn(ViewColumn col) {
+	private void writeViewColumn(ViewColumn col, ViewNode view) {
 		VDPViewColumn vvc = new VDPViewColumn();
         logger.atFine().log("Write View %d column %d", col.getViewId(), col.getColumnNumber());
+		
 		vvc.fillFromComponent(col);
 		vvc.fillTheWriteBuffer(VDPWriter);
 		VDPWriter.writeAndClearTheRecord();
-		writeColumnCalculation(col);
+		writeColumnCalculation(col, view);
 	}
 
-	private void writeColumnCalculation(ViewColumn col) {
+	private void writeColumnCalculation(ViewColumn col, ViewNode view) {
 		String ccl = col.getColumnCalculation();
 		if (ccl != null && ccl.length() > 0) {
-			VDPColumnCalculationLogic vccl = new VDPColumnCalculationLogic();
-            logger.atFine().log("Write View %d column calculation\n%s", col.getViewId(), ccl);
-			vccl.setRecordType(VDPRecord.VDP_COLUMN_CALCULATION);
-			vccl.setViewId(col.getViewId());
-			vccl.setSequenceNbr((short) 1); // If there is more than 8K we ar in trouble
-			vccl.setColumnId(col.getComponentId());
-			vccl.setInputFileId(col.getComponentId());
-			vccl.setLogicLength((short) ccl.length());
-			vccl.setRecLen((short) (26 + ccl.length()));
-			vccl.setLogic(ccl);
-			vccl.fillTheWriteBuffer(VDPWriter);
-			VDPWriter.setLengthFromPosition(); //Need this for the variable length records
-			VDPWriter.writeAndClearTheRecord();
+			if(view.getViewDefinition().getViewType() != ViewType.EXTRACT) {
+				VDPColumnCalculationLogic vccl = new VDPColumnCalculationLogic();
+				logger.atFine().log("Write View %d column calculation\n%s", col.getViewId(), ccl);
+				vccl.setRecordType(VDPRecord.VDP_COLUMN_CALCULATION);
+				vccl.setViewId(col.getViewId());
+				vccl.setSequenceNbr((short) 1); // If there is more than 8K we ar in trouble
+				vccl.setColumnId(col.getComponentId());
+				vccl.setInputFileId(col.getComponentId());
+				vccl.setLogicLength((short) ccl.length());
+				vccl.setRecLen((short) (26 + ccl.length()));
+				vccl.setLogic(ccl);
+				vccl.fillTheWriteBuffer(VDPWriter);
+				VDPWriter.setLengthFromPosition(); //Need this for the variable length records
+				VDPWriter.writeAndClearTheRecord();
 
-			writeColumnCalculationStack(col);
+				writeColumnCalculationStack(col);
+			} else {
+				logger.atWarning().log("Ignoring column calculation %s for View %d Column %d since this is an extract view", ccl, view.getViewDefinition().getComponentId(), col.getColumnNumber());
+			}
 		}
 	}
 
@@ -450,9 +458,16 @@ public class VDPFileWriter {
 		vcl.setSequenceNbr((short) 0);
 		vcl.setRecordId(vcs.getComponentId());
 		vcl.setInputFileId(vcs.getComponentId());
-		vcl.setLogicLength((short) cl.length());
-		vcl.setRecLen((short) (26 + cl.length()));
-		vcl.setLogic(cl);
+        if(cl.length() > 8162) {
+			vcl.setLogicLength((short) 8162);
+			vcl.setRecLen((short) (26 + 8162));
+			vcl.setLogic(cl.substring(0, 8162));
+            logger.atWarning().log("Truncating logic text record for view %s column %d, length was %d", vcs.getViewId(), vcs.getColumnNumber(), cl.length());
+        } else {
+			vcl.setLogicLength((short) cl.length());
+			vcl.setRecLen((short) (26 + cl.length()));
+			vcl.setLogic(cl);
+        }
 		vcl.fillTheWriteBuffer(VDPWriter);
 		VDPWriter.setLengthFromPosition(); //Need this for the variable length records
 		VDPWriter.writeAndClearTheRecord();
@@ -645,17 +660,18 @@ public class VDPFileWriter {
 		Iterator<LogicalFile> lfi = Repository.getLogicalFiles().getIterator();
 		while (lfi.hasNext()) {
 			LogicalFile lf = lfi.next();
-			Iterator<PhysicalFile> pfi = lf.getPFIterator();
-			short seqNum = 1;
+			Iterator<Entry<Integer, PhysicalFile>> pfi = lf.getPFSeqIterator();
 			while (pfi.hasNext()) {
-				PhysicalFile pf = pfi.next();
+				Entry<Integer, PhysicalFile> pfe = pfi.next();
+				PhysicalFile pf = pfe.getValue();
 				pf.setLogicalFileId(lf.getID());
 				pf.setLogicalFilename(lf.getName());
 				VDPPhysicalFile vdppf = new VDPPhysicalFile();
 				if(lf.isRequired() && pf.isRequired()) {
 			        logger.atFine().log("Write PF:%d", pf.getComponentId());
 					vdppf.fillFromComponent(pf);
-					vdppf.setSequenceNbr(seqNum++);
+					int si = pfe.getKey();
+					vdppf.setSequenceNbr((short)si);
 					vdppf.fillTheWriteBuffer(VDPWriter);
 					VDPWriter.writeAndClearTheRecord();
 				} else {

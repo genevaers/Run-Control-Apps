@@ -3,61 +3,26 @@
  */
 package org.genevaers.runcontrolgenerator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.logging.Level;
 
-import org.genevaers.compilers.extract.astnodes.ExtractAST2Dot;
 import org.genevaers.genevaio.dbreader.DatabaseConnection.DbType;
 import org.genevaers.genevaio.dbreader.DatabaseConnection;
 import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.genevaio.dbreader.PostgresConnection;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
-import org.genevaers.genevaio.ltfile.LTLogger;
-import org.genevaers.genevaio.ltfile.LogicTable;
 import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
-import org.genevaers.repository.components.ViewColumnSource;
-import org.genevaers.repository.components.ViewNode;
-import org.genevaers.repository.components.ViewSource;
-import org.genevaers.repository.components.enums.ColumnSourceType;
-import org.genevaers.repository.components.enums.DataType;
-import org.genevaers.repository.components.enums.DateCode;
-import org.genevaers.repository.components.enums.ExtractArea;
-import org.genevaers.repository.components.enums.JustifyId;
-import org.genevaers.repository.components.enums.ViewType;
-import org.genevaers.repository.data.CompilerMessageSource;
-import org.genevaers.repository.data.ViewLogicDependency.LogicType;
-import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
-import org.genevaers.runcontrolgenerator.workbenchinterface.ColumnData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.LRData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.LRFieldData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.RCDriver;
-import org.genevaers.runcontrolgenerator.workbenchinterface.ViewColumnSourceData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.ViewData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.ViewSourceData;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBCompilerFactory;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBCompilerType;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBExtractColumnCompiler;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBExtractFilterCompiler;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBExtractOutputCompiler;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBFormatCalculationCompiler;
-import org.genevaers.runcontrolgenerator.workbenchinterface.WBFormatFilterCompiler;
 import org.genevaers.runcontrolgenerator.workbenchinterface.WorkbenchCompiler;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -76,7 +41,6 @@ import org.junit.jupiter.api.Disabled;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 import com.google.common.flogger.FluentLogger;
@@ -105,7 +69,7 @@ import com.google.common.flogger.FluentLogger;
 
   @BeforeEach
   public void initEach(TestInfo info) {
-    new RunControlConfigration();
+    GersConfigration.initialise();
     Repository.setGenerationTime(Calendar.getInstance().getTime());
     RecordParser.clearAndInitialise();
     LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();

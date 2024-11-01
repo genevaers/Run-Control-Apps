@@ -109,7 +109,7 @@ public class LookupSourceKeyParser extends BaseParser {
 		lookupKey.setComponentId(lkid);
 		lookupKey.setDateTimeFormat(DateCode.NONE);
 		lookupKey.setJustification(JustifyId.NONE);
-		lookupKey.setKeyNumber(seqNum);
+		lookupKey.setKeyNumber((short)seqNum);
 		currentKeyList = new ArrayList<LookupPathKey>();
 		currentStepId = componentID;
 //		lookupStepKeys.put(componentID, currentKeyList);

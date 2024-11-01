@@ -81,6 +81,7 @@ public class ViewColumnSourceParser extends BaseParser {
 				break;
 			case "VALUE":
 				vcs.setSrcValue(text);
+				vcs.setValueLength(text.length());
 				break;
 			case "LOOKUPID":
 				vcs.setSrcJoinId(Integer.parseInt(text));

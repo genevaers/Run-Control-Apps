@@ -48,6 +48,7 @@ public class ViewHeaderFooterParser extends RecordParser {
 			switch (part) {
 				case "HEADERFOOTERID":
 					id = Integer.parseInt(text);
+					itemText = "";
 					break;
 				case "STDFUNCCD":
 					functonCode = text.trim();

@@ -101,6 +101,7 @@ public class ViewSourceAstNode extends ExtractBaseAST implements EmittableASTNod
         nv.setSourceSeqNbr(vs.getSequenceNumber());
         ltEmitter.setSuffixSeqNbr((short)0);
         ltEmitter.addToLogicTable(nv);
+        ltEmitter.setFileId(vs.getSourceLFID());
         return nv;
     }
 

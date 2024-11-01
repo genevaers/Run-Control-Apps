@@ -30,6 +30,7 @@ import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewDefinition;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
+import org.genevaers.repository.components.enums.FileType;
 import org.genevaers.repository.components.enums.OutputMedia;
 import org.genevaers.repository.components.enums.ViewStatus;
 import org.genevaers.repository.components.enums.ViewType;
@@ -60,7 +61,7 @@ public class RTHHeader extends REHHeader{
 
         addColumns();
 
-        makePF(viewNum);
+//        makePF(viewNum);
     }
 
     @Override
@@ -77,6 +78,7 @@ public class RTHHeader extends REHHeader{
         vn.getOutputFile().setComponentId(rehViewNum);
         vn.getOutputFile().setName(Repository.getPhysicalFiles().get(rehViewNum).getName());
         vn.getOutputFile().setOutputDDName(Repository.getPhysicalFiles().get(rehViewNum).getOutputDDName());
+        vn.getOutputFile().setFileType(FileType.DISK);
         vsnode.setViewSource(vs);
         lfNode.getLogicalFile().getPFIterator().next().setRequired(true); //There should be only one
         lfNode.getLogicalFile().setRequired(true);

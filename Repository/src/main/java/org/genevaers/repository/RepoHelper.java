@@ -69,7 +69,7 @@ public class RepoHelper {
         fld.setDatatype(DataType.BINARY);
         fld.setDateTimeFormat(DateCode.CCYYMMDD);
         fld.setLength((short)4);
-        fld.setJustification(JustifyId.NONE);
+        fld.setJustification(JustifyId.LEFT);
         fld.setMask("");
         fld.setNumDecimalPlaces((short)0);
         fld.setOrdinalOffset((short)1);

@@ -85,7 +85,7 @@ public class Cookie {
             case LTDateRunDay:
                 return "RUNDAY(" + vaString + ")";
             case LTDateFiscalDay:
-                return "FISCAL(" + vaString + ")";
+                return "FISCALDAY(" + vaString + ")";
             case LTDateRunMonth:
             return "RUNMONTH(" + vaString + ")";
             case LTDateFiscalMonth:

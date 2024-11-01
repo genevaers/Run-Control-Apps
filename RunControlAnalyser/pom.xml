@@ -135,44 +135,7 @@ under the License.
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.10</version>
-				<executions>
-					<execution>
-						<id>assemble-script</id>
-						<phase>package</phase>
-						<goals>
-							<goal>assemble</goal>
-						</goals>
-						<configuration>
-							<assembleDirectory>${project.build.directory}/</assembleDirectory>
-                            <platforms>
-                                <platform>windows</platform>
-                                <platform>unix</platform>
-                            </platforms>
-							<programs>
-								<program>
-									<mainClass>org.genevaers.runcontrolanalyser.App</mainClass>
-									<id>gvbrca</id>
-								</program>
-							</programs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
 		</plugins>
-		<resources>
-			<resource>
-				<filtering>true</filtering>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>application.properties</include>
-					<include>RCARPT.ftl</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 
 </project>

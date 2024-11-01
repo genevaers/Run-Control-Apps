@@ -42,30 +42,12 @@ public class RCAApp {
 
     public static void run() {
         ranOkay = Status.OK;
-        GersConfigration.clear();
-        ParmReader pr = new ParmReader();
-        RcaConfigration rcac = new RcaConfigration();
-        GersConfigration.setCurrentWorkingDirectory(cwd);
-        pr.setConfig(rcac);
-        try {
-            pr.populateConfigFrom(GersConfigration.getParmFileName());
-            GersConfigration.setLinesRead(pr.getLinesRead());
-            GenevaLog.initLogger(RunControlAnalyser.class.getName(), RcaConfigration.getLogFileName(), GersConfigration.getLogLevel());
-            logger.atInfo().log("GenevaERS Run Control Analyser %s", AnalyserDriver.readVersion());
-            logger.atInfo().log("Java Vendor %s", System.getProperty("java.vendor"));
-            logger.atInfo().log("Java Version %s", System.getProperty("java.version"));
-            logger.atInfo().log("Log level %s", GersConfigration.getLogLevel());
-            if(RcaConfigration.isValid()) {
-                ranOkay = AnalyserDriver.runFromConfig();
-            } else {
-                logger.atSevere().log("Invalid configuration. Processing stopped");
-            }
-        } catch (IOException e) {
-            ranOkay = Status.ERROR;
-            logger.atSevere().log("Unable to read PARM file");
+        if (GersConfigration.isRCAConfigValid()) {
+            ranOkay = AnalyserDriver.runFromConfig();
+        } else {
+             logger.atSevere().log("Invalid analysis configuration. No report requested");
         }
-        GenevaLog.closeLogger(RunControlAnalyser.class.getName());
-        if(ranOkay != Status.OK) {
+        if (ranOkay == Status.OK) {
             System.out.println("Run control analyser completed");
         } else {
             System.out.println("Run control analyser failed. See log for details.");

@@ -23,8 +23,6 @@ package org.genevaers.runcontrolgenerator.compilers;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.List;
-
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.format.FormatAST2Dot;
 import org.genevaers.compilers.format.FormatCompiler;
@@ -36,7 +34,7 @@ import org.genevaers.compilers.format.astnodes.FormatView;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewNode;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
+import org.genevaers.utilities.GersConfigration;
 
 import com.google.common.flogger.FluentLogger;
 
@@ -74,7 +72,7 @@ public class FormatRecordsBuilder {
 	}
 
 	private static void writeFormatAstIfEnabled() {
-		if(RunControlConfigration.isFormatDotEnabled()) {
+		if(GersConfigration.isFormatDotEnabled()) {
         	FormatAST2Dot.write(formatRoot, Paths.get("target/Format.dot"));
 		}
 	}

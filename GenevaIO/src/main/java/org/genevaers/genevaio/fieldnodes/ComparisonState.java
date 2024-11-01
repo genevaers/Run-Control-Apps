@@ -28,5 +28,6 @@ public enum ComparisonState {
     INSTANCE,
     IGNORED,
     RECIGNORE,
-    CPPONLY
+    CPPONLY, 
+    MAPPED
 }

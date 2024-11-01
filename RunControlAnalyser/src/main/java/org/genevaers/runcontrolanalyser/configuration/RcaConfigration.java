@@ -26,9 +26,6 @@ import com.google.common.flogger.FluentLogger;
 public class RcaConfigration extends GersConfigration {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    public static final String DEFAULT_PARM_FILENAME = RCA_BASENAME + "PARM";
-    public static final String DEFAULT_ZOSPARM_FILENAME = RCA_BASENAME + "PARM";
-
     public static final String COMPARE = "COMPARE";
     public static final String COVERAGE = "COVERAGE";
  
@@ -37,26 +34,25 @@ public class RcaConfigration extends GersConfigration {
     public static final String VDP_REPORT_DDNAME = "VDPRPT";
     public static final String REPORT_DDNAME = "RCARPT";
 
-    public static final String RCA_DIR = "RCA/";
     public RcaConfigration() {
         //Map preloaded with expect names and default values
-        parmToValue.put(LOG_LEVEL, new ConfigEntry("STANDARD", false));
+        // parmToValue.put(LOG_LEVEL, new ConfigEntry("STANDARD", false));
 
-        //Hidden defaults
-        parmToValue.put(PARMFILE, new ConfigEntry(DEFAULT_PARM_FILENAME, true));
-        parmToValue.put(ZOSPARMFILE, new ConfigEntry(DEFAULT_ZOSPARM_FILENAME, true));
-        // parmToValue.put(REPORT_FILE, new ConfigEntry(REPORT_FILE, true));
-        parmToValue.put(LOG_FILE, new ConfigEntry("RCALOG", true));
-        parmToValue.put(LOG_LEVEL, new ConfigEntry("STANDARD", true));
-        parmToValue.put(XLT_DDNAME, new ConfigEntry("XLT", true));
-        parmToValue.put(JLT_DDNAME, new ConfigEntry("JLT", true));
+        // //Hidden defaults
+        // parmToValue.put(PARMFILE, new ConfigEntry(DEFAULT_PARM_FILENAME, true));
+        // parmToValue.put(ZOSPARMFILE, new ConfigEntry(DEFAULT_ZOSPARM_FILENAME, true));
+        // // parmToValue.put(REPORT_FILE, new ConfigEntry(REPORT_FILE, true));
+        // parmToValue.put(LOG_FILE, new ConfigEntry("RCALOG", true));
+        // parmToValue.put(LOG_LEVEL, new ConfigEntry("STANDARD", true));
+        // parmToValue.put(XLT_DDNAME, new ConfigEntry("XLT", true));
+        // parmToValue.put(JLT_DDNAME, new ConfigEntry("JLT", true));
         
-        parmToValue.put(XLT_REPORT, new ConfigEntry("N", false));
-        parmToValue.put(JLT_REPORT, new ConfigEntry("N", false));
-        parmToValue.put(VDP_REPORT, new ConfigEntry("N", false));
-        parmToValue.put(COMPARE, new ConfigEntry("N", false));
-        parmToValue.put(RCA_REPORT, new ConfigEntry("N", false));
-        parmToValue.put(REPORT_FORMAT, new ConfigEntry("TXT", false));
+        // parmToValue.put(XLT_REPORT, new ConfigEntry("N", false));
+        // parmToValue.put(JLT_REPORT, new ConfigEntry("N", false));
+        // parmToValue.put(VDP_REPORT, new ConfigEntry("N", false));
+        // parmToValue.put(COMPARE, new ConfigEntry("N", false));
+        // parmToValue.put(RCA_REPORT, new ConfigEntry("N", false));
+        // parmToValue.put(REPORT_FORMAT, new ConfigEntry("TXT", false));
     }
 
     public static boolean isValid() {

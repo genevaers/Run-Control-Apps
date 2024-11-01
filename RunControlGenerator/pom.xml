@@ -86,25 +86,11 @@ under the License.
 			<groupId>com.google.flogger</groupId>
 			<artifactId>flogger-system-backend</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 		</plugins>
-		<resources>
-			<resource>
-				<filtering>true</filtering>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>application.properties</include>
-					<include>RCGRPT.ftl</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 
 	<profiles>

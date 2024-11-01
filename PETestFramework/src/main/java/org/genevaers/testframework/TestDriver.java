@@ -26,6 +26,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +41,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.genevaers.genevaio.recordreader.BinRecordWriter;
 import org.genevaers.genevaio.recordreader.ZosHelper;
 import org.genevaers.testframework.sdsf.HeldJobs;
 import org.genevaers.testframework.sdsf.TestJobs;
@@ -97,7 +101,7 @@ public class TestDriver {
 
 	private static HeldJobs heldJobs;
 
-	private static String appname = "RCG";
+	private static String appname = "RCA";
 
 	public static boolean processSpecList() {
 		try {
@@ -278,16 +282,16 @@ public class TestDriver {
 		//copy config
 		//Create WBXMLI
 		//copy XML to above
-		//cd to or run gvbrcg from test dir 
+		//cd to or run gvbrca from test dir 
 		CommandRunner cr = new CommandRunner();
 		try {
 			String mr91String;
 			String rcaString;
 			if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-				mr91String = "gvbrcg.bat";
+				mr91String = "gvbrca.bat";
 				rcaString = "gvbrca.bat";
 			} else {
-				mr91String = "gvbrcg";
+				mr91String = "gvbrca";
 				rcaString = "gvbrca";
 			}
 			cr.run(mr91String, localTest.toFile());
@@ -630,11 +634,11 @@ public class TestDriver {
 		if (GersEnvironment.get("OSNAME").startsWith("Win")) {
 			System.out.println("Get output file from " + dataset + " to " + outFile.toFile().toString() + " :" + f.getRecfm() + "," + f.getLrecl());
 		} else {
-			if(ZosHelper.convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
+			if(convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
 				//try again it may have been busy
 				snooze(1000);
 				logger.atInfo().log("retrying copy");
-				ZosHelper.convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl());
+				convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl());
 			}
 		}
 	}
@@ -802,5 +806,44 @@ public class TestDriver {
 		}
 		return eventFiles;
 	}	
+
+	public static boolean convertE2AAndCopyDataset2File(String dataset, File target, String recfm, String lrecl) {
+          boolean copied = false;
+          ZFile fileIn = null;
+          BinRecordWriter fw = new BinRecordWriter();
+          try {
+              fw.writeRecordsTo(target);
+              fileIn = new ZFile(dataset,"rb,type=record,recfm=" + recfm.toLowerCase() + ",lrecl=" + lrecl + ",noseek");
+              byte[] recBuf = new byte[Integer.parseInt(lrecl)];
+              while (fileIn.read(recBuf) != -1) {
+                  ByteBuffer convbb = ByteBuffer.wrap(ebcdicToAscii(recBuf));
+                  convbb.position(recBuf.length);
+                  fw.writeArray(convbb);
+              }
+              copied = true;
+          } catch (IOException e) {
+            logger.atSevere().log("convertE2AAndCopyDataset2File Failed to copy %s to %s\n%s", target.toString(), dataset, e.getMessage());
+          } finally {
+              try {
+                  if (fileIn != null) {
+                      fileIn.close();
+                  }
+                  fw.close();
+              } catch (IOException e) {
+                logger.atSevere().log("convertE2AAndCopyDataset2File Failed to close\n%s", e.getMessage());
+              }
+          }
+          return copied;
+      }
+
+      private static byte[] ebcdicToAscii(byte[] buf) {
+        Charset utf8charset = Charset.forName("ISO8859-1");
+        Charset ebccharset = Charset.forName("IBM-1047");
+        ByteBuffer inputBuffer = ByteBuffer.wrap(buf);
+        CharBuffer data = ebccharset.decode(inputBuffer);
+        return utf8charset.encode(data).array();
+      }
+  
+
 
 }

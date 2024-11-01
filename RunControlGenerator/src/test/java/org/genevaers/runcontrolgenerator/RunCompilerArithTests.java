@@ -11,10 +11,8 @@ import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.logging.Level;
 
-import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.astnodes.ASTFactory;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
-import org.genevaers.compilers.extract.astnodes.ErrorAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
@@ -28,8 +26,8 @@ import org.genevaers.genevaio.ltfile.LogicTableRE;
 import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
-import org.genevaers.runcontrolgenerator.configuration.RunControlConfigration;
 import org.genevaers.utilities.GenevaLog;
+import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -72,6 +70,8 @@ class RunCompilerArithTests extends RunCompilerBase {
         RecordParser.clearAndInitialise();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
+        GersConfigration.clear();
+        GersConfigration.initialise();
         GenevaLog.initLogger(RunCompilerArithTests.class.getName(), target.resolve(info.getDisplayName()).toString(), Level.FINE);
     }
 
@@ -99,7 +99,7 @@ class RunCompilerArithTests extends RunCompilerBase {
      }
 
      @Test void testFieldTimesConstant() {
-        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = {Binary1} * 3");
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = (((({Binary1} * 3))))");
         String[] expected = new String[]{ "DIMN", "SETE", "MULC", "DTA" };
         int expectedGotos[][] = {{}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
@@ -194,7 +194,7 @@ class RunCompilerArithTests extends RunCompilerBase {
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue addc = (LogicTableNameValue) xlt.getFromPosition(9);
         assertEquals("g_9956_1506_1762_1_1", addc.getTableName());        
-        assertEquals("g_9956_1506_1762_1_0", addc.getValue());        
+        assertEquals("g_9956_1506_1762_1_0", addc.getValue().getPrintString());        
     }
 
     @Test void testFieldMinusAccumulator() {
@@ -212,7 +212,7 @@ class RunCompilerArithTests extends RunCompilerBase {
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue mula = (LogicTableNameValue) xlt.getFromPosition(9);
         assertEquals("g_9956_1506_1762_1_1", mula.getTableName());        
-        assertEquals("g_9956_1506_1762_1_0", mula.getValue());        
+        assertEquals("g_9956_1506_1762_1_0", mula.getValue().getPrintString());        
     }
 
     @Test void testFieldDivideAccumulator() {
@@ -302,11 +302,8 @@ class RunCompilerArithTests extends RunCompilerBase {
 
 
     @Test void testFieldAssignment() throws IOException {
-        TestHelper.setupWithOneColumnView();
-        readConfigAndBuildRepo();
-        TestHelper.setColumn1Logic(9956, "COLUMN = {ZONED}");
-        RunControlConfigration.setDotFilter("9956", "1,2", "N");
-        ExtractBaseAST root = (ExtractBaseAST)CompileAndGenerateDots();
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = {ZONED}");
+        ExtractBaseAST root = ExtractPhaseCompiler.getXltRoot();
         ColumnAssignmentASTNode colAss = (ColumnAssignmentASTNode) root.getChildNodesOfType(ASTFactory.Type.COLUMNASSIGNMENT).get(0);
         assertEquals("ZONED", ((FieldReferenceAST)colAss.getFirstLeafNode()).getName());
     }
@@ -320,40 +317,67 @@ class RunCompilerArithTests extends RunCompilerBase {
         assertEquals("Ginger", dtc.getArg().getValue().getString());
     }
 
-    //     //This gets us into the whole Cookie debacle 
-    // @Test void testRundayAssignment() throws IOException {
-    //     LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = RUNDAY()");
-    //     String[] expected = new String[]{ "DTC" };
-    //     int expectedGotos[][] = {{}};
-    //     TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
-    //     LogicTableF1 dtc =  (LogicTableF1) xlt.getFromPosition(4);
-    //     assertEquals("Ginger", dtc.getArg().getValue());
-    // }
-
-    @Test void testNumricConstAssignment() {
-        LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, "COLUMN = 25");
-        String[] expected = new String[]{ "DTC" };
-        int expectedGotos[][] = {{}};
+    // This gets us into the whole Cookie debacle
+    @Test
+    void testRundayAssignment() throws IOException {
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = RUNDAY()");
+        String[] expected = new String[] { "DTC" };
+        int expectedGotos[][] = { {} };
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
-        LogicTableF1 dtc =  (LogicTableF1) xlt.getFromPosition(4);
+        LogicTableF1 dtc = (LogicTableF1) xlt.getFromPosition(4);
+        assertEquals("RUNDAY(0)", dtc.getArg().getValue().getPrintString());
+    }
+
+    @Test
+    void testNegativeRundayAssignment() throws IOException {
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = RUNDAY(-3)");
+        String[] expected = new String[] { "DTC" };
+        int expectedGotos[][] = { {} };
+        TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+        LogicTableF1 dtc = (LogicTableF1) xlt.getFromPosition(4);
+        assertEquals("RUNDAY(-3)", dtc.getArg().getValue().getPrintString());
+    }
+
+    @Test
+    void testFiscaldayAssignment() throws IOException {
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = FISCALDAY(6)");
+        String[] expected = new String[] { "DTC" };
+        int expectedGotos[][] = { {} };
+        TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+        LogicTableF1 dtc = (LogicTableF1) xlt.getFromPosition(4);
+        assertEquals("FISCALDAY(6)", dtc.getArg().getValue().getPrintString());
+    }
+
+    @Test
+    void testNegativeFiscaldayAssignment() throws IOException {
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = FISCALDAY(-9)");
+        String[] expected = new String[] { "DTC" };
+        int expectedGotos[][] = { {} };
+        TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+        LogicTableF1 dtc = (LogicTableF1) xlt.getFromPosition(4);
+        assertEquals("FISCALDAY(-9)", dtc.getArg().getValue().getPrintString());
+    }
+
+    @Test
+    void testNumricConstAssignment() {
+        LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, "COLUMN = 25");
+        String[] expected = new String[] { "DTC" };
+        int expectedGotos[][] = { {} };
+        TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
+        LogicTableF1 dtc = (LogicTableF1) xlt.getFromPosition(4);
         assertEquals("25", dtc.getArg().getValue().getString());
     }
 
     @Test void testNoneExistingFieldAssignment() throws IOException {
-        TestHelper.setupWithOneColumnView();
-        readConfigAndBuildRepo();
-        TestHelper.setColumn1Logic(9956, "COLUMN = {Rubbish}");
-        RunControlConfigration.setDotFilter("9956", "1", "N");
-        ExtractBaseAST root = (ExtractBaseAST) CompileAndGenerateDots();
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = {Rubbish}");
+        GersConfigration.setDotFilter("9956", "1", "N");
+        ExtractBaseAST root = ExtractPhaseCompiler.getXltRoot();
         assertTrue(Repository.getCompilerErrors().size() > 0);
     }
 
     @Test void testBadSyntaxAssignment() throws IOException {
-        TestHelper.setupWithOneColumnView();
-        readConfigAndBuildRepo();
-        TestHelper.setColumn1Logic(9956, "COLUMN = oops}");
-        RunControlConfigration.setDotFilter("9956", "1", "N");
-        ExtractBaseAST root = (ExtractBaseAST) CompileAndGenerateDots();
+        LogicTable xlt = runFromXMLOverrideLogic(9956, TestHelper.ONE_COL, "COLUMN = oops}");
+        ExtractBaseAST root = ExtractPhaseCompiler.getXltRoot();
         assertTrue(Repository.getCompilerErrors().size() > 0);
     }
 

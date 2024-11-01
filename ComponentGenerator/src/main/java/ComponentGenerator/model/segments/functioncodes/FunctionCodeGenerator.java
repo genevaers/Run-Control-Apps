@@ -128,10 +128,11 @@ public class FunctionCodeGenerator  extends GeneratorBase {
                 String func = c.getFunctionCode().substring(0,2);
                 if(func.equals("LK") && c.getLtRecordType().equals("F2")) {
                     args += ", LookupPathKey key";
-                } else if(c.getLtRecordType().equals("F2") 
+                } else if(func.equals("SK")) {
+                        args += ", ViewColumn vc, ViewSortKey vsk";
+                    } else if(c.getLtRecordType().equals("F2") 
                 || func.equals("DT")
-                || func.equals("CT")
-                || func.equals("SK")) {
+                || func.equals("CT")) {
                     //add the column anyway
                     args += ", ViewColumn vc";
                 }

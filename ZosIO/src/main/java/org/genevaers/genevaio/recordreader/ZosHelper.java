@@ -23,11 +23,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.StringUtils;
+import org.genevaers.utilities.GersFile;
 
 import com.google.common.flogger.FluentLogger;
 import com.ibm.jzos.RcException;
@@ -129,43 +131,6 @@ public class ZosHelper {
         return ebccharset.encode(data).array();
       }
   
-      private static byte[] ebcdicToAscii(byte[] buf) {
-        Charset utf8charset = Charset.forName("ISO8859-1");
-        Charset ebccharset = Charset.forName("IBM-1047");
-        ByteBuffer inputBuffer = ByteBuffer.wrap(buf);
-        CharBuffer data = ebccharset.decode(inputBuffer);
-        return utf8charset.encode(data).array();
-      }
-  
-      public static boolean convertE2AAndCopyDataset2File(String dataset, File target, String recfm, String lrecl) {
-          boolean copied = false;
-    //       ZFile fileIn = null;
-    //       BinRecordWriter fw = new BinRecordWriter();
-    //       try {
-    //           fw.writeRecordsTo(target);
-    //           fileIn = new ZFile(dataset,"rb,type=record,recfm=" + recfm.toLowerCase() + ",lrecl=" + lrecl + ",noseek");
-    //           byte[] recBuf = new byte[Integer.parseInt(lrecl)];
-    //           while (fileIn.read(recBuf) != -1) {
-    //               ByteBuffer convbb = ByteBuffer.wrap(ebcdicToAscii(recBuf));
-    //               convbb.position(recBuf.length);
-    //               fw.writeArray(convbb);
-    //           }
-    //           copied = true;
-    //       } catch (IOException e) {
-    //         logger.atSevere().log("convertE2AAndCopyDataset2File Failed to copy %s to %s\n%s", target.toString(), dataset, e.getMessage());
-    //       } finally {
-    //           try {
-    //               if (fileIn != null) {
-    //                   fileIn.close();
-    //               }
-    //               fw.close();
-    //           } catch (IOException e) {
-    //             logger.atSevere().log("convertE2AAndCopyDataset2File Failed to close\n%s", e.getMessage());
-    //           }
-    //       }
-          return copied;
-      }
-
       public static void putEventFile(String destDataset, File input, String name, String lrecl) {
         String datasetName = destDataset + "." + name;
         if (datasetDoesNotExist(datasetName)) {

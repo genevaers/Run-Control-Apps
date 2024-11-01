@@ -43,6 +43,7 @@ public class BuildGenevaFormatASTVisitor extends GenevaFormatBaseVisitor<FormatB
 
     private boolean fromFilter;
 	private Set<Integer> columnRefs = new TreeSet<>();
+    private FormatBaseAST assign;
 
     BuildGenevaFormatASTVisitor(boolean fromFilter) {
         this.fromFilter = fromFilter;
@@ -92,7 +93,7 @@ public class BuildGenevaFormatASTVisitor extends GenevaFormatBaseVisitor<FormatB
             return visitChildren(ctx);
 
             case 3:
-            FormatBaseAST assign = null;
+            //FormatBaseAST assign = null;
             if(ctx.getChild(0).getText().equalsIgnoreCase("COLUMN")) {
                 assign = FormatASTFactory.getNodeOfType(Type.COLASSIGN);
                 assign.addChildIfNotNull(visitChildren(ctx));
@@ -181,16 +182,21 @@ public class BuildGenevaFormatASTVisitor extends GenevaFormatBaseVisitor<FormatB
 
     @Override
     public FormatBaseAST visitExprArithAddSub(ExprArithAddSubContext ctx) {
-        FormatBaseAST arithNode = null;
-        if(ctx.getChildCount() == 3) {
-            arithNode = FormatASTFactory.getArithNode(ctx.getChild(1).getText());
-            if(arithNode != null) {
-                arithNode.addChildIfNotNull(visit(ctx.getChild(0)));
-                arithNode.addChildIfNotNull(visit(ctx.getChild(2)));
+        if (ctx.getChildCount() > 1) {
+            int nodenum = 1;
+            assign.addChildIfNotNull(visit(ctx.getChild(nodenum - 1)));
+            while (nodenum < ctx.getChildCount()) {
+                assign.addChildIfNotNull(visit(ctx.getChild(nodenum + 1)));
+                if(nodenum < ctx.getChildCount()) {
+                    FormatBaseAST opNode = FormatASTFactory.getArithNode(ctx.getChild(nodenum).getText());
+                    assign.addChildIfNotNull(opNode);
+                } else {
+                }
+                nodenum += 2;
             }
-            return arithNode; 
+            return null;
         } else {
-            return visitChildren(ctx); 
+            return visitChildren(ctx);
         }
     }
 

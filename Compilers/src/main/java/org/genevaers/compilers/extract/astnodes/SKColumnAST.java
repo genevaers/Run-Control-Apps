@@ -34,10 +34,10 @@ import org.genevaers.repository.components.enums.DateCode;
 
 
 public class SKColumnAST extends ColumnAST {
-    private ViewSortKey skc;
+    private ViewSortKey vsk;
     public SKColumnAST(ViewColumn vc) {
         type = ASTFactory.Type.SK_COLUMN;
-        skc = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
+        vsk = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
         this.vc = vc;
     }
 
@@ -64,48 +64,40 @@ public class SKColumnAST extends ColumnAST {
     @Override
     public LTFileObject getFieldLtEntry(LRField field) {
         LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
-        LogicTableF2 ske = (LogicTableF2) fcf.getSKE(field, vc);
-        // LogicTableArg arg1 = ske.getArg1();
-        LogicTableArg arg2 = ske.getArg2();
-        arg2.setFieldFormat(skc.getSortKeyDataType());
-        // if(arg2.getFieldFormat() == DataType.ALPHANUMERIC && arg1.getFieldFormat() != DataType.ALPHANUMERIC) {
-        //     arg2.setFieldFormat(DataType.ZONED);
-        // }
+        LogicTableF2 ske = (LogicTableF2) fcf.getSKE(field, vc, vsk);
         return ske;
     }
 
     @Override
     public LTFileObject getPriorFieldLtEntry(LRField field) {
         LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
-        return fcf.getSKP(field, vc);
+        return fcf.getSKP(field, vc, vsk);
     }
 
     @Override
     public LTFileObject getConstLtEntry(String value) {
         LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
-        ViewSortKey sk = Repository.getViews().get(vc.getViewId()).getViewSortKeyFromColumnId(vc.getComponentId());
-        LogicTableF1 skc = (LogicTableF1) fcf.getSKC(value, vc);
-        skc.getArg().setFieldLength(sk.getSkFieldLength());
+        LogicTableF1 skc = (LogicTableF1) fcf.getSKC(value, vc, vsk);
         return skc;
     }
 
     @Override
     public DataType getDataType() {
-        return overriddenDataType != DataType.INVALID ? overriddenDataType : skc.getSortKeyDataType();
+        return overriddenDataType != DataType.INVALID ? overriddenDataType : vsk.getSortKeyDataType();
     }
 
     @Override
     public DateCode getDateCode() {
-        return (overriddenDateCode != null) ? overriddenDateCode : skc.getSortKeyDateTimeFormat();
+        return (overriddenDateCode != null) ? overriddenDateCode : vsk.getSortKeyDateTimeFormat();
     }
 
     @Override
     public String getMessageName() {
-        return "Sort Key" + skc.getSequenceNumber();
+        return "Sort Key" + vsk.getSequenceNumber();
     }
     
     @Override
     public int getMaxNumberOfDigits() {
-        return RepoHelper.getMaxNumberOfDigitsForType(skc.getSortKeyDataType(), skc.getSkFieldLength());
+        return RepoHelper.getMaxNumberOfDigitsForType(vsk.getSortKeyDataType(), vsk.getSkFieldLength());
     }
 }

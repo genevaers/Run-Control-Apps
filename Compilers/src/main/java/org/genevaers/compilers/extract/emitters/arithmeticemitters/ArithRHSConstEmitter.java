@@ -22,6 +22,7 @@ import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.NumAtomAST;
 import org.genevaers.compilers.extract.astnodes.NumericAccumulator;
 import org.genevaers.compilers.extract.emitters.arithmeticemitters.ArithDataTypeChecker.ArithResult;
+import org.genevaers.genevaio.ltfile.Cookie;
 import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LogicTableNameValue;
 import org.genevaers.repository.components.enums.LtRecordType;
@@ -54,7 +55,7 @@ public class ArithRHSConstEmitter extends ArithEmitter  {
                 default:
                 break;
             }
-            arithfn.setValue(num.getValueString());
+            arithfn.setValue(new Cookie(num.getValueString()));
         }
         if(res != ArithResult.ARITH_OK) {
             //we have a message to report

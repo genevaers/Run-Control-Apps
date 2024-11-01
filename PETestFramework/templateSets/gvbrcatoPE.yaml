@@ -1,26 +1,26 @@
 ---
-name: "gvbrcgtoPE"
+name: "gvbRCAtoPE"
 templates:
 #
 # JCL templates
 #
-  - name: "jcl/RCGL.ftl"
+  - name: "jcl/RCAL.ftl"
     target: "${test}L"
     type: "JCL"
-  - name: "jcl/RCGR.ftl"
+  - name: "jcl/RCAR.ftl"
     target: "${test}R"
     type: "JCL"
-  - name: "jcl/RCGE.ftl"
+  - name: "jcl/RCAE.ftl"
     target: "${test}E"
     type: "JCL"
-  - name: "jcl/RCGF.ftl"
+  - name: "jcl/RCAF.ftl"
     target: "${test}F"
     type: "JCL"
 # The two below are run if COVERAGE is set to Y - should this be managed by env vars?
-  - name: "jcl/RCGX.ftl"
+  - name: "jcl/RCAX.ftl"
     target: "${test}X"
     type: "COVERAGEJCL"
-  - name: "jcl/RCGJ.ftl"
+  - name: "jcl/RCAJ.ftl"
     target: "${test}J"
     type: "COVERAGEJCL"
 # Only generate the G JCL if we are comparing on the Mainframe -->
@@ -36,8 +36,8 @@ templates:
 #
 # Config templates
 #
-  - name: "cfg/RCGCFG.ftl"
-    target: "RCGPARM"
+  - name: "cfg/RCACFG.ftl"
+    target: "RCAPARM"
     type: "Config"
   - name: "cfg/PMConf_D95C.ftl"
     target: "REGRR95C"

@@ -201,12 +201,7 @@ public class LookupEmitter extends CodeEmitter {
             //Then that's steps target lf id what we want
             //But the field arg are those of the generated/mapped field 
             int lfid;
-            if(key.getStepNumber() > 1) {
-                lfid = lookup.getTargetLFMatchingLrid(key.getSourceLrId());
-                lkfe.setLogicalFileID(lfid);
-            } else {
-                lfid = ExtractBaseAST.getLtEmitter().getFileId();
-            }
+            lkfe.setLogicalFileID(ExtractBaseAST.getCurrentViewSource().getSourceLFID());
             LogicTableF2 lk = lkfe.emit(key, lookup);
             ExtractBaseAST.getLtEmitter().addToLogicTable(lk);
         } else if(key.getSymbolicName().length() > 0) {

@@ -45,13 +45,17 @@ public class LKFieldEmitter extends LookupEmitter {
         LogicTableF2 lk;
         if(lkpkey.getStepNumber() == 1) {
             lk = (LogicTableF2) ltfact.getLKE(Repository.getFields().get(lkpkey.getFieldId()), lkpkey);
+            LogicTableArg arg1 = lk.getArg1();
+            arg1.setLogfileId(srcLFID);
         } else {
             //we need the the mapped field not the original
             int keyfieldLR = Repository.getFields().get(lkpkey.getFieldId()).getLrID();
             //does key field come from the event LR?
             if(keyfieldLR == lookup.getStep(1).getSourceLR()) {
                 lk = (LogicTableF2) ltfact.getLKE(Repository.getFields().get(lkpkey.getFieldId()), lkpkey);
-            } else { //Keyfield is from a previous step
+                LogicTableArg arg1 = lk.getArg1();
+                arg1.setLogfileId(srcLFID);
+        } else { //Keyfield is from a previous step
                 JLTView jltvOfTargetSourceStep = Repository.getJoinViews().getJltViewFromKeyField(lkpkey.getFieldId(), lookup);
                 LRField redfld = jltvOfTargetSourceStep.getRedFieldFromLookupField(lkpkey.getFieldId());
                 lk = (LogicTableF2) ltfact.getLKL(Repository.getFields().get(lkpkey.getFieldId()), lkpkey);

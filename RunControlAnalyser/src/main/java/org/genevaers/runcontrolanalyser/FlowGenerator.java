@@ -413,6 +413,7 @@ public class FlowGenerator {
 			if(vc.findFromSourcesByNumber(currentViewSource) == null) {
 				ViewColumnSource vcs = new ViewColumnSource();
 				vcs.setSrcValue(dtc.getArg().getValue().getString());
+				vcs.setValueLength(dtc.getArg().getValue().getString().length());
 				vcs.setSourceType(ColumnSourceType.CONSTANT);
 				vcs.setSequenceNumber(currentViewSource);
 				vc.addToSourcesByNumber(vcs);

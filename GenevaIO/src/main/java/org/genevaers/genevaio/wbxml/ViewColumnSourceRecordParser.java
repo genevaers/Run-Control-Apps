@@ -59,6 +59,7 @@ public class ViewColumnSourceRecordParser extends RecordParser {
 					break;
 				case "CONSTVAL":
 					vcs.setSrcValue(text);
+					vcs.setValueLength(text.length());
 					break;
 				case "LOOKUPID":
 					vcs.setSrcJoinId(Integer.parseInt(text));

@@ -1,5 +1,7 @@
 package org.genevaers.genevaio.wbxml;
 
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -53,8 +55,9 @@ public class LFPFAssocRecordParser extends RecordParser {
 					lfpf.lfid = Integer.parseInt(text);
 					lfpf.pfid = pfid;
 					lfpf.seq = Integer.parseInt(seqNum);
-					String keyName = text + "_" + seqNum;
-					RecordParserData.lfpfsByAssocSeq.put(keyName, lfpf);
+
+					Map<Integer, LFPF> lfseq = RecordParserData.addOrGetLfSeqMap(lfpf.lfid);
+					lfseq.put(lfpf.seq , lfpf);
 					RecordParserData.lfpfs.put(assocId, lfpf);
 					break;
 				default:
