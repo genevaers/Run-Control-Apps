@@ -127,8 +127,7 @@ public class Tester {
 			initialisePaths();
 			readAndProcessTheInputs();
 			} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				logger.atSevere().log("IO exception on MR91 inputs\n%s", e.getMessage());
 		}
 		return true;
     }
@@ -162,8 +161,7 @@ public class Tester {
 		try {
 			run(xmlFiles);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("IO exception MR91 XML file reads\n%s", e.getMessage());
 		}
 	}
 

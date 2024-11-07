@@ -24,8 +24,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
+import com.google.common.flogger.FluentLogger;
 
 public class TestMessageCoverage {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	@Test
 	public void testBaseFiles() {
@@ -54,7 +56,7 @@ public class TestMessageCoverage {
 			assertTrue(coverage.numberOfInfos() == 0);
 
 		} catch (IOException e1) {
-			e1.printStackTrace();
+            logger.atSevere().log("IO exception in Test Message generation\n%s", e.getMessage());
 		}
 	}
 
@@ -77,7 +79,7 @@ public class TestMessageCoverage {
 				System.out.println(repLine);
 			}
 		} catch (IOException e1) {
-			e1.printStackTrace();
+            logger.atSevere().log("IO exception in Test Message write\n%s", e.getMessage());
 		}
 	}
 

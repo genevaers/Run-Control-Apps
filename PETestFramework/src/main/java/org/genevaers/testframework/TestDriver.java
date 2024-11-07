@@ -114,8 +114,7 @@ public class TestDriver {
 				logger.atSevere().log("Invalid variable values");
 			}
 		} catch (Exception e) {
-			logger.atSevere().log("Exception in testing");
-			e.printStackTrace();
+            logger.atSevere().log("Exception in testing\n%s", e.getMessage());
 		}
 
 		// if we ran tests run overview no matter what
@@ -156,7 +155,7 @@ public class TestDriver {
 		try {
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + TEST_SRC));
 		} catch (Exception e) {
-			e.printStackTrace();
+            logger.atSevere().log("Exception in Gers Environment generated junit\n%s", e.getMessage());
 		}
 	}
 
@@ -167,7 +166,7 @@ public class TestDriver {
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + "cfg"));
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + "out"));
 		} catch (Exception e) {
-			e.printStackTrace();
+            logger.atSevere().log("Exception in Gers Environment Junit file generation\n%s", e.getMessage());
 		}
 	}
 
@@ -217,7 +216,7 @@ public class TestDriver {
 			properties.load(resourceStream);
 			ver = properties.getProperty("app.name") + ": " + properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.atSevere().log("IO exception in Test Driver version read\n%s", e.getMessage());
 		}
 		return ver;
 	}
@@ -301,8 +300,7 @@ public class TestDriver {
 			cr.run(rcaString, localTest.toFile());
 			logger.atInfo().log(cr.getCmdOutput().toString());
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("Interruption error in .bat file creation\n%s", e.getMessage());
 		}
 		// dittto gvbrca
 		processLocalResult(testToRun);
@@ -347,8 +345,7 @@ public class TestDriver {
 			nodeMap.put("cssPath", cssPath);
 			TemplateApplier.generateTestTemplatedOutput(template, nodeMap, resultFilePath);
 		} catch (IOException | TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception in test driver result read\n%s", e.getMessage());
 		}
 	}
 
@@ -475,8 +472,7 @@ public class TestDriver {
 				ZFile.remove(dataset);
 			}
 		} catch (ZFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("jzos zfile deletion error\n%s", e.getMessage());
 		}
 	}
 
@@ -509,7 +505,7 @@ public class TestDriver {
 				runTest(t);
 				specPassed &= t.getResult().getMessage().startsWith("pass") ? true : false;
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.atSevere().log("IO exception in test driver run spec process\n%s", e.getMessage());
 			}
 		}
 		if(specPassed) {
@@ -659,7 +655,7 @@ public class TestDriver {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+            logger.atSevere().log("Interrupt exception in test driver snooze process\n%s", e.getMessage());
 		} // 1 second
 	}
 
@@ -669,7 +665,7 @@ public class TestDriver {
 			logger.atInfo().log("check %s exists", dataset);
 			found = ZFile.exists(dataset);
 		} catch (ZFileException e) {
-			e.printStackTrace();
+            logger.atSevere().log("jzos zFile error in out file existence test\n%s", e.getMessage());
 		}
 		return found;
 	}
@@ -740,8 +736,7 @@ public class TestDriver {
 				nodeMap.put("cssPath", cssPath);
 				TemplateApplier.generateTestTemplatedOutput(template, nodeMap, resultFilePath);
 			} catch (IOException | TemplateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("IO exception in test driver result parsing\n%s", e.getMessage());
 			}
 		}
 	}
@@ -779,8 +774,7 @@ public class TestDriver {
 						System.out.println(Menu.GREEN + "PASS for " + outFilePath.toString() + Menu.RESET);
 					}
 			} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				logger.atSevere().log("IO exception in test driver output file match process\n%s", e.getMessage());
 				}
 			}
 		}
@@ -808,8 +802,7 @@ public class TestDriver {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception in test driver get file info process\n%s", e.getMessage());
 		}
 		return eventFiles;
 	}	

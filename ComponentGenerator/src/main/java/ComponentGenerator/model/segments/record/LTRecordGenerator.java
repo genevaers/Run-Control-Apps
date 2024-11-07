@@ -102,11 +102,9 @@ public class LTRecordGenerator extends GeneratorBase{
 			to = to.resolve(cr.replace(" ", "") + ".md");
 			generateTemplatedOutput(template, nodeMap, to);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on writing LT Record documentation\n%s", e.getMessage());
 		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Template exception on writing LT Record documentation\n%s", e.getMessage());
 		}
     }
 

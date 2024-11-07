@@ -51,6 +51,10 @@ under the License.
       <version>5.9.1</version>
       <scope>test</scope>
     </dependency>
+    		<dependency>
+			<groupId>com.google.flogger</groupId>
+			<artifactId>flogger</artifactId>
+		</dependency>
   </dependencies>
 
   <build>

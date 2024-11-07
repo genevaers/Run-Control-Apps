@@ -23,18 +23,20 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.google.common.flogger.FluentLogger;
 
 public class CommandLineHandler {
 
 	static ModelGenerator modelGenerateor = new ModelGenerator();
 	private static final String MODEL_CONFIGFILE = "../ComponentGenerator/src/main/resources/modelConfig.yaml";
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public static void main(String[] args)  {
 		initLogger();
 		try {
 			modelGenerateor.generateFrom(MODEL_CONFIGFILE);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Cannot generate modelConfig.yaml\n%s", e.getMessage());
 		}
 	}
 

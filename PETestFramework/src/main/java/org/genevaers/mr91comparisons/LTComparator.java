@@ -79,7 +79,7 @@ public class LTComparator {
 			moveTargetLTReportToSource(srcxlt, trgxlt, JXTRGRPT);
 			results = getXLTRPTcomparisonResults(testOutPath, srcxlt, trgxlt, XLT);
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on compare XLT report\n%s", e.getMessage());
 		}
 		return results;
 	}
@@ -112,10 +112,10 @@ public class LTComparator {
 			}
 	        cmd.clear();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on compare JLT report\n%s", e.getMessage());
 		}
 		catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Interrupt exception on compare JLT report\n%s", e.getMessage());
 		}
 		return result;
 	}

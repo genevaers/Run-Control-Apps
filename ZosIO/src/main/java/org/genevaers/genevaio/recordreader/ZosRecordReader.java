@@ -36,7 +36,7 @@ public class ZosRecordReader extends RecordFileReader {
             logger.atInfo().log("Close dataset");
             reader.close();
         } catch (com.ibm.jzos.ZFileException e) {
-			e.printStackTrace();
+            logger.atSevere().log("jzos file exception on Zos Record read\n%s", e.getMessage());
 		}
     }
 

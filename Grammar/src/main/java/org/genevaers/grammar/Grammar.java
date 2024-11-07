@@ -21,8 +21,10 @@ package org.genevaers.grammar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import com.google.common.flogger.FluentLogger;
 
 public class Grammar  {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private Grammar() {
 	}
@@ -35,7 +37,7 @@ public class Grammar  {
 			properties.load(resourceStream);
 			ver = properties.getProperty("library.name") + ":" + properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on grammar version\n%s", e.getMessage());
 		}
 		return ver;
 	}

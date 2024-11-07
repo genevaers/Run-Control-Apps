@@ -26,8 +26,10 @@ import org.genevaers.testframework.TestReporter;
 import org.genevaers.utilities.GersEnvironment;
 import org.genevaers.utilities.menu.Menu;
 import org.genevaers.utilities.menu.MenuItem;
+import com.google.common.flogger.FluentLogger;
 
 public class ShowCurrentTests extends MenuItem {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public ShowCurrentTests() {
         color = Ansi.Color.MAGENTA;
@@ -42,7 +44,7 @@ public class ShowCurrentTests extends MenuItem {
         try {
             reporter.generate();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.atSevere().log("Exception on generation of current test report\n%s", e.getMessage());
         }
         try {
             BufferedReader in = new BufferedReader(
@@ -55,8 +57,7 @@ public class ShowCurrentTests extends MenuItem {
             Menu.promptedRead("Enter to continue");
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO exception on current test report read\n%s", e.getMessage());
         }
         return true;
     }

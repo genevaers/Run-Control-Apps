@@ -95,9 +95,7 @@ public abstract class MenuItem {
     //             runner.run("gvbrcg", rcDir.toFile());
     //         }
     //     } catch (IOException | InterruptedException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
-    //     }
+    //          logger.atSevere().log("IO exception on windows file run\n%s", e.getMessage())    //     }
     // }
 
     /*
@@ -117,8 +115,7 @@ public abstract class MenuItem {
     //         ""
     //         );
     //     } catch (Exception e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
+    //          logger.atSevere().log("Exception on gerenate flow\n%s", e.getMessage());
     //     }
     // }
 

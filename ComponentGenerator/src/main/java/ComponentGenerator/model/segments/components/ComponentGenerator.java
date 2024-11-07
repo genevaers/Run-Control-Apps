@@ -68,11 +68,9 @@ public class ComponentGenerator extends GeneratorBase{
 			to = to.resolve("Java"+cr.replace(" ", "") + ".md");
 			generateTemplatedOutput(template, nodeMap, to);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on writing documentation\n%s", e.getMessage());
 		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Template exception on writing documentation\n%s", e.getMessage());
 		}
     }
 

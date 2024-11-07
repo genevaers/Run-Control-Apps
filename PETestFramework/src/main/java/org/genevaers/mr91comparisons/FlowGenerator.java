@@ -46,8 +46,7 @@ public class FlowGenerator {
 			}
 	        cmd.clear();
 		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("IO exception on Flow Analyser Report\n%s", e.getMessage());
 		}
 	}
 }
