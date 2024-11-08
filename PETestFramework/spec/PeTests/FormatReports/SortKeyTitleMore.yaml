@@ -12,7 +12,7 @@ tests:
   source: "WBXML"
   timeout: "120"
   xmlfiles:
-  - name: "SortKeyTitle/Sort_Key_Title_one_step_LU_2SKT[12224].xml"
+  - name: "SortKeyTitle/Sort_Key_Title_one_step_LU_2SK[12223].xml"
   reffiles:
   - ddname: "PROD0001"
     filename: "PRODUCT.FILEREG1"  
