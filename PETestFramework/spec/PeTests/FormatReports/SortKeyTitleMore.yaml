@@ -65,7 +65,7 @@ tests:
     filename: "PRODUCT.FILEREG3"  
   eventfiles:
   - ddname: "CA000001"
-    filename: "SALES.CO.FILEREG2"
+    dummy: ""
   - ddname: "CO000001"
     filename: "SALES.CO.FILEREG1"
   - ddname: "IL000001"
