@@ -15,7 +15,7 @@ tests:
   - name: "SortKeyTitle/Sort_Key_Title_one_step_LU_2SK[12223].xml"
   reffiles:
   - ddname: "PROD0001"
-    filename: "PRODUCT.FILEREG1"  
+    filename: "PRODUCT.FILEREG3"  
   eventfiles:
   - ddname: "CA000001"
     filename: "SALES.CO.FILEREG2"
@@ -62,7 +62,7 @@ tests:
   - name: "SortKeyTitle/Sort_Key_Title_Column_change[12227].xml"
   reffiles:
   - ddname: "PROD0001"
-    filename: "PRODUCT.FILEREG1"  
+    filename: "PRODUCT.FILEREG3"  
   eventfiles:
   - ddname: "CA000001"
     filename: "SALES.CO.FILEREG2"
