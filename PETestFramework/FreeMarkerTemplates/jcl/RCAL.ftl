@@ -39,10 +39,6 @@ ${env["GERS_TEST_HLQ"]}.${test.dataSet}</#macro>
 //*********************************************************************
 //*
 //*******************************************************************
-//* Licensed Materials - Property of IBM
-//* 5655-DGJ
-//* Copyright IBM Corp. 1997, 2021
-//* STATUS = HJVBB00
 //*
 //* Batch job to run the Java VM
 //*

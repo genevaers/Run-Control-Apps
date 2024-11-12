@@ -179,6 +179,8 @@ public class JoinViewsManager {
 
 	private List<JoinTargetEntry> joinTargets = new ArrayList<>();
 
+	private int headerViewNumber = 0;
+
     //The way C++ does this is to keep 3 maps for
     //Normal, Exit and External lookups
     //They each can have an association SKT flag
@@ -491,8 +493,13 @@ public class JoinViewsManager {
 		}
 	}
 
-	public int getREHViewNumber() {
-        return JLTView.JOINVIEWBASE + getNumberOfReferenceJoins() + 1;
+	public int getHeaderViewNumber() {
+		if(headerViewNumber == 0) {
+			headerViewNumber = JLTView.JOINVIEWBASE + getNumberOfReferenceJoins() + 1;
+		} else {
+			headerViewNumber++;
+		}
+        return headerViewNumber;
     }
 
     private int getNumberOfReferenceJoins() {
@@ -504,10 +511,6 @@ public class JoinViewsManager {
 		}
 		return totalNumberOfJoins + externalJoins.getNumberOfJoins();
 	}
-
-	public int getRTHViewNumber() {
-        return JLTView.JOINVIEWBASE + getNumberOfReferenceJoins() + 2;
-    }
 
 	public Map<Integer, JLTViewMap<ReferenceJoin>> getReferenceDataSet() {
 		return referenceDataSet;

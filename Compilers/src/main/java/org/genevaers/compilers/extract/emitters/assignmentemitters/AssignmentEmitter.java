@@ -30,11 +30,11 @@ import org.genevaers.repository.components.ViewColumn;
 /**
  * Base class for Assignment Emitters.
  * 
- * The {@link #getLTEntry(ExtractBaseAST, ExtractBaseAST)} is the function used by the compiler to emit the appropriate function code
+ * The {@see #getLTEntry(ExtractBaseAST, ExtractBaseAST)} is the function used by the compiler to emit the appropriate function code
  * to assign a value to a column.
  * 
- * Internally it is uses the {@link AssignmentDataCheckerFactory} to verify the data types of the assignment statement.
- * The {@link AssignmentEmitterFactory} is then used to get the concrete emitter.
+ * Internally it is uses the {@see AssignmentDataCheckerFactory} to verify the data types of the assignment statement.
+ * The {@see AssignmentEmitterFactory} is then used to get the concrete emitter.
  * The concrete emitter used is determined by the type of the RHS.
  */
 public abstract class AssignmentEmitter extends CodeEmitter {

@@ -1,6 +1,6 @@
 specFileSets:
  - name: "Format phase Tests"
-   templateSetName: "MR91toPE.yaml"
+   templateSetName: "gvbrcatoPE.yaml"
    specs:
     - "PeTests/FormatReports/SortKeyTitle.yaml"
     - "PeTests/FormatReports/SortKeyTitleExtra.yaml"

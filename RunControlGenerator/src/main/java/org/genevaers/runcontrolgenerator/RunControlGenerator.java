@@ -59,7 +59,7 @@ public class RunControlGenerator {
         Repository.setRunviews(IdsReader.getIdsFrom(GersConfigration.RUNVIEWS));
 		if(buildComponentRepositoryFromSelectedInput() != Status.ERROR) {
 			logger.atInfo().log("Repository populated");
-			Repository.fixupMaxHeaderLines();
+			Repository.fixupViewsAndSkts();
 			Repository.fixupPFDDNames();
 			Repository.allLFsNotRequired();
 			Repository.setGenerationTime(Calendar.getInstance().getTime());

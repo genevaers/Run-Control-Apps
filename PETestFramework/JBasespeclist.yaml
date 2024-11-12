@@ -22,3 +22,4 @@ specFileSets:
       - "PeTests/FormatReports/ReportHeaderTest.yaml"
       - "PeTests/FormatReports/NEWP2.yaml"
       - "PeTests/Format/NEWP3.yaml"
+      - "PeTests/Format/FCLART.yaml"

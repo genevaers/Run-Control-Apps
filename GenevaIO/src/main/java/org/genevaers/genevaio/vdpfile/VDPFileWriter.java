@@ -125,6 +125,8 @@ public class VDPFileWriter {
 		// if(vmd.getFormatFile() == null) {
 		// 	makeViewFormatRecord(view);  //This is a silly name for the view output record (basically its DDname)
 		// }
+		writeHeaders(view);
+		writeFooters(view);
 		writeTheOutputFile(view);
 		writeFormatFilterLogic(view);
 		writeFormatFilterStack(view);
@@ -133,8 +135,6 @@ public class VDPFileWriter {
 		writeViewSortKeys(view);
 		writeViewSources(view);
 		writeViewColumnSources(view);
-		writeHeaders(view);
-		writeFooters(view);
 	}
 
 	private void writeHeaders(ViewNode view) {

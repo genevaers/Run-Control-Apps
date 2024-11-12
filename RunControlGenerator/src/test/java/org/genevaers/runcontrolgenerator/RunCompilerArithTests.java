@@ -68,6 +68,7 @@ class RunCompilerArithTests extends RunCompilerBase {
         Repository.setGenerationTime(Calendar.getInstance().getTime());
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         RecordParser.clearAndInitialise();
+        ExtractBaseAST.init();
         java.nio.file.Path target = Paths.get("target/test-logs/");
         target.toFile().mkdirs();
         GersConfigration.clear();
@@ -89,13 +90,13 @@ class RunCompilerArithTests extends RunCompilerBase {
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableName dimn = (LogicTableName) xlt.getFromPosition(4);
         //Horible old accumulator naming....
-        assertEquals("g_9956_1506_1762_1_0", dimn.getAccumulatorName());
+        assertEquals("g_9956_1506_1762_0_0", dimn.getAccumulatorName());
         LogicTableNameF1 sete = (LogicTableNameF1) xlt.getFromPosition(5);
-        assertEquals("g_9956_1506_1762_1_0", sete.getAccumulatorName());
+        assertEquals("g_9956_1506_1762_0_0", sete.getAccumulatorName());
         LogicTableNameValue addc = (LogicTableNameValue) xlt.getFromPosition(6);
-        assertEquals("g_9956_1506_1762_1_0", addc.getTableName());
+        assertEquals("g_9956_1506_1762_0_0", addc.getTableName());
         LogicTableNameF1 dta = (LogicTableNameF1) xlt.getFromPosition(7);
-        assertEquals("g_9956_1506_1762_1_0", dta.getAccumulatorName());
+        assertEquals("g_9956_1506_1762_0_0", dta.getAccumulatorName());
      }
 
      @Test void testFieldTimesConstant() {
@@ -193,8 +194,8 @@ class RunCompilerArithTests extends RunCompilerBase {
         int expectedGotos[][] = {{}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue addc = (LogicTableNameValue) xlt.getFromPosition(9);
-        assertEquals("g_9956_1506_1762_1_1", addc.getTableName());        
-        assertEquals("g_9956_1506_1762_1_0", addc.getValue().getPrintString());        
+        assertEquals("g_9956_1506_1762_0_0", addc.getTableName());        
+        assertEquals("g_9956_1506_1762_0_1", addc.getValue().getPrintString());        
     }
 
     @Test void testFieldMinusAccumulator() {
@@ -211,8 +212,8 @@ class RunCompilerArithTests extends RunCompilerBase {
         int expectedGotos[][] = {{}};
         TestLTAssertions.assertFunctionCodesAndGotos(4, expected, expectedGotos, xlt);
         LogicTableNameValue mula = (LogicTableNameValue) xlt.getFromPosition(9);
-        assertEquals("g_9956_1506_1762_1_1", mula.getTableName());        
-        assertEquals("g_9956_1506_1762_1_0", mula.getValue().getPrintString());        
+        assertEquals("g_9956_1506_1762_0_0", mula.getTableName());        
+        assertEquals("g_9956_1506_1762_0_1", mula.getValue().getPrintString());        
     }
 
     @Test void testFieldDivideAccumulator() {

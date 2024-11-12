@@ -95,6 +95,7 @@ public class VDPTextWriter extends TextRecordWriter {
 		ignoreTheseDiffs.put("Column_Calculation_Stack_recordId", true); 
 		ignoreTheseDiffs.put("Format_Filter_Stack_recordId", true); 
 		ignoreTheseDiffs.put("Column_Sources_viewSrcLrId", true); 
+		ignoreTheseDiffs.put("Sort_Keys_descOrdinalPosition", true); 
 	}
 
 	private void checkIfOldIsCpp(MetadataNode recordsRoot) {

@@ -280,14 +280,14 @@ class RunCompilerTest extends RunCompilerBase {
         LogicTableNameF1 mule = (LogicTableNameF1) xlt.getFromPosition(14);
         assertEquals("MULE", mule.getFunctionCode());
         assertEquals(10208, mule.getArg().getLogfileId());
-        assertEquals("g_10702_10208_10249_3_0", mule.getAccumulatorName());
+        assertEquals("g_10702_10208_10249_2_0", mule.getAccumulatorName());
         LogicTableWR wrsu = (LogicTableWR) xlt.getFromPosition(38);
         assertEquals("WRSU", wrsu.getFunctionCode());
         assertEquals(4000, wrsu.getExtrSumRecCnt());
         LogicTableNameF1 sete = (LogicTableNameF1) xlt.getFromPosition(13);
         assertEquals(10208, sete.getArg().getLogfileId());
         LogicTableNameF1 sete21 = (LogicTableNameF1) xlt.getFromPosition(21);
-        assertEquals("g_10702_10208_10249_4_0", sete21.getAccumulatorName());
+        assertEquals("g_10702_10208_10249_3_0", sete21.getAccumulatorName());
         LogicTableNameF1 cta = (LogicTableNameF1) xlt.getFromPosition(15);
         assertEquals("CTA", cta.getFunctionCode());
         assertEquals(10208, cta.getArg().getLogfileId());

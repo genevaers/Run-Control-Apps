@@ -174,13 +174,16 @@ public class LTLogger {
 				LogicTableF1 f1 = (LogicTableF1) ltr;
 				return(leadin + "  " + f1.getArg().getValue().getPrintString());
 			}
+			case "KSLK": {
+				return(leadin + "  " +  getKSLKInfo(ltr));
+			}
 			case "GOTO":
-				LogicTableF0 agoto = (LogicTableF0) ltr;
-				return(String.format(AGOTO, leadin, agoto.getGotoRow1()));
-				case "CFAA": 
-				case "CFAC": {
-						LogicTableNameValue cfa = (LogicTableNameValue) ltr;
-				return(String.format(CFA, leadin, cfa.getTableName(), cfa.getCompareType(), cfa.getValue(), getGotos(ltr)));
+			LogicTableF0 agoto = (LogicTableF0) ltr;
+			return(String.format(AGOTO, leadin, agoto.getGotoRow1()));
+			case "CFAA": 
+			case "CFAC": {
+					LogicTableNameValue cfa = (LogicTableNameValue) ltr;
+			return(String.format(CFA, leadin, cfa.getTableName(), cfa.getCompareType(), cfa.getValue(), getGotos(ltr)));
 			}
 			case "CFCE": 
 			case "CFCL": {
@@ -302,6 +305,11 @@ public class LTLogger {
 	private static Object getLKLRInfo(LTRecord ltr) {
 		LogicTableF1 lklr = (LogicTableF1) ltr;
 		return String.format("%d/%d %d -> \"%s\"", lklr.getArg().getLogfileId(), lklr.getArg().getLrId(), lklr.getColumnId(), lklr.getArg().getValue().getPrintString());
+	}
+
+	private static Object getKSLKInfo(LTRecord ltr) {
+		LogicTableF1 kslk = (LogicTableF1) ltr;
+		return String.format("%d/%d %d fld %d len %d", kslk.getArg().getLogfileId(), kslk.getArg().getLrId(), kslk.getColumnId(), kslk.getArg().getFieldId(), kslk.getArg().getFieldLength());
 	}
 
 	private static String getViewLine(LTRecord ltr) {

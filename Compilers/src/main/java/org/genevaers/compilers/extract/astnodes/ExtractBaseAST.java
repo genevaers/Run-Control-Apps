@@ -239,4 +239,8 @@ public abstract class ExtractBaseAST extends ASTBase{
         ExtractBaseAST.currentMessageSource = currentMessageSource;
     }
 
+    public static void init() {
+        currentViewColumn = null;
+    }
+
 }

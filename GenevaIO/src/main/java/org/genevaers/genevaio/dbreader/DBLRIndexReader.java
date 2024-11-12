@@ -25,8 +25,12 @@ import java.sql.SQLException;
 
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRIndex;
+import org.genevaers.repository.components.LogicalRecord;
 
 public class DBLRIndexReader extends DBReaderBase{
+
+    private int lrid;
+    private boolean effectiveDatesAdded = false;
 
     @Override
     public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
@@ -50,25 +54,47 @@ public class DBLRIndexReader extends DBReaderBase{
     @Override
     protected void addComponentToRepo(ResultSet rs) throws SQLException {
         LRIndex lri = new LRIndex();
-        lri.setComponentId(rs.getInt("LRINDEXID"));
+        int id = rs.getInt("LRINDEXID");
+        lri.setComponentId(id);
+        int rslrid = rs.getInt("LOGRECID");
+        if(rslrid != lrid) {
+            lrid = rslrid;
+            effectiveDatesAdded = false;
+        }
         lri.setLrId(rs.getInt("LOGRECID"));
         lri.setKeyNumber(rs.getShort("FLDSEQNBR"));
         lri.setEffectiveDateStart(false);
         lri.setEffectiveDateEnd(false);
-        if(rs.getInt("EFFDATESTARTFLDID") == 0 && rs.getInt("EFFDATEENDFLDID") == 0) {
-            lri.setName("PK");
-            lri.setFieldID(rs.getInt("LRFIELDID"));
-        } else {
+        lri.setName("PK");
+        lri.setFieldID(rs.getInt("LRFIELDID"));
+        Repository.addLRIndex(lri);
+        if(!effectiveDatesAdded) {
+            LogicalRecord lr = Repository.getLogicalRecords().get(lrid);
             if(rs.getInt("EFFDATESTARTFLDID") > 0) {
-                lri.setFieldID(rs.getInt("EFFDATESTARTFLDID"));
-                lri.setEffectiveDateStart(true);
+                LRIndex efsi = new LRIndex();
+                efsi.setComponentId(id);
+                efsi.setLrId(rs.getInt("LOGRECID"));
+                efsi.setKeyNumber((short)(lr.getValuesOfIndexBySeq().size() + 1));
+                efsi.setEffectiveDateEnd(false);
+                efsi.setFieldID(rs.getInt("EFFDATESTARTFLDID"));
+                efsi.setEffectiveDateStart(true);
+                efsi.setName("Starting Effective Date");
+                Repository.addLRIndex(efsi);
+                effectiveDatesAdded = true;
             }
             if(rs.getInt("EFFDATEENDFLDID") > 0) {
-                lri.setFieldID(rs.getInt("EFFDATEENDFLDID"));
-                lri.setEffectiveDateEnd(true);
+                LRIndex efei = new LRIndex();
+                efei.setComponentId(id);
+                efei.setLrId(rs.getInt("LOGRECID"));
+                efei.setKeyNumber((short)(lr.getValuesOfIndexBySeq().size() + 1));
+                efei.setEffectiveDateStart(false);
+                efei.setFieldID(rs.getInt("EFFDATEENDFLDID"));
+                efei.setEffectiveDateEnd(true);
+                efei.setName("End Effective Date");
+                Repository.addLRIndex(efei);
+                effectiveDatesAdded = true;
             }
         }
-        Repository.addLRIndex(lri);
     }
 
     public void addLRToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params, int environmentID, int sourceLR) {

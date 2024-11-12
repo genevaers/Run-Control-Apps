@@ -38,8 +38,11 @@ import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.UserExit;
+import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewDefinition;
 import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.ViewSortKey;
+import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.LrStatus;
 import org.genevaers.repository.data.CompilerMessage;
 import org.genevaers.repository.data.ComponentCollection;
@@ -386,11 +389,12 @@ public class Repository {
 		}
 	}
 
-    public static void fixupMaxHeaderLines() {
+    public static void fixupViewsAndSkts() {
 		Iterator<ViewNode> vi = views.getIterator();
 		while(vi.hasNext()) {
 			ViewNode view = vi.next();
 			view.fixupMaxHeaderLines();
+			fixupSortKeyTitles(view);
 		}
     }
 
@@ -507,4 +511,38 @@ public class Repository {
 			}
 		}
 	}
+
+	public static void fixupSortKeyTitles(ViewNode v) {
+		int startPos = 1;
+		Iterator<ViewSortKey> ski = v.getSortKeyIterator();
+		while (ski.hasNext()) {
+			ViewSortKey sk = ski.next();
+			int sktfid = sk.getRtdLrFieldId();
+			if (sktfid > 0) {
+				LRField sktField = Repository.getFields().get(sktfid);
+				sk.setSktStartPosition((short) startPos); // if there is more than one how do we increment this?
+				LogicalRecord sktLr = Repository.getLogicalRecords().get(sktField.getLrID());
+				int indexLength = getIndexLength(sktLr) + 8; //Magic number supposedly for LR and LR id
+				sk.setSktFieldLength((short)indexLength );
+				startPos += indexLength;
+				sk.setDescStartPosition((short) 1);
+				sk.setDescFieldLength(sktField.getLength());
+			}
+		}
+	}
+				
+
+	private static int getIndexLength(LogicalRecord sktLr) {
+		int indexLength = 0;
+		Iterator<LRIndex> ndxi = sktLr.getIteratorForIndexBySeq();
+		while (ndxi.hasNext()) {
+			LRIndex ndx = ndxi.next();
+			if(!ndx.isEffectiveDateStart() && !ndx.isEffectiveDateEnd()) {
+				LRField ndxField = Repository.getFields().get(ndx.getFieldID());
+				indexLength += ndxField.getLength();
+			}
+		}
+		return indexLength;
+	}
+
 }

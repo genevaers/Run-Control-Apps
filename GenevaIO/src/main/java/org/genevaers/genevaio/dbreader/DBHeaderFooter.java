@@ -95,6 +95,7 @@ public class DBHeaderFooter extends DBReaderBase {
 		rh.setRow(rs.getShort("ROWNUMBER"));
 		rh.setColumn(rs.getShort("COLNUMBER"));
 		rh.setTitleLength(rs.getShort("LENGTH"));
-		rh.setText(rs.getString("ITEMTEXT").trim());
+		String it = rs.getString("ITEMTEXT");
+		rh.setText(it != null ? it.trim() : "");
 	}
 }

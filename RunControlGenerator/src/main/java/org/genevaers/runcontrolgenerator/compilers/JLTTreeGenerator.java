@@ -57,6 +57,7 @@ public class JLTTreeGenerator {
     private ExtractBaseAST joinsRoot;
     private List<JLTView> headerEntries = new ArrayList<>();
     private int joinNumber = 1;
+    int headerViewNumber;
 
     public JLTTreeGenerator(LogicTableEmitter ltEmitter) {
         jltEmitter = ltEmitter;
@@ -133,12 +134,12 @@ public class JLTTreeGenerator {
     private REHHeader makeHeaderViewIfNeeded(JLTView he) {
         if(he.getLookupType() == LookupType.NORMAL) {
             if(rehHeader == null) 
-                return addREHView(Repository.getJoinViews().getREHViewNumber());
+                return addREHView(Repository.getJoinViews().getHeaderViewNumber());
             else
                 return rehHeader;
         } else {
             if(rthHeader == null)
-                return addRTHView(Repository.getJoinViews().getRTHViewNumber());
+                return addRTHView(Repository.getJoinViews().getHeaderViewNumber());
             else 
                 return rthHeader;
         }
