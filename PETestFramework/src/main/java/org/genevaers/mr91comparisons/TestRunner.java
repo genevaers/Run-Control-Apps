@@ -38,8 +38,7 @@ public class TestRunner {
 	    			logger.severe("Not all tests passed");
 	    		}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("IO exception on test runner log file\n%s", e.getMessage());
 			}
 		}
 		System.exit(exitCode);

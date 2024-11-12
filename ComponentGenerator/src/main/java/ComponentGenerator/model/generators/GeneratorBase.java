@@ -77,11 +77,9 @@ public class GeneratorBase {
             template = cfg.getTemplate(templateName);
             generateTemplatedOutput(template, nodeMap, to);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Cannot write model file\n%s", e.getMessage());
         } catch (TemplateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Template exception on model file\n%s", e.getMessage());
         }
     }
 
@@ -107,8 +105,7 @@ public class GeneratorBase {
         try {
             t = cfg.getTemplate(templateName);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("IO exception on getting template name\n%s", e.getMessage());
         }
         return t;
     }

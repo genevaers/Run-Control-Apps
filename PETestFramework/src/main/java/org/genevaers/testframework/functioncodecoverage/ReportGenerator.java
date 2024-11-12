@@ -45,10 +45,12 @@ import org.genevaers.testframework.functioncodecoverage.FunctionCodeHit.HITS_STA
 
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.TrTag;
+import com.google.common.flogger.FluentLogger;
 
 public class ReportGenerator {
 
 	private static final String HITS_STYLE = "text-align: right; border-style: solid; border-width: 1px;padding: 3;";
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String TH_STYLE = "border-style: solid; border-width: 1px;padding: 3;";
 
@@ -88,8 +90,7 @@ public class ReportGenerator {
 							)).renderFormatted());
 			testHtml.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.atSevere().log("IO exception on Report Generation HTML write\n%s", e.getMessage());
 		}
 
 	}

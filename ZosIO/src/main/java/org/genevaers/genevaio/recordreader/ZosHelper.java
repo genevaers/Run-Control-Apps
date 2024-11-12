@@ -43,8 +43,7 @@ public class ZosHelper {
         try {
             ZFile.remove(name);
         } catch (ZFileException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("jzos file exception on file delete\n%s", e.getMessage());
         }
     }
 
@@ -156,13 +155,13 @@ public class ZosHelper {
                         try {
                             writer.close();
                         } catch (ZFileException zfe) {
-                            zfe.printStackTrace(); // but continue
+                            logger.atSevere().log("jzos z file exception on file close\n%s", e.getMessage()); // but continue
                         }
                     }
                     try {
                         ZFile.bpxwdyn("free fi(" + ddname + ") msg(2)");
                     } catch (RcException rce) {
-                        rce.printStackTrace(); // but continue
+                        logger.atSevere().log("jzos z file exception on file free\n%s", e.getMessage()); // but continue
                     }
                 }
             } catch (IOException e) {

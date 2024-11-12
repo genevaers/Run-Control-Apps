@@ -98,7 +98,7 @@ public class TestReporter {
 				System.exit(0);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+            logger.atSevere().log("Exception in test report generation\n%s", e.getMessage());
 			logger.atSevere().withCause(e);
 		}
 	}
@@ -154,7 +154,7 @@ public class TestReporter {
 			logger.atInfo().log(WRITE_TO + csvOverview.toString());
 			generateTemplatedOutput(csvTemplate, nodeMap, csvOverview);
 		} catch (IOException | TemplateException e) {
-			e.printStackTrace();
+            logger.atSevere().log("IO exception in Overview HTML write\n%s", e.getMessage());
 		}
 	}
 
@@ -183,7 +183,7 @@ public class TestReporter {
 			nodeMap.put("pmspec", spec);
 			generateTemplatedOutput(template, nodeMap, specHTMLPath);
 		} catch (IOException | TemplateException e) {
-			e.printStackTrace();
+            logger.atSevere().log("IO or Template exception in Spec HTML generation\n%s", e.getMessage());
 		}
 		Path sphtml = outPath.relativize(specHTMLPath);
 		return sphtml.toString();
