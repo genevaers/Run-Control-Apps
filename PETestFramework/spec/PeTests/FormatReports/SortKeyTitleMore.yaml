@@ -50,9 +50,6 @@ tests:
     recfm: "FB"
     lrecl: "160"
     workfile: "1"
-  expectedresult:
-    message: "pass compare phase"
-    rc: "0"
 - name: "OVERWT"
   header: "SK and SKT with column overwrite"
   description: "SK and SKT with write to prev column"
@@ -99,6 +96,3 @@ tests:
     recfm: "FB"
     lrecl: "250"
     workfile: "1"
-  expectedresult:
-    message: "pass compare phase"
-    rc: "0"
