@@ -1,14 +1,14 @@
 ---
 name: "SKT"
 title: "Sort key title LU"
-description: "Sort key title test with LU"
+description: "Sort key title test and extract-phase LU"
 category: "PeTests/FormatReports"
 cq: ""
 note: ""
 tests:
 - name: "SKT1LX"
   header: "SKT 1 step LU"
-  description: "Sort key title one step LU and extract time LU"
+  description: "Sort key title one step LU and extract-phase LU"
   source: "WBXML"
   timeout: "120"
   xmlfiles:
