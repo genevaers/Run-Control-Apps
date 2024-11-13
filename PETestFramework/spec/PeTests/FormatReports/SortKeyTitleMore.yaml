@@ -91,6 +91,8 @@ tests:
     workfile: "1"
   formatfiles:
   - ddname: "F0012227"
+    startkey: "TOTAL_AMOUNT"
+    stopkey: "End of file"
     space: "TRK"
     primary: "10"
     secondary: "10"
