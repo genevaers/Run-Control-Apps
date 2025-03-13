@@ -23,10 +23,16 @@ import java.sql.PreparedStatement;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.LRIndex;
+import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.ViewNode;
 
 import com.google.common.flogger.FluentLogger;
@@ -46,6 +52,10 @@ public abstract class DBReaderBase {
     protected static Set<Integer> requiredExits = new TreeSet<>();
     protected static Set<Integer> lrlfAssociationIds = new TreeSet<>();
     protected static Set<Integer> lfpfAssociationIds = new TreeSet<>();
+
+  	protected static Map<Integer, LRIndex> effdateStarts = new HashMap<>();
+    protected static Map<Integer, LRIndex> effdateEnds = new HashMap<>();
+
 
     protected void executeAndWriteToRepo(DatabaseConnection dbConnection, String query, DatabaseConnectionParams params, int id) {
         try(PreparedStatement ps = dbConnection.prepareStatement(query);) {
@@ -149,5 +159,20 @@ public abstract class DBReaderBase {
     public static void clearViewIds() {
         viewIds.clear();;
     }
+
+	public static void fixupEffectiveDateIndexes() {
+		addEffDateKeyFrom(effdateStarts.entrySet().iterator());
+		addEffDateKeyFrom(effdateEnds.entrySet().iterator());
+	}
+
+	private static void addEffDateKeyFrom(Iterator<Entry<Integer, LRIndex>> efdi) {
+		while (efdi.hasNext()) {
+			Entry<Integer, LRIndex> efde = efdi.next();
+			LRIndex effStartNdx = efde.getValue();
+			LogicalRecord lr = Repository.getLogicalRecords().get(effStartNdx.getLrId());
+			effStartNdx.setKeyNumber((short) (lr.getValuesOfIndexBySeq().size() + 1));
+			lr.addToIndexBySeq(effStartNdx);
+		}
+	}
 
 }
