@@ -541,8 +541,11 @@ public class Repository {
 	}
 
 	public static void addWarningMessage(CompilerMessage warn) {
-		logger.atWarning().log(warn.getDetail());
-		warnings.add(warn);
+		//Ignore JLT warnings
+		if(warn.getViewid() < 9000001) {
+			logger.atWarning().log(warn.getDetail());
+			warnings.add(warn);
+		}
 	}
 
 	public static List<CompilerMessage> getCompilerErrors() {

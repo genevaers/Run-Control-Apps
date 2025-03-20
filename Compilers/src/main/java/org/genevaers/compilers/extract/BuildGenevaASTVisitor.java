@@ -758,6 +758,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
                     strcmp.addChildIfNotNull(lhs);
                     strcmp.setComparisonOperator(op);
                     strcmp.addChildIfNotNull(rhs);
+                    restrictLeftAndRight(strcmp);
                     return strcmp; 
                 } else {
                     ExprComparisonAST exprcmp = (ExprComparisonAST)ASTFactory.getNodeOfType(ASTFactory.Type.EXPRCOMP);
@@ -774,6 +775,17 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         }
         //should be an error node 
         return retval;
+    }
+
+    private void restrictLeftAndRight(StringComparisonAST strcmp) {
+        // For the moment as a fix for MR95 limit the RHS of LEFT and RIGHT to strings
+        String op = strcmp.getOp();
+        if(op.equalsIgnoreCase("BEGINS_WITH") || op.equalsIgnoreCase("ENDS_WITH")) {
+            ExtractBaseAST rhs = (ExtractBaseAST)(strcmp.getChild(1));
+            if(rhs.getType() != ASTFactory.Type.STRINGATOM) {
+                strcmp.addError("Only string constants allowed after a 'BEGINS_WITH' or an 'ENDS_WITH'");
+            }
+        }
     }
 
     @Override public ExtractBaseAST  visitExprConcatString(GenevaERSParser.ExprConcatStringContext ctx) {
