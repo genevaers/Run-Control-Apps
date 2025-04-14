@@ -19,10 +19,13 @@ package org.genevaers.genevaio.ltfile;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.LtCompareType;
+import org.genevaers.repository.components.enums.LtRecordType;
 import org.genevaers.utilities.GersFile;
 
 import com.google.common.flogger.FluentLogger;
@@ -40,7 +43,10 @@ import com.google.common.flogger.StackSize;
 public class LTLogger {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-	private static final String LEAD_IN = " %7d %5d %-4s";
+	private static final String ROW_WIDTH ="7";
+	private static final String COLUMN_WIDTH ="5";
+	private static final String LEAD_IN = " %" + ROW_WIDTH + "d %" + COLUMN_WIDTH + "d %-4s";
+	
 	private static final String NV_FORMAT = " %s  LR=%s SKA=%s, STA=%s, DTA=%s, CTC=%s Source Number=%s";
 	private static final String GEN_FORMAT = "%s  Text %s\n"
 			+ "               Number of Records              %d\n"
@@ -95,6 +101,24 @@ public class LTLogger {
 	private static final String FILEID = "%s %d";
 	private static final String CFA = "%s %47s  %s %-47s %s";
 
+	private static Map<LtRecordType, LtEntry> typeMap;
+	static {
+		typeMap = new HashMap<>();
+		// typeMap.put(LtRecordType.CALC, "Calc");
+		// typeMap.put(LtRecordType.CC, "CC");
+		// typeMap.put(LtRecordType.F0, "F0");
+		typeMap.put(LtRecordType.F1, new F1LtEntry());
+		// typeMap.put(LtRecordType.F2, "F2");
+		typeMap.put(LtRecordType.GENERATION, new GenerationLtEntry());
+		typeMap.put(LtRecordType.HD, new HdEntry());
+		// typeMap.put(LtRecordType.NAME, "NAME");
+		// typeMap.put(LtRecordType.NAMEF1, "NAMEF1");
+		// typeMap.put(LtRecordType.NAMEF2, "NAMEF2");
+		// typeMap.put(LtRecordType.NAMEVALUE, "NAMEVALUE");
+		typeMap.put(LtRecordType.NV, new NvLtEntry());
+		// typeMap.put(LtRecordType.RE, "RE");
+		// typeMap.put(LtRecordType.WR, "WR");
+	}
 
 	// Format strings for the parts
 	// Format strings for the layout
@@ -136,11 +160,16 @@ public class LTLogger {
 		Iterator<LTRecord> lti = lt.getIterator();
 		while (lti.hasNext()) {
 			LTRecord ltr = lti.next();
-			String logme = getLogString(ltr);
+			String logme = getLogEntry(ltr);
 			logger.atFine().log(logme);
 			out.write(logme + "\n");
 		}
 		out.write("\nEnd of LT Records");
+	}
+
+	private static String getLogEntry(LTRecord ltr) {
+		LtEntry lte = typeMap.get(ltr.getRecordType());
+		return lte != null ? lte.getEntry(ltr) : ltr.getFunctionCode() + " entry not defined";
 	}
 
 	private static String getLogString(LTRecord ltr) {
