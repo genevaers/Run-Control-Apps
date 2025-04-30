@@ -1,10 +1,10 @@
 package org.genevaers.genevaio.ltfile;
 
-public class HdEntry extends LtEntry{
+public class HdEntry extends LtRecordLogger {
 
-    @Override
-    public String getEntry(LTRecord ltr) {
-		return String.format(LEAD_IN, ltr.getRowNbr(), ltr.getSuffixSeqNbr(), ltr.getFunctionCode());
-    }
+  @Override
+  public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    return String.format(LEAD_IN, ltr.getRowNbr(), ltr.getSuffixSeqNbr(), ltr.getFunctionCode());
+  }
 
 }

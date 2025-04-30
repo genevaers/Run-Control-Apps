@@ -22,6 +22,8 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.LtCompareType;
@@ -43,6 +45,7 @@ import com.google.common.flogger.StackSize;
 public class LTLogger {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
+	private static DescriptionKey descriptionRoot = new DescriptionKey("Function Code Descriptions", 0);
 	private static final String ROW_WIDTH ="7";
 	private static final String COLUMN_WIDTH ="5";
 	private static final String LEAD_IN = " %" + ROW_WIDTH + "d %" + COLUMN_WIDTH + "d %-4s";
@@ -101,13 +104,14 @@ public class LTLogger {
 	private static final String FILEID = "%s %d";
 	private static final String CFA = "%s %47s  %s %-47s %s";
 
-	private static Map<LtRecordType, LtEntry> typeMap;
+	private static Map<LtRecordType, LtRecordLogger> typeMap;
 	static {
 		typeMap = new HashMap<>();
 		// typeMap.put(LtRecordType.CALC, "Calc");
 		// typeMap.put(LtRecordType.CC, "CC");
 		// typeMap.put(LtRecordType.F0, "F0");
-		typeMap.put(LtRecordType.F1, new F1LtEntry());
+		typeMap.put(LtRecordType.F1, new F1LtLogger());
+		typeMap.put(LtRecordType.F2, new F2LtLogger());
 		// typeMap.put(LtRecordType.F2, "F2");
 		typeMap.put(LtRecordType.GENERATION, new GenerationLtEntry());
 		typeMap.put(LtRecordType.HD, new HdEntry());
@@ -116,25 +120,11 @@ public class LTLogger {
 		// typeMap.put(LtRecordType.NAMEF2, "NAMEF2");
 		// typeMap.put(LtRecordType.NAMEVALUE, "NAMEVALUE");
 		typeMap.put(LtRecordType.NV, new NvLtEntry());
-		// typeMap.put(LtRecordType.RE, "RE");
-		// typeMap.put(LtRecordType.WR, "WR");
+		typeMap.put(LtRecordType.RE, new ReLtLogger());
+		typeMap.put(LtRecordType.WR, new WrLtLogger());
 	}
 
-	// Format strings for the parts
-	// Format strings for the layout
-	// Layout func code dependent and generally type dependent
-	// leadin + gen
-	// leadin + nv
-	// leadin + join
-	// leadin + gotos
-	// leadin + goto
-	// leadin + file id
-	// leadin + assignment (different types)
-	// leadin + comparison (different types) + gotos
-	// leadin + declaration
-	// leadin + arithmetic op
-	// leadin + CT assignment
-	// leadin + WR
+	private static Map<String, String> descriptionCache = new TreeMap<>();
 
 	public static String logRecords(LogicTable lt) {
 		StringBuilder sb = new StringBuilder();
@@ -147,12 +137,53 @@ public class LTLogger {
 	}
 
 	public static void writeRecordsTo(LogicTable lt, String ltPrint, String generation) {
+		LtRecordLogger.initialiseKeys();
 		try (Writer out = new GersFile().getWriter(ltPrint);) {
 			writeDetails(lt, out, generation);
 		} catch (Exception e) {
 			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
 		}
 		logger.atInfo().log("%s LT report written", ltPrint);
+		//Optionally write a key report
+		//Figure out option control later - for the moment write it
+		writeKeyReport(ltPrint);
+	}
+
+	private static void writeKeyReport(String ltPrint) {
+		try (Writer out = new GersFile().getWriter("K" +ltPrint);) {
+			writeKeys(out);
+		} catch (Exception e) {
+			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
+		}
+		logger.atInfo().log("%s LT report written", ltPrint);
+	}
+
+	private static void writeKeys(Writer out) throws IOException {
+		Iterator<Entry<String, String>> di = descriptionCache.entrySet().iterator();
+		while (di.hasNext()) {
+			Entry<String, String> de = di.next();
+			out.write(String.format("%4s %s\n", de.getKey(), de.getValue()));
+		}
+
+		out.write("\nKey Descriptions");
+		out.write("\n----------------\n");
+//		DescriptionKeysCache.writeKeyCacheText(out);
+
+		out.write("\nKey Descriptions from tree");
+		out.write("\n----------------\n");
+
+		out.write(descriptionRoot.getDescriptionKey() + System.lineSeparator());
+		writeDescriptionTree(out, descriptionRoot);
+	}
+
+	private static void writeDescriptionTree(Writer out, DescriptionKey descriptionRoot) throws IOException {
+		Iterator<DescriptionKey> di = descriptionRoot.getIterator();
+		while (di.hasNext()) {
+			DescriptionKey d = di.next();
+			out.write(d.getName() + ": " + d.getDescriptionKey() + "   format - " + d.getFormatString() + System.lineSeparator());
+			writeDescriptionTree(out, d);
+		}
+		out.write(System.lineSeparator());
 	}
 
 	private static void writeDetails(LogicTable lt, Writer out, String generation) throws IOException {
@@ -168,8 +199,13 @@ public class LTLogger {
 	}
 
 	private static String getLogEntry(LTRecord ltr) {
-		LtEntry lte = typeMap.get(ltr.getRecordType());
-		return lte != null ? lte.getEntry(ltr) : ltr.getFunctionCode() + " entry not defined";
+		LtRecordLogger ltrl = typeMap.get(ltr.getRecordType());
+		if(ltrl != null) {
+			descriptionCache.putIfAbsent(ltr.getFunctionCode(), ltrl.getDescription(ltr));
+			return ltrl.getLogEntry(ltr, descriptionRoot);
+		} else {
+			return ltr.getFunctionCode() + "(" + ltr.getRecordType() + ") Logger not defined";
+		}
 	}
 
 	private static String getLogString(LTRecord ltr) {

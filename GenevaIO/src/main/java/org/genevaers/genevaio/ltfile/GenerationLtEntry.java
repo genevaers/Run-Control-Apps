@@ -1,9 +1,9 @@
 package org.genevaers.genevaio.ltfile;
 
-public class GenerationLtEntry extends LtEntry {
+public class GenerationLtEntry extends LtRecordLogger {
 
     @Override
-    public String getEntry(LTRecord ltr) {
+    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
         LogicTableGeneration g = (LogicTableGeneration)ltr; 
         return String.format(GEN_FORMAT, g.isExtract() ? "Extract" : "Join",
                 g.isIsAscii() ? "ASCII" : "EBCDIC",
