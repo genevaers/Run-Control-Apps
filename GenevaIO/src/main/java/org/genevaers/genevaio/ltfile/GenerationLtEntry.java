@@ -3,7 +3,7 @@ package org.genevaers.genevaio.ltfile;
 public class GenerationLtEntry extends LtRecordLogger {
 
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    public String getLogEntry(LTRecord ltr) {
         LogicTableGeneration g = (LogicTableGeneration)ltr; 
         return String.format(GEN_FORMAT, g.isExtract() ? "Extract" : "Join",
                 g.isIsAscii() ? "ASCII" : "EBCDIC",

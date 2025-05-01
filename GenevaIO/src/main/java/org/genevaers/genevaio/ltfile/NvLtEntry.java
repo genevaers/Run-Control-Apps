@@ -12,7 +12,7 @@ public class NvLtEntry extends LtRecordLogger{
 	}
 
 	@Override
-	public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+	public String getLogEntry(LTRecord ltr) {
         return(getViewLine(ltr) + getLeadin(ltr) + getNewViewDetails((LogicTableNV) ltr));
 	}
 }

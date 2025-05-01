@@ -59,7 +59,7 @@ public abstract class LtRecordLogger {
 
 	protected static List<DescriptionPart> descParts;
 
-    public abstract String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot);
+    public abstract String getLogEntry(LTRecord ltr);
 
     public String getDescription(LTRecord ltr) {
 		return "Don't know what to say yet";
@@ -165,46 +165,4 @@ public abstract class LtRecordLogger {
 		}
 	}
 
-	public static void initialiseKeys() {
-		//Need to tie the Description Keys more closily with the LtEnries?
-		//Or maybe the name is enough?
-
-		//Function Code level keys
-		DescriptionKey ass = DescriptionKeysCache.add("Assignment", new DescriptionKey("LF_LR_Field -> Targ_Column", 0));
-		ass.setSeparator(" -> ");
-		DescriptionKey constass = DescriptionKeysCache.add("ConstAssignment", new DescriptionKey("ConstValue -> Targ_Column", 0));
-		constass.setSeparator(" -> ");
-
-		//Assignemnt keys
-		DescriptionKey lflrf = DescriptionKeysCache.add("LF_LR_Field", new DescriptionKey("LFID LRID FieldID fPosition FieldAttributes", 0));
-		ass.addChild(lflrf);
-		DescriptionKey tc = DescriptionKeysCache.add("Targ_Column", new DescriptionKey("cPosition ColumnAttributes", 0));
-		ass.addChild(tc);
-
-		//LF_LR_Field
-		DescriptionKey lf = DescriptionKeysCache.add("LFID", new DescriptionKey("Integer", 7));
-		lflrf.addChild(lf);
-        DescriptionKey lr = DescriptionKeysCache.add("LRID", new DescriptionKey("Integer", 7));
-		lflrf.addChild(lr);
-        DescriptionKey field = DescriptionKeysCache.add("FieldID", new DescriptionKey("Integer", 7));
-		lflrf.addChild(field);
-		DescriptionKey fp = DescriptionKeysCache.add("fPosition", new DescriptionKey("Integer", 5));
-		lflrf.addChild(fp);
-		//Can make a specific FieldAttributes class that knows how to describe its children
-		DescriptionKey fa = DescriptionKeysCache.add("FieldAttributes", new DescriptionKey("Variable", 1));
-		lflrf.addChild(fa);
-
-
-		DescriptionKey p = DescriptionKeysCache.add("cPosition", new DescriptionKey("Integer", 5));
-		tc.addChild(p);
-        DescriptionKey ca = DescriptionKeysCache.add("ColumnAttributes", new DescriptionKey("Length Type ColumnDetails", 1));
-		tc.addChild(ca);
-
-		DescriptionKey cd = DescriptionKeysCache.add("ColumnDetails", new DescriptionKey("cPosition ColumnAttributes", 1));
-		ca.addChild(cd);
-
-		DescriptionKey cv = DescriptionKeysCache.add("ConstValue", new DescriptionKey("String", 47));
-		constass.addChild(cv);
-		constass.addChild(tc);
-	}
 }

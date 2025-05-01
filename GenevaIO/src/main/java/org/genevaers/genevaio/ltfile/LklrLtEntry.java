@@ -3,7 +3,7 @@ package org.genevaers.genevaio.ltfile;
 public class LklrLtEntry extends LtRecordLogger {
 
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    public String getLogEntry(LTRecord ltr) {
         return(getLeadin(ltr) + getLKLRInfo(ltr));
     }
 

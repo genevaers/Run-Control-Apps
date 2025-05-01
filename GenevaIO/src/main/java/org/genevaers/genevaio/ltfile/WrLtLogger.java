@@ -14,9 +14,9 @@ public class WrLtLogger extends LtRecordLogger{
 	}
 
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    public String getLogEntry(LTRecord ltr) {
         LtRecordLogger fcl = fcMap.get(ltr.getFunctionCode());
-        return fcl == null ? getWrEntry(ltr) : fcl.getLogEntry(ltr, descriptionRoot);
+        return fcl == null ? getWrEntry(ltr) : fcl.getLogEntry(ltr);
     }
 
     private String getWrEntry(LTRecord ltr) {

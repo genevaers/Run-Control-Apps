@@ -12,24 +12,12 @@ public class ConstAssignmentLtEntry extends LtRecordLogger {
     }
 
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
-        addDescription(descriptionRoot);
+    public String getLogEntry(LTRecord ltr) {
         LogicTableF1 ass = (LogicTableF1) ltr;
-        //to get the log entry pass the ltr into the Key tree?
-        String fs = DescriptionKeysCache.get(name).getFormatString(); 
         LogicTableArg arg = ass.getArg();
-        String descString = String.format(fs, arg.getValue().getPrintString(),
+        String descString = String.format(CONSTASSIGNMENT, arg.getValue().getPrintString(),
                                        arg.getStartPosition(), arg.getFieldLength());
-        //return(String.format(fs, descString));
         return getLeadin(ltr) + descString;
-    }
-
-    private void addDescription(DescriptionKey descriptionRoot) {
-        DescriptionKey assKey = DescriptionKeysCache.get(name);
-        if(assKey != null && assKey.isReferenced() == false) {
-            descriptionRoot.addChild(assKey);
-            assKey.setReferenced(true);
-        } 
     }
 
     @Override

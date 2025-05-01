@@ -45,7 +45,6 @@ import com.google.common.flogger.StackSize;
 public class LTLogger {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-	private static DescriptionKey descriptionRoot = new DescriptionKey("Function Code Descriptions", 0);
 	private static final String ROW_WIDTH ="7";
 	private static final String COLUMN_WIDTH ="5";
 	private static final String LEAD_IN = " %" + ROW_WIDTH + "d %" + COLUMN_WIDTH + "d %-4s";
@@ -137,53 +136,12 @@ public class LTLogger {
 	}
 
 	public static void writeRecordsTo(LogicTable lt, String ltPrint, String generation) {
-		LtRecordLogger.initialiseKeys();
 		try (Writer out = new GersFile().getWriter(ltPrint);) {
 			writeDetails(lt, out, generation);
 		} catch (Exception e) {
 			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
 		}
 		logger.atInfo().log("%s LT report written", ltPrint);
-		//Optionally write a key report
-		//Figure out option control later - for the moment write it
-		writeKeyReport(ltPrint);
-	}
-
-	private static void writeKeyReport(String ltPrint) {
-		try (Writer out = new GersFile().getWriter("K" +ltPrint);) {
-			writeKeys(out);
-		} catch (Exception e) {
-			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
-		}
-		logger.atInfo().log("%s LT report written", ltPrint);
-	}
-
-	private static void writeKeys(Writer out) throws IOException {
-		Iterator<Entry<String, String>> di = descriptionCache.entrySet().iterator();
-		while (di.hasNext()) {
-			Entry<String, String> de = di.next();
-			out.write(String.format("%4s %s\n", de.getKey(), de.getValue()));
-		}
-
-		out.write("\nKey Descriptions");
-		out.write("\n----------------\n");
-//		DescriptionKeysCache.writeKeyCacheText(out);
-
-		out.write("\nKey Descriptions from tree");
-		out.write("\n----------------\n");
-
-		out.write(descriptionRoot.getDescriptionKey() + System.lineSeparator());
-		writeDescriptionTree(out, descriptionRoot);
-	}
-
-	private static void writeDescriptionTree(Writer out, DescriptionKey descriptionRoot) throws IOException {
-		Iterator<DescriptionKey> di = descriptionRoot.getIterator();
-		while (di.hasNext()) {
-			DescriptionKey d = di.next();
-			out.write(d.getName() + ": " + d.getDescriptionKey() + "   format - " + d.getFormatString() + System.lineSeparator());
-			writeDescriptionTree(out, d);
-		}
-		out.write(System.lineSeparator());
 	}
 
 	private static void writeDetails(LogicTable lt, Writer out, String generation) throws IOException {
@@ -191,9 +149,9 @@ public class LTLogger {
 		Iterator<LTRecord> lti = lt.getIterator();
 		while (lti.hasNext()) {
 			LTRecord ltr = lti.next();
-			String logme = getLogEntry(ltr);
-			logger.atFine().log(logme);
-			out.write(logme + "\n");
+			boolean newWay = true;
+			String logme = newWay ? getLogEntry(ltr) : getLogString(ltr);
+			out.write(logme + System.lineSeparator());
 		}
 		out.write("\nEnd of LT Records");
 	}
@@ -201,8 +159,7 @@ public class LTLogger {
 	private static String getLogEntry(LTRecord ltr) {
 		LtRecordLogger ltrl = typeMap.get(ltr.getRecordType());
 		if(ltrl != null) {
-			descriptionCache.putIfAbsent(ltr.getFunctionCode(), ltrl.getDescription(ltr));
-			return ltrl.getLogEntry(ltr, descriptionRoot);
+			return ltrl.getLogEntry(ltr);
 		} else {
 			return ltr.getFunctionCode() + "(" + ltr.getRecordType() + ") Logger not defined";
 		}

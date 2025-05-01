@@ -9,19 +9,10 @@ public class JoinLtEntry extends LtRecordLogger {
 
     public JoinLtEntry() {
         super();
-        if(descParts == null) {
-            descParts = new ArrayList<>();
-            descParts.add(new JoinLFLRDesc());
-            descParts.add(new JoinMappingDesc());
-            descParts.add(new GotosDesc());
-            // keyNodes.add(new KeyNode("LR_LF", "LR ID/LF ID"));
-            // keyNodes.add(new KeyNode("LR_LF", "LR ID/LF ID"));
-            // keyNodes.add(new KeyNode("LR_LF", "LR ID/LF ID"));
-        }
-    }
+     }
     
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    public String getLogEntry(LTRecord ltr) {
         LogicTableF1 j = (LogicTableF1) ltr;
         LogicTableArg arg = j.getArg();
         return(String.format(LEAD2GOTOS,

@@ -12,9 +12,9 @@ public class ReLtLogger extends LtRecordLogger{
 	}
 
     @Override
-    public String getLogEntry(LTRecord ltr, DescriptionKey descriptionRoot) {
+    public String getLogEntry(LTRecord ltr) {
         LtRecordLogger fcl = fcMap.get(ltr.getFunctionCode());
-        return fcl == null ? getF2Entry(ltr) : fcl.getLogEntry(ltr, descriptionRoot);
+        return fcl == null ? getF2Entry(ltr) : fcl.getLogEntry(ltr);
     }
 
     private String getF2Entry(LTRecord ltr) {
