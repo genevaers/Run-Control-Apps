@@ -1,6 +1,6 @@
 specFileSets:
   - name: "Regression Tests"
-    templateSetName: "MR91toPE.yaml"
+    templateSetName: "gvbrcatoPE.yaml"
     specs:
       - "PeTests/Assignment/BIGASS.yaml"
       - "PeTests/Comparison/Integer/CMIALL.yaml"
@@ -33,7 +33,7 @@ specFileSets:
       - "PeTests/FormatReports/ReportZeroSuppress.yaml"
       - "PeTests/FormatReports/ReportHeaderTest.yaml"
   - name: "Error cases"
-    templateSetName: "MR91toPEError.yaml"
+    templateSetName: "gvbrcatoPEError.yaml"
     specs:
       - "PeTests/Format/OVERFLW.yaml" 
 
