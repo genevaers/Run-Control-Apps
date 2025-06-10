@@ -11,9 +11,11 @@ fields:
   component_field: none
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: prefix.sequenceNbr
   type: mappingOnly
+  existing_java_type: sequence_nbr
   component_field: sequenceNumber
 - name: view_sort_key_id
   type: integer

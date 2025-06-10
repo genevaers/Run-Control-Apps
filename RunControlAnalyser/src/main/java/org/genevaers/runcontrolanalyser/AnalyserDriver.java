@@ -1,5 +1,7 @@
 package org.genevaers.runcontrolanalyser;
 
+import java.io.File;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -47,7 +49,7 @@ public class AnalyserDriver {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static RunControlAnalyser fa = new RunControlAnalyser();
-	private static LTCoverageAnalyser ltCoverageAnalyser = new LTCoverageAnalyser();
+	private static LTCoverageAnalyser ltCoverageAnalyser;
 	private static Status status = Status.OK;
 
 	private static String version;
@@ -65,6 +67,7 @@ public class AnalyserDriver {
 
 	public static Status runFromConfig() {
 		Path root = Paths.get(GersConfigration.getCurrentWorkingDirectory());
+		ltCoverageAnalyser = new LTCoverageAnalyser();
 		if (GersConfigration.isCompare()) {
 			logger.atInfo().log("We are in compare mode.... best figure out how to do this");
 			compareRunControlFiles(root);
@@ -81,6 +84,9 @@ public class AnalyserDriver {
 			}
 			if (GersConfigration.isRcaReport()) {
 				generateRcaPrint(root);
+			}
+			if (GersConfigration.isAggregate()) {
+				ltCoverageAnalyser.aggregateCoverage();;
 			}
 		}
 		setStatus(numVDPDiffs, numXLTDiffs, numJLTDiffs);
@@ -140,37 +146,43 @@ public class AnalyserDriver {
 
 	public static void generateXltPrint(Path root) {
 		logger.atInfo().log("Generate %s", GersConfigration.XLT_REPORT_DDNAME);
-		writeLtReport(root, GersConfigration.XLT_DDNAME, GersConfigration.getXLTReportName());
-		//collectCoverageDataFrom(xltp, xlt);
+		LogicTable xlt = writeLtReport(root, GersConfigration.XLT_DDNAME, GersConfigration.getXLTReportName());
+		collectCoverageDataFrom(root, xlt);
 	}
 
-	private static void writeLtReport(Path root, String ddname, String ltReportDdname) {
+	private static LogicTable writeLtReport(Path root, String ddname, String ltReportDdname) {
+		LogicTable lt=null;
 		switch (GersConfigration.getReportFormat()) {
 			case "TEXT":
 			case "TXT":
-				LogicTable tlt = fa.readLT(root, null, false, ddname);
-				LTLogger.writeRecordsTo(tlt, ltReportDdname, generation);
+				lt = fa.readLT(root, null, false, ddname);
+				LTLogger.writeRecordsTo(lt, ltReportDdname, generation);
 				break;
 			case "CSV":
-				LogicTable cxlt = fa.readLT(root, null, false, ddname);
-				LTCSVWriter.write(cxlt, ltReportDdname);
+				lt = fa.readLT(root, null, false, ddname);
+				LTCSVWriter.write(lt, ltReportDdname);
 				break;
 			case "HTML":
 				MetadataNode recordsRoot = new MetadataNode();
 				recordsRoot.setName("Root");
 				recordsRoot.setSource1(root.toString());
-				fa.readLT(root, recordsRoot, false, ddname);
+				lt = fa.readLT(root, recordsRoot, false, ddname);
 				LTRecordsHTMLWriter ltrw = new LTRecordsHTMLWriter();
 				ltrw.setIgnores();
 				ltrw.writeFromRecordNodes(recordsRoot, ltReportDdname);
 				break;
 			default:
+				logger.atSevere().log("Invalid or no LT report format specified.");
 				break;
 		}
+		return lt;
 	}
 
 	private static void collectCoverageDataFrom(Path xltp, LogicTable xlt) {
-		ltCoverageAnalyser.addDataFrom(xltp, xlt);
+		if(GersConfigration.isCoverage()) {
+			ltCoverageAnalyser.addDataFrom(xltp, xlt);
+			ltCoverageAnalyser.writeResults(xltp);
+		}
 	}
 
 	public static void generateJltPrint(Path root) {

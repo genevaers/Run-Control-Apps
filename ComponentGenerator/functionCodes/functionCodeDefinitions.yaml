@@ -606,103 +606,103 @@ codes:
     
   - function_code: SFCE
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a constant for a current source field
   - function_code: SFCL
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a constant for a lookup field
   - function_code: SFCP
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a constant for a prior source field
   - function_code: SFCX
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a constant for a column
     
   - function_code: SFEC
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a current source field for a constant
   - function_code: SFEE
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a current source field for a current source field
   - function_code: SFEL
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a current source field for a lookup field
   - function_code: SFEP
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a current source field for a prior source field
   - function_code: SFEX
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a current source field for a column
     
   - function_code: SFLC
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a lookup field for a constant
   - function_code: SFLE
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a lookup field for a current source field
   - function_code: SFLL
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a lookup field for a lookup field
   - function_code: SFLP
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a lookup field for a prior source field
   - function_code: SFLX
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a lookup field for a column
     
   - function_code: SFPC
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a prior source field for a constant
   - function_code: SFPE
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a prior source field for a current source field
   - function_code: SFPL
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a prior source field for a lookup field
   - function_code: SFPP
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a prior source field for a prior source field
   - function_code: SFPX
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a prior source field for a column
     
   - function_code: SFXC
     lt_record_type: F1
-    category: Seacrh
+    category: Search
     description: Search within a column for a constant
   - function_code: SFXE
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a column for a current source field
   - function_code: SFXL
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a column for a lookup field
   - function_code: SFXP
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a column for a prior source field
   - function_code: SFXX
     lt_record_type: F2
-    category: Seacrh
+    category: Search
     description: Search within a column for a column
     
   - function_code: SKA 

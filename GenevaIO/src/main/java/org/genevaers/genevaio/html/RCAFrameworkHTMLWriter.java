@@ -138,7 +138,7 @@ public class RCAFrameworkHTMLWriter {
 						div(
 								iframe().withSrc(gw.getFileName()).attr("height", "100%").attr("width", "99%").attr("name", PAGE_IFRAME)
 							).withStyle("width:100% ; height:100% ; overflow:hidden;")
-					).withStyle("margin-left:25% ");
+					).withStyle("margin-left:12% ");
 	}
 
 	private DivTag sidebar() {
@@ -164,7 +164,7 @@ public class RCAFrameworkHTMLWriter {
 								grcgreport(),
 								functionCodeCoverage()
 						).withClass("w3-container w3-dark-grey")
-					).withClass("w3-sidebar w3-bar-block w3-light-grey").withStyle("width:25%; height:100%");
+					).withClass("w3-sidebar w3-bar-block w3-light-grey").withStyle("width:12%; height:100%");
 	}
 
 
@@ -186,7 +186,7 @@ public class RCAFrameworkHTMLWriter {
 	private DomContent functionCodeCoverage() {
 		return a().withText("Function Code Coverage")
 				.withClass(MENU_CLASS)
-				.withHref("ltcov.html")
+				.withHref("../ltcov.html")
 				.withTarget(PAGE_IFRAME);
 	}
 

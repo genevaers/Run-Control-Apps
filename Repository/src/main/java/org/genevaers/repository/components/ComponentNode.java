@@ -18,6 +18,13 @@ package org.genevaers.repository.components;
  */
 
 
+ /**
+  * An abstract base class for all components.
+  *
+  * <p>A component has a flag to indicate whether it is required in the final VDP file.</p>
+  * <p>The required flag is only used in the management of Physical Files. See Single Pass Optimisation.</p>
+  * <p> The class also has a static maxColumnID. Which probably shouldn't be here</p>
+  */
 public abstract class ComponentNode { 
 	protected static int maxColumnID; //share betweem all views
     private boolean required = true;

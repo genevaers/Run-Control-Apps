@@ -80,4 +80,9 @@ public class CookieField extends Field {
         String ccName = NameUtils.getCamelCaseName(name, false);
         return  "rn.add(new StringFieldNode(\"value\", "+ ccName + ".getPrintString()), compare);";
     }
+
+    @Override
+    public String getType() {
+        return "Cookie";
+    }
 }

@@ -31,7 +31,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.commons.io.file.AccumulatorPathVisitor;
@@ -44,15 +43,12 @@ import org.genevaers.repository.components.enums.LtRecordType;
 import org.genevaers.utilities.GenevaLog;
 
 import com.google.common.flogger.FluentLogger;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 
 public class LTCoverageAnalyser extends LtFunctionCodeCache{
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static LTCoverageFile ltcov = new LTCoverageFile();
-    private static LtCoverageYamlWriter yamlWriter = new LtCoverageYamlWriter();
     private static LTCoverageFile aggcov;
     private static boolean aggFileInitRequired; 
     private static List<Path> sources = new ArrayList<>();
@@ -65,7 +61,7 @@ public class LTCoverageAnalyser extends LtFunctionCodeCache{
         super();
     }
 
-	public static void main(String[] args) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException, InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		GenevaLog.formatConsoleLogger(LTCoverageAnalyser.class.getName(), Level.FINE);
 
         GenevaLog.closeLogger(LTCoverageAnalyser.class.getName());
@@ -176,7 +172,7 @@ public class LTCoverageAnalyser extends LtFunctionCodeCache{
     private static void aggregateLTFromPath(Path p) {
         Path testPath = p.getParent();
         logger.atInfo().log(testPath.toString());  
-        Path ltcovPath = testPath.resolve("rca").resolve("ltcov.yaml");
+        Path ltcovPath = testPath.resolve("ltcov.yaml");
         if(ltcovPath.toFile().exists()) {
             aggcov.addSource(ltcovPath);
             if(aggFileInitRequired) {
@@ -186,7 +182,7 @@ public class LTCoverageAnalyser extends LtFunctionCodeCache{
                 aggcov.aggregateFrom(LtCoverageYamlReader.readYaml(ltcovPath));
             }
         } else {
-            logger.atWarning().log("Test passed but not LTCov");  
+            logger.atWarning().log("Test passed but no LTCov");  
         }
     }
 

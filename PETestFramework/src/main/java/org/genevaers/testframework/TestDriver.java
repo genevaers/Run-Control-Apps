@@ -79,12 +79,9 @@ public class TestDriver {
 	 *
 	 */
 	private static final String TEST_SRC = "target/generated-sources/org/genevaers/test/";
-	/**
-	 *
-	 */
-	private static final String DELALL = "DELALL";
 	private static final String LOCALROOT = "LOCALROOT";
-	private static final String TSO_USERID = "TSO_USERID";
+
+	private static final String WINDOWS_TEMPLATESET = "gvbrcaOnly.yaml";
 	private Map<String, String> envVars;
 	
 	TestDriver() {
@@ -104,6 +101,7 @@ public class TestDriver {
 	private static String appname = "RCA";
 
 	public static boolean processSpecList() {
+		boolean run = false;
 		try {
 			GersConfigration.initialise();
 			initFreeMarkerConfiguration();
@@ -111,6 +109,7 @@ public class TestDriver {
 			checkExistsAndProcessSpeclist();
 			if (envVariablesAreValid()) {
 				putEventFiles();
+				run = true;
 			} else {
 				logger.atSevere().log("Invalid variable values");
 			}
@@ -118,26 +117,20 @@ public class TestDriver {
 			logger.atSevere().log("Exception in testing");
 			e.printStackTrace();
 		}
-
-		// if we ran tests run overview no matter what
-		return GersEnvironment.get("RUNTESTS").compareToIgnoreCase("Y") == 0;
+		return run;
 	}
 
 	private static void putEventFiles() throws Exception {
 		String testHLQ = GersEnvironment.get("GERS_TEST_HLQ");
-		if(testHLQ.equalsIgnoreCase("LOCAL")) {
-        	logger.atInfo().log("Local testing");
+		if(GersEnvironment.isWindows()) {
+        	logger.atInfo().log("Local Windows testing");
 		} else {
 			String destHLQ = testHLQ + ".INPUT";
 			logger.atInfo().log("Write Event Files to " + destHLQ);
 			List<EventFile> eventFiles = getFileInfo(testPaths.getEventPath());
-			if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-				logger.atInfo().log("Ignore put event files for Windows");
-			} else {
-				for (EventFile ef : eventFiles) {
-					Path input = testPaths.getEventPath().resolve("data").resolve(ef.getName());
-					ZosHelper.putEventFile(destHLQ, input.toFile(), ef.getName(), ef.getLrecl());
-				}
+			for (EventFile ef : eventFiles) {
+				Path input = testPaths.getEventPath().resolve("data").resolve(ef.getName());
+				ZosHelper.putEventFile(destHLQ, input.toFile(), ef.getName(), ef.getLrecl());
 			}
 		}
 	}
@@ -174,19 +167,22 @@ public class TestDriver {
 
 	private static boolean envVariablesAreValid() {
 		boolean valid = true;
-		if (GersEnvironment.get("GERS_TEST_HLQ").isEmpty()) {
-			logger.atSevere().log("GERS_TEST_HLQ is empty. We need an HLQ");
-			valid = false;
-		}
-		if (GersEnvironment.get("GERS_ENV_HLQ").isEmpty()) {
-			logger.atSevere().log("GERS_ENV_HLQ is empty. We need an HLQ");
-			valid = false;
+		if(GersEnvironment.isWindows() == false) {
+			if (GersEnvironment.get("GERS_TEST_HLQ").isEmpty()) {
+				logger.atSevere().log("GERS_TEST_HLQ is empty. We need an HLQ");
+				valid = false;
+			}
+			if (GersEnvironment.get("GERS_ENV_HLQ").isEmpty()) {
+				logger.atSevere().log("GERS_ENV_HLQ is empty. We need an HLQ");
+				valid = false;
+			}
 		}
 		return valid;
 	}
 
 	private static void checkExistsAndProcessSpeclist() throws Exception {
 		String specFileListName = GersEnvironment.get("GERS_TEST_SPEC_LIST");
+		logger.atInfo().log("Using Specfile list " + specFileListName);
 		if (specFileListName != null) {
 			File specFileList = new File(GersEnvironment.get(LOCALROOT) + File.separator + specFileListName);
 			if (!specFileList.exists()) {
@@ -198,7 +194,7 @@ public class TestDriver {
 	}
 
 	private static void processYamlSpecFileList(File specFileList) {
-		TestRepository.buildTheRepo(specFileList);
+		TestRepository.buildTheRepo(specFileList, GersEnvironment.isWindows() ? WINDOWS_TEMPLATESET : null);
 	}
 
 	private static void initFreeMarkerConfiguration() throws IOException {
@@ -229,15 +225,9 @@ public class TestDriver {
 		String testHLQ = GersEnvironment.get("GERS_TEST_HLQ");
 		String testDataset = testHLQ + "." + testToRun.getDataSet();
 		TestDataGenerator.applyTemplatesToTest(testToRun);
-		if ( testHLQ.equalsIgnoreCase("LOCAL"))  {
+		if ( GersEnvironment.isWindows())  {
 			runLocalTest(testToRun);
 			return;
-		} else if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-			System.out.println("delete existing test datasets " + testDataset);
-			System.out.println("Run " + testToRun.getFullName());
-			return;
-		} else {
-			// ZosHelper.deleteDataSet(testDataset);
 		}
 
 		Path xmlDir = buildTheXMLFiles(testToRun);
@@ -280,35 +270,9 @@ public class TestDriver {
 			substs.clear();
 		}
 		Path configFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").resolve(testToRun.getFullName());
-		Files.copy(configFolder.resolve(appname + "PARM"), localTest.resolve(appname + "PARM.cfg"), StandardCopyOption.REPLACE_EXISTING);
-		//copy config
-		//Create WBXMLI
-		//copy XML to above
-		//cd to or run gvbrca from test dir 
-		CommandRunner cr = new CommandRunner();
-		try {
-			String mr91String;
-			String rcaString;
-			if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-				mr91String = "gvbrca.bat";
-				rcaString = "gvbrca.bat";
-			} else {
-				mr91String = "gvbrca";
-				rcaString = "gvbrca";
-			}
-			cr.run(mr91String, localTest.toFile());
-			logger.atInfo().log(cr.getCmdOutput().toString());
-			cr.clear();
-			cr.run(rcaString, localTest.toFile());
-			logger.atInfo().log(cr.getCmdOutput().toString());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// dittto gvbrca
+		Files.copy(configFolder.resolve(appname + "PARM"), localTest.resolve(appname + "PARM"), StandardCopyOption.REPLACE_EXISTING);
+		runWinRcaFrom(localTest);
 		processLocalResult(testToRun);
-
-		//how to we check a pretend pass? Just return code?
 	}
 
 	private static void processLocalResult(GersTest test) {
@@ -318,7 +282,7 @@ public class TestDriver {
 		Path resultFolder = outPath.resolve(test.getFullName());
 		Path vdp = resultFolder.resolve(GersConfigration.VDP_DDNAME);
 		Path xlt = resultFolder.resolve(GersConfigration.XLT_DDNAME);
-		logger.atInfo().log("Check existenc in " + resultFolder.toString());
+		logger.atInfo().log("Check existence in " + resultFolder.toString());
 		if (vdp.toFile().exists() && xlt.toFile().exists()) {
 			test.getResult().setMessage("generated");
 		} else {
@@ -522,7 +486,7 @@ public class TestDriver {
 
 	private static void submitJobsAndWaitForCompletion(GersTest testToRun) throws IOException {
 		Path firstJob = testJCLDirectory.resolve(testToRun.getName() + (testToRun.getDb2bind().equals("Y") ? "N" : "L"));
-		if (GersEnvironment.get("OSNAME").startsWith("Win")) {
+		if (GersEnvironment.isWindows()) {
 			System.out.println("Submit " + firstJob.toString());
 		} else {
 			submitJobs(firstJob);
@@ -636,7 +600,7 @@ public class TestDriver {
 
 	private static void getOutputFile(String dataset, OutputFile f, String fileName, GersTest testToRun) {
 		Path outFile = getOutFilePathForTest(fileName, testToRun);
-		if (GersEnvironment.get("OSNAME").startsWith("Win")) {
+		if (GersEnvironment.isWindows()) {
 			System.out.println("Get output file from " + dataset + " to " + outFile.toFile().toString() + " :" + f.getRecfm() + "," + f.getLrecl());
 		} else {
 			if(convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
@@ -843,4 +807,43 @@ public class TestDriver {
           }
           return copied;
       }
+
+	public static void generateCoverage() {
+		if(GersEnvironment.isWindows()) {
+			Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT));
+			Path outPath = rootPath.resolve("out");
+			generateCoverageRCAPARM(outPath);
+			runWinRcaFrom(outPath);
+		} else {
+			logger.atSevere().log("Only generate function code coverage on Windows");
+		}
+	}
+
+	private static void runWinRcaFrom(Path loc) {
+		CommandRunner cr = new CommandRunner();
+		try {
+			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
+			String rcaString = "java -jar " + winrcapps + "/rcapps-latest.jar";
+			cr.run(rcaString, loc.toFile());
+			logger.atInfo().log(cr.getCmdOutput().toString());
+		} catch (InterruptedException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void generateCoverageRCAPARM(Path outPath) {
+        logger.atInfo().log("Write RCAParms for coverage");
+        try (FileWriter fw = new FileWriter(outPath.resolve(GersConfigration.RCA_PARM_FILENAME).toFile())) {
+            fw.write("# Auto generated Run Control Parms\n");
+            fw.write(GersConfigration.GENERATE +"=N\n");
+            fw.write(GersConfigration.COVERAGE + "=Y\n");
+            fw.write(GersConfigration.AGGREGATE + "=Y\n");
+            fw.write(GersConfigration.LOG_LEVEL + "=DEBUG\n");
+            fw.close();
+        } catch (IOException e) {
+            logger.atSevere().log("Unable to write RCA Parms %s", e.getMessage() );
+        }
+	}
+
 }

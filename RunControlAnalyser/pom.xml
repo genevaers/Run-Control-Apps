@@ -87,10 +87,6 @@ under the License.
 			<artifactId>commons-cli</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.googlecode.java-diff-utils</groupId>
 			<artifactId>diffutils</artifactId>
 		</dependency>

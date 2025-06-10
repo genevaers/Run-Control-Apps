@@ -96,4 +96,8 @@ public class VarStringField extends Field {
         return defaultStringNodeEntry(prefix, arrayValue);    
     }
 
+    @Override
+    public String getType() {
+        return "varstring";
+    }
 }

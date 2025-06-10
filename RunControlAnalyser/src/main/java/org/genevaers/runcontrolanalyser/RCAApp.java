@@ -1,7 +1,6 @@
 package org.genevaers.runcontrolanalyser;
 
 import java.io.IOException;
-import org.genevaers.runcontrolanalyser.configuration.RcaConfigration;
 import org.genevaers.utilities.GenevaLog;
 import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.ParmReader;

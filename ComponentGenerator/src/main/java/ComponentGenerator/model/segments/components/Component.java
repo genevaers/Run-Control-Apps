@@ -23,6 +23,15 @@ import java.util.List;
 
 import ComponentGenerator.model.segments.components.members.Member;
 
+/**
+ * A POJO Class to map a component defined in a component YAML file.
+ * 
+ * 
+ * <p>Class instances will be populated via Jackson when the {@link ComponentSegment#readYaml()} is called.</p>
+ * <p>It has the class name, a list of members and the name of the associated VDP Record.</p> 
+ * 
+ * <p>The components are used in the FreeMarker template <a href="file:../../../../../../../ComponentGenerator/FreeMarkerTemplates/compJavaObject.ftl">compJavaObject.ftl</a>
+ */
 public class Component {
 
     private String componentName;

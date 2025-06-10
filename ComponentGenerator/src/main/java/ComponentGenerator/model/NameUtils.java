@@ -20,8 +20,14 @@ package ComponentGenerator.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Utils class for string processing.
+ */
 public class NameUtils {
-    public static String getCamelCaseName(String in, boolean capFirst) {
+/**
+ * Convert the YAML snake case to camel. .
+ */
+public static String getCamelCaseName(String in, boolean capFirst) {
         if(in.contains("_")) {
             StringBuilder cc = new StringBuilder();
             String[] parts = in.toLowerCase().split("_");

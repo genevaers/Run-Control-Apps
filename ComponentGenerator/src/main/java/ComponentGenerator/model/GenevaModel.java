@@ -22,6 +22,9 @@ import java.util.List;
 
 import ComponentGenerator.model.segments.Segment;
 
+/**
+ * POJO for the Geneva model. Used in the Jackson processing.
+ */
 public class GenevaModel {
     private String description;
     private List<Segment> segments;

@@ -18,6 +18,7 @@ fields:
   component_field: none
 - name: record_id
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: month_of_fiscal_period
   type: short

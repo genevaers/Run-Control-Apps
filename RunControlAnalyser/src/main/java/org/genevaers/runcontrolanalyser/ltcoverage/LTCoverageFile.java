@@ -21,7 +21,11 @@ package org.genevaers.runcontrolanalyser.ltcoverage;
 
 
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -49,6 +53,11 @@ public class LTCoverageFile {
     }
 
     public String getGenerationDate() {
+        if(generationDate == null) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+            Date dt = Calendar.getInstance().getTime();
+            generationDate = dateFormat.format(dt);
+        }
         return generationDate;
     }
 
@@ -57,7 +66,7 @@ public class LTCoverageFile {
     }
 
     public String getLtcoverage() {
-        return ltcoverage;
+        return ltcoverage == null ? "" : ltcoverage;
     }
 
     public void setLtcoverage(String ltcoverage) {

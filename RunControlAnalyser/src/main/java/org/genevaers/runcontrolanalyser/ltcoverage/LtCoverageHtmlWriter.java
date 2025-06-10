@@ -133,8 +133,8 @@ public class LtCoverageHtmlWriter {
 													h1(ltcov.getLtcoverage() + " Function Code Coverage").withClass("w3-teal"),
 													getSources(ltcov.getSources(), output),
 													h2("Data Generated " + ltcov.getGenerationDate()).withClass("w3-green"),
-													functionCodeTable(ltcov.getFunctionCodes()).withClass("w3-col l10 m12"),
-											div().withClass("w3-col l2 m12")).withClass("w3-row")))
+													functionCodeTable(ltcov.getFunctionCodes()).withClass("w3-col l11 m12"),
+											div().withClass("w3-col l1 m12")).withClass("w3-row")))
 					).renderFormatted());
 			testHtml.close();
 		} catch (IOException e) {

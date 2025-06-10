@@ -18,6 +18,9 @@ package ComponentGenerator.model.segments;
  */
 
 
+/**
+ * Force implementers to read their yaml file
+ */
 public interface SegmentYamlReader {
     
     public void readYaml();

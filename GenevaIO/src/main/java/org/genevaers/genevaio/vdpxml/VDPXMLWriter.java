@@ -181,6 +181,7 @@ public class VDPXMLWriter {
         }
         writeElement("SpacesBeforeColumn", Integer.toString(vc.getSpacesBeforeColumn()), fw);
         writeElement("DataType", vc.getDataType().dbcode(), fw);
+        writeElement("DateFormat", vc.getDateCode().dbcode(), fw);
         writeElement("Length", Integer.toString(vc.getFieldLength()), fw);
         writeElement("Position", Integer.toString(vc.getStartPosition()), fw);
         writeElement("Alignment", vc.getJustifyId().dbcode(), fw);

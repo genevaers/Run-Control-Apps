@@ -44,7 +44,7 @@ public class GersEnvironment {
 		locroot = locroot.replace("\\", "/");
 
 		getEnvVarOrDefault("LOCALROOT", locroot);
-		getEnvVarOrDefault("GERS_TEST_SPEC_LIST", "Basespeclist.yaml");
+		getEnvVarOrDefault("GERS_TEST_SPEC_LIST", "JBasespeclistV4.yaml");
 		getEnvVarOrDefault("RUNTESTS", "N");
 		getEnvVarOrDefault("CLEARLOCAL", "N");
 		getEnvVarOrDefault("CLEARJUNIT", "Y");
@@ -110,7 +110,7 @@ public class GersEnvironment {
 	}
 
 	private static String getEnvVarOrDefault(String env, String def) {
-		String value = System.getenv(env);
+        String value = System.getenv(env);
 		if (value == null) {
 			value = def;
 		}
@@ -135,6 +135,10 @@ public class GersEnvironment {
 			String msg = String.format("%s=%s%n", entry.getKey(), value);
 			System.out.print(msg);
 		}
+	}
+
+	public static boolean isWindows() {
+		return get("OSNAME").startsWith("Win");
 	}
 	
 	public static Map<String, String> getEnvironmentVariables() {

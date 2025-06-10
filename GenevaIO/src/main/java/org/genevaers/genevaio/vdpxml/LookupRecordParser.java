@@ -67,6 +67,7 @@ public class LookupRecordParser extends BaseParser {
 			case "NAME":
 				lookup = new LookupPath();
 				lookup.setID(componentID);
+				lookup.setStatus(1);
 				componentName = text;
 				lookup.setName(componentName);
 				Repository.getLookups().add(lookup, componentID, text);

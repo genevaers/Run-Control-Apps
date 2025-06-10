@@ -1,6 +1,6 @@
 <#assign aDateTime = .now>
 <#assign aDate = aDateTime?date>
-<#assign aTime = aDateTime?time>
+<#assign aTime = aDateTime?iso_utc>
 ~RCARPT
  
 GenevaERS - The Single-Pass Optimization Engine
@@ -13,8 +13,8 @@ Program ID:      GVBRCA (${rcaversion})
 Program Title:   Run-Control App
 Built:           ${buildtimestamp}
  
-Executed:        ${aDate} : ${aTime}
- 
+Executed:        ${aDate?iso_utc} ${aTime?substring(11, 16)}
+
 Report DD Name:  RCARPT
 Report Title:    GVBRCA Control Report
  

@@ -81,4 +81,9 @@ public class ShortField extends Field {
         return defaultNumericNodeEntry(prefix, arrayValue);
     }  
 
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
 }

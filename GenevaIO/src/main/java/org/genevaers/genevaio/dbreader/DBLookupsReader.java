@@ -47,6 +47,7 @@ public class DBLookupsReader extends DBReaderBase{
             String query = "SELECT 	distinct "
                 + "l.LOOKUPID, "
                 + "l.NAME, "
+                + "l.VALIDIND as VALID, "
                 + "l.SRCLRID as LKUPSRCLR, "
                 + "DESTLRLFASSOCID, "
                 + "s.STEPSEQNBR, "
@@ -151,6 +152,7 @@ public class DBLookupsReader extends DBReaderBase{
         }
         lpKey.setSymbolicName(getDefaultedString(rs.getString("SYMBOLICNAME"), ""));
         Repository.addLookupPathKey(lpKey);
+        Repository.setCurrentLookupPathState(rs.getInt("VALID"));
     }
     
     public boolean addNamedLookupToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params, int environmentID, String name) {
@@ -159,6 +161,7 @@ public class DBLookupsReader extends DBReaderBase{
             String query = "SELECT 	distinct "
                 + "l.LOOKUPID, "
                 + "l.NAME, "
+                + "l.VALIDIND as VALID, "
                 + "l.SRCLRID as LKUPSRCLR, "
                 + "DESTLRLFASSOCID, "
                 + "s.STEPSEQNBR, "

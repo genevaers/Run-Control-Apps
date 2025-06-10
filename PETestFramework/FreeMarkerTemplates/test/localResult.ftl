@@ -39,9 +39,6 @@
 				<div class="w3-card-4">
 				<a href="rca/gvbrca.html">See Analysis here</a>
 				</div>
-				<div class="w3-card-4">
-				<a href="MR91LOG">MR91LOG here</a>
-				</div>
 			</div>
 		</div>		
    </body>
