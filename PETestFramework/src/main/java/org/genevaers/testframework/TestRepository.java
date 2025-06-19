@@ -61,21 +61,21 @@ public class TestRepository  {
         //Make sure we can't intantiate this - there will be only one
     }
 
-    public static void buildTheRepo(File specFileList) {
+    public static void buildTheRepo(File specFileList, String overrideTemplateSet) {
         yr = new YAMLReader();
         try {
             //specFiles = yr.readSpecFileList(specFileList);
             specFileSets = yr.readSpecFileSets(specFileList);
-            processSpecFileSets();
+            processSpecFileSets(overrideTemplateSet);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    private static void processSpecFileSets() {
+    private static void processSpecFileSets(String overrideTemplateSet) {
         for(SpecFiles specFiles : specFileSets.getSpecFileSets()) {
-            TemplateSet ts = readTemplateSet(specFiles.getTemplateSetName());
+            TemplateSet ts = readTemplateSet(overrideTemplateSet != null ? overrideTemplateSet : specFiles.getTemplateSetName());
             specFiles.addTemplateSet(ts);
             specFiles.buildTemplateTypeLists();
             readTheTestSpecs(specFiles);

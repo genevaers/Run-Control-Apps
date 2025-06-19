@@ -1,0 +1,67 @@
+digraph FrontendProjects {
+    rankdir=TB
+//Nodes
+graph [label="Run Control Apps Package Hierarchy\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22 ranksep="2 equally" compound=true ];
+labeljust=center;
+
+// Applications
+subgraph cluster_rca { label="Run Control Apps" node [shape=plaintext]
+    RCA[label="Run Control Apps" shape=rect style=filled color=PaleGreen]
+}
+subgraph cluster_rcg { label="Run Control Generator" node [shape=plaintext]
+    RCG[label="Run Control Generator" shape=rect style=filled color=PaleGreen]
+}
+
+subgraph cluster_comp { label="Compilers"  node [shape=plaintext] 
+    COMPS[label="Extract and Format Compilers" shape=rect style=filled color="lightblue1" ]
+}
+
+
+subgraph cluster_fa { label="Run Control Analyser" node [shape=plaintext]
+    RCAN[label="Run Control Analyser" shape=rect style=filled color=PaleGreen]
+}
+
+subgraph cluster_compgen { label="Component Generator" node [shape=plaintext]
+    COMPRECS[label="Records" shape=rect style=filled color=PaleGreen]
+    COMPCOMPS[label="Components" shape=rect style=filled color=PaleGreen]
+}
+
+//Libraries
+
+subgraph cluster_gio { label="GenevaIO" node [shape=plaintext]
+
+    subgraph cluster_giolt { label="Outputs" node [shape=plaintext]
+       LTR[label="RC Files" shape=rect style=filled color="lightblue1" ]
+    }
+
+    subgraph cluster_gior { label="Readers" node [shape=plaintext]
+        RCDEFS[label="Run Control Definitions" shape=rect style=filled color="lightblue1" ]
+    }
+
+    subgraph cluster_giow { label="Writers" node [shape=plaintext]
+         REPORTS[label="Reports" shape=rect style=filled color="lightblue1" ]
+    }
+
+}
+
+subgraph cluster_repo { label="Repository" margin=18 node [shape=plaintext]
+    REPODATA[label="Run Control Definition Data"  shape=rect style=filled color="lightblue1" ]
+}
+
+COMPS -> RCDEFS [lhead=cluster_gio, ltail=cluster_comp]
+RCAN -> RCDEFS [lhead=cluster_gio, ltail=cluster_fa]
+RCAN -> REPODATA [lhead=cluster_repo, ltail=cluster_fa]
+
+RCDEFS -> REPODATA [lhead=cluster_repo]
+RCG -> COMPS [lhead=cluster_comp, ltail=cluster_rcg]
+RCG -> REPODATA [lhead=cluster_repo, ltail=cluster_rcg]
+
+COMPS  -> { REPODATA} [lhead=cluster_repo, ltail=cluster_comp]
+
+COMPRECS -> RCDEFS [lhead=cluster_gio, ltail=cluster_compgen]
+COMPCOMPS -> REPODATA [lhead=cluster_repo, ltail=cluster_compgen]
+
+RCA -> RCG [lhead=cluster_rcg, ltail=cluster_rca]
+RCA -> RCAN [lhead=cluster_fa, ltail=cluster_rca]
+
+}

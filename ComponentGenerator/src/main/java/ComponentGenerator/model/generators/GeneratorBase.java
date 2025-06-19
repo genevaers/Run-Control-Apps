@@ -38,6 +38,10 @@ import freemarker.template.TemplateException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
+/**
+ * Base class for generation.
+ * <p>Holds common generation functions</p>
+ */
 public class GeneratorBase {
     
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();

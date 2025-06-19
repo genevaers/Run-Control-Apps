@@ -18,15 +18,14 @@ package ComponentGenerator.model.segments;
  */
 
 
-import freemarker.template.Configuration;
-
+/**
+ * POJO for the segment details
+ */
 public class Segment {
 
     private String name;
     private String source;
     private String type;
-
-//    private ModelSegment model;
 
     public String getName() {
         return name;
@@ -44,14 +43,6 @@ public class Segment {
         this.source = source;
     }
 
-    // public void addModel(ModelSegment m) {
-    //     model = m;
-    // }
-
-    // public ModelSegment getModel() {
-    //     return model;
-    // }
-
     public String getType() {
         return type;
     }
@@ -59,13 +50,5 @@ public class Segment {
     public void setType(String type) {
         this.type = type;
     }
-
-    // public void setFreeMarkerCfg(Configuration cfg) {
-    //     this.cfg = cfg;
-    // }
-
-    // public Configuration getFreeMarkerCfg() {
-    //     return cfg;
-    // }
 
 }

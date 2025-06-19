@@ -58,9 +58,14 @@ public class DBLRIndexReader extends DBReaderBase {
         int id = rs.getInt("LRINDEXID");
         lri.setComponentId(id);
         int rslrid = rs.getInt("LOGRECID");
+        if(lastlrid != rslrid) {
+            lastlrid = rslrid;
+            effectiveDatesMade = false;
+        }
         if (effectiveDatesMade == false) {
             changingLRCheckAndAddEffectiveDateIndexes(rs);
         }
+
         lri.setLrId(rs.getInt("LOGRECID"));
         lri.setKeyNumber(rs.getShort("FLDSEQNBR"));
         lri.setEffectiveDateStart(false);
@@ -68,21 +73,6 @@ public class DBLRIndexReader extends DBReaderBase {
         lri.setName("Primary");
         lri.setFieldID(rs.getInt("LRFIELDID"));
         Repository.addLRIndex(lri);
-        if(rslrid != lastlrid) {
-            addEffectiveDateIndexes();
-        }
-    }
-
-    private void addEffectiveDateIndexes() {
-        if(efsi != null) {
-            Repository.addLRIndex(efsi);
-            efsi = null;
-        }
-        if(efei != null) {
-            Repository.addLRIndex(efei);
-            efei = null;
-        }
-        effectiveDatesMade = false;
     }
 
     private void changingLRCheckAndAddEffectiveDateIndexes(ResultSet rs) throws SQLException {
@@ -100,6 +90,7 @@ public class DBLRIndexReader extends DBReaderBase {
             efsi.setEffectiveDateStart(true);
             efsi.setName("Starting Effective Date");
             effectiveDatesMade = true;
+            effdateStarts.put(id, efsi);
         }
         if (rs.getInt("EFFDATEENDFLDID") > 0) {
             efei = new LRIndex();
@@ -110,6 +101,7 @@ public class DBLRIndexReader extends DBReaderBase {
             efei.setFieldID(rs.getInt("EFFDATEENDFLDID"));
             efei.setEffectiveDateEnd(true);
             efei.setName("End Effective Date");
+            effdateEnds.put(id, efei);
             effectiveDatesMade = true;
         }
     }

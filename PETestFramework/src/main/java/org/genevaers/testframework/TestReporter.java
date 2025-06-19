@@ -159,6 +159,7 @@ public class TestReporter {
 	}
 
 	private void writeCoverageHTML() {
+		
 		// Generate the accumulated HTML coverage report
 		if (covergageEnabled) {
 			CoverageReportGenerator covGenerator = new CoverageReportGenerator();

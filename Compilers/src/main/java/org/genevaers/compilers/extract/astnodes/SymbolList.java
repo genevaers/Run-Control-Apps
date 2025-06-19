@@ -1,5 +1,7 @@
 package org.genevaers.compilers.extract.astnodes;
 
+import java.util.ArrayList;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -19,6 +21,7 @@ package org.genevaers.compilers.extract.astnodes;
 
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.genevaers.compilers.base.ASTBase;
 
@@ -52,4 +55,13 @@ public class SymbolList extends ExtractBaseAST {
         return key ;
     }
 
+    public List<String> getSymbols() {
+        List<String> symbols = new ArrayList<>();
+        Iterator<ASTBase> ci = children.iterator();
+        while(ci.hasNext()) {
+            SymbolEntry sym = (SymbolEntry)ci.next();
+            symbols.add(sym.getName());
+        }
+        return symbols;
+    }
 }

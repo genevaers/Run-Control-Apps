@@ -181,6 +181,7 @@ public class VDPXMLWriter {
         }
         writeElement("SpacesBeforeColumn", Integer.toString(vc.getSpacesBeforeColumn()), fw);
         writeElement("DataType", vc.getDataType().dbcode(), fw);
+        writeElement("DateFormat", vc.getDateCode().dbcode(), fw);
         writeElement("Length", Integer.toString(vc.getFieldLength()), fw);
         writeElement("Position", Integer.toString(vc.getStartPosition()), fw);
         writeElement("Alignment", vc.getJustifyId().dbcode(), fw);
@@ -278,16 +279,23 @@ public class VDPXMLWriter {
     private void writeColumn(ViewColumn vc, Writer fw) throws IOException {
         writeSeqIdElement("ExtractColumn", vc.getComponentId(), vc.getColumnNumber(), fw);
         writeElement("Area", vc.getExtractArea().dbcode(), fw);
+        ViewSortKey vsk = currentView.getViewSortKeyFromColumnId(vc.getComponentId());
         if (vc.getExtractArea() != ExtractArea.AREACALC) {
-            writeElement("DataType", vc.getDataType().dbcode(), fw);
-            writeElement("Length", Integer.toString(vc.getFieldLength()), fw);
+            if(vc.getExtractArea().name() == ExtractArea.SORTKEY.name() && vsk != null){
+                writeElement("DataType", vsk.getSortKeyDataType().dbcode(), fw);
+                writeElement("Length", Integer.toString(vsk.getSkFieldLength()), fw);
+                writeElement("DateFormat", vsk.getSortKeyDateTimeFormat().dbcode(), fw);
+            }else {
+                writeElement("DataType", vc.getDataType().dbcode(), fw);
+                writeElement("Length", Integer.toString(vc.getFieldLength()), fw);
+                writeElement("DateFormat", vc.getDateCode().dbcode(), fw);
+            }
             writeElement("Position", Integer.toString(vc.getExtractAreaPosition()), fw);
             writeElement("Ordinal", Integer.toString(vc.getOrdinalPosition()), fw);
         }
         ViewColumnSource vcs = vc.getIteratorForSourcesByNumber().next();
         if (vcs.getSortTitleFieldId() > 0) {
             writeIdElement("SortTitleKey", vcs.getSortTitleFieldId(), fw);
-            ViewSortKey vsk = currentView.getViewSortKey((short) vc.getColumnNumber());
             writeElement("DataType", vsk.getDescDataType().dbcode(), fw);
             writeElement("Length", Integer.toString(vsk.getSktFieldLength()), fw);
             closeElement("SortTitleKey", fw);

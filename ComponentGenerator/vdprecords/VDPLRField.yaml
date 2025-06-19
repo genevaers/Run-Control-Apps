@@ -10,6 +10,7 @@ fields:
   component_field: none
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: field_name
   type: string

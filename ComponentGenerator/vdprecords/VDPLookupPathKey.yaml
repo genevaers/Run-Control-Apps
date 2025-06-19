@@ -9,12 +9,15 @@ fields:
   component_field: none
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_Id
   component_field: componentId
 - name: prefix.inputFileId
   type: mappingOnly
+  existing_java_type: input_file_id
   component_field: targetlfid
 - name: prefix.sequenceNbr
   type: mappingOnly
+  existing_java_type: sequence_nbr
   component_field: keyNumber
 - name: join_name
   type: string

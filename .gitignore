@@ -207,3 +207,6 @@ ZosIO/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFil
 WinIO/target/maven-archiver/pom.properties
 WinIO/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 WinIO/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+RCApps/target/classes/org/genevaers/rcapps/doc-files/projects.dot
+RCApps/target/classes/org/genevaers/rcapps/doc-files/projects.svg
+ComponentGenerator/target/**

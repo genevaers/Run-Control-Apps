@@ -24,6 +24,11 @@ public class ExistingMember extends Member {
 
     private String existingJavaType;
 
+    @Override
+    public String getType() {
+        return existingJavaType;
+    }
+    
     public String getExistingJavaType() {
         return existingJavaType;
     }

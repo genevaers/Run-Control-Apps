@@ -108,4 +108,9 @@ public class MapMember extends Member {
         imports += "\nimport java.util.Collection;\nimport java.util.Iterator;";
         return imports;
     }
+
+    @Override
+    public String getType() {
+        return "Map of " + valuesType;
+    }
 }

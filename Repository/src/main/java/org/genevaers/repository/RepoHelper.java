@@ -1,9 +1,6 @@
 package org.genevaers.repository;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
@@ -18,7 +15,6 @@ import org.genevaers.repository.components.enums.FieldDelimiter;
 import org.genevaers.repository.components.enums.FileRecfm;
 import org.genevaers.repository.components.enums.JustifyId;
 import org.genevaers.repository.components.enums.RecordDelimiter;
-import org.genevaers.repository.components.enums.ReportFunction;
 import org.genevaers.repository.components.enums.SubtotalType;
 import org.genevaers.repository.components.enums.TextDelimiter;
 
@@ -41,7 +37,9 @@ import com.google.common.flogger.FluentLogger;
  * under the License.
  */
 
-
+/**
+ * A collection of static functions to help manipulate the Repository components.
+ */
 public class RepoHelper {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 

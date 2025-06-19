@@ -32,6 +32,9 @@ import ComponentGenerator.model.segments.functioncodes.FunctionCodeSegment;
 import ComponentGenerator.model.segments.record.LtRecordSegment;
 import ComponentGenerator.model.segments.record.VDPRecordSegment;
 
+/**
+ * Factory to read the ModelSegment of the supplied type
+ */
 public class SegmentFactory {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     

@@ -1,6 +1,6 @@
 digraph RunControlGeneratoFileFlowr {
 rankdir=LR
-graph [label="Run Control Generator File Flow\n\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22];
+graph [label="Run Control Generator Data Flow\n\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22];
 labeljust=center;
 
 // Files
@@ -8,49 +8,61 @@ labeljust=center;
 WB[label="Workbench" shape=square style=filled color=lawngreen]
 DB[label="Database" shape=circle style=filled color=tan]
 
-subgraph cluster_rcapps {
-    label = "Run Control Apps\n\n"; 
-    node [shape = plaintext;];
+//subgraph cluster_rcapps {
+//    label = "Run Control Apps\n\n"; 
+//    node [shape = plaintext;];
 
+    RUN[label="Runner" shape=oval style=filled color=PaleGreen ]
+    
     subgraph cluster_rcg {
-        label = "RC Apps phase 1\n\n";
+        label = "Phase 1\n\n";
         node [shape = plaintext;];
         RCG[label="Run Control Generator" shape=oval style=filled color=PaleGreen]
     }
-    VDP[label="VDP" shape=rect style=filled color=pink ]
-    XLT[label="XLT" shape=rect style=filled color=pink ]
+    subgraph cluster_rcf {
+        label = "RC Files \n\n";
+        node [shape = plaintext;];
     JLT[label="JLT" shape=rect style=filled color=pink ]
+    XLT[label="XLT" shape=rect style=filled color=pink ]
+    VDP[label="VDP" shape=rect style=filled color=pink ]
+    }
     subgraph cluster_rca {
-        label = "RC Apps phase 2\n\n";
+        label = "Phase 2\n\n";
         node [shape = plaintext;];
         RCA[label="Run Control Analyzer" shape=oval style=filled color=PaleGreen]
     }
-}
+//}
 
-RCP[label="RCGParm" shape=rect style=filled color=lightblue1]
+VDPXMLO[label="VDPXML" shape=rect style=filled color=orange ]
+VDPXMLI[label="VDPXML" shape=rect style=filled color=orange ]
+
 RAP[label="RCAParm" shape=rect style=filled color=lightblue1]
 WBX[label="WB XML Files" shape=rect style=filled color=lightblue1 ]
 RPT[label="Run Report" shape=rect style=filled color=beige ]
 LOG[label="Log" shape=rect style=filled color=beige ]
-REPS[label="Analyser Reports" shape=rect style=filled color=beige ]
+REPS[label="Analysis Reports" shape=rect style=filled color=beige ]
 
 DB -> WB -> WBX
-DB -> RCG
-RCP -> RCG
-WBX -> RCG
-RCG -> VDP
-RCG -> XLT
-RCG -> JLT
+DB -> RCG [label="Read" color=brown]
+RAP -> RUN
+RUN -> RCG [label="Call" color=green]
+RUN -> RCA [label="Call" color=green]
+WBX -> RCG [label="Read" color=blue]
+RCG -> VDP [label="Write" color=pink] 
+RCG -> XLT [label="Write" color=pink] 
+RCG -> JLT [label="Write" color=pink] 
+RCG -> VDPXMLO
+VDPXMLI -> RCG
 
-VDP -> RCA
-XLT -> RCA
-JLT -> RCA
+VDP -> RCA [label="Read" color=pink]
+XLT -> RCA [label="Read" color=pink]
+JLT -> RCA [label="Read" color=pink]
 
-RCA -> REPS
+RCA -> REPS [label="Write" color=brown] 
 
-RCA -> RPT [ltail=rca]
-RCA -> LOG
+RUN -> RPT [label="Write" color=brown] 
+RUN -> LOG [label="Write" color=brown] 
 
-RAP -> RCA
+//RAP -> RCA
 
 }

@@ -22,7 +22,6 @@ package org.genevaers.rcapps;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -32,7 +31,6 @@ import org.genevaers.genevaio.dbreader.DBViewsReader;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolgenerator.compilers.ExtractPhaseCompiler;
 import org.genevaers.utilities.GersConfigration;
-import org.genevaers.utilities.GersEnvironment;
 import org.genevaers.utilities.GersFile;
 import org.genevaers.utilities.Status;
 
@@ -70,7 +68,6 @@ public class ReportWriter {
     private static Object numJLTDiffs;
 
 	public static void write(Status status){
-		GersEnvironment.initialiseFromTheEnvironment();
 		configureFreeMarker();
         Template template;
         try {

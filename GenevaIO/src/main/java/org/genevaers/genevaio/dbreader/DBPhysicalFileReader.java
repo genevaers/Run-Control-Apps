@@ -121,6 +121,7 @@ public class DBPhysicalFileReader extends DBReaderBase {
             pf.setOutputDDName(String.format("O%07d", pf.getComponentId()));
         }
         pf.setRecfm(FileRecfm.fromdbcode(getDefaultedString(rs.getString("RECFM"), "VB")));
+        pf.setLrecl(rs.getShort("LRECL"));
         pf.setDatabaseConnection(getDefaultedString(rs.getString("DBMSSUBSYS"), ""));
         pf.setSqlText(getDefaultedString(rs.getString("DBMSSQL"), ""));
         pf.setDatabaseTable(getDefaultedString(rs.getString("DBMSTABLE"), ""));

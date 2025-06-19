@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CommandLineHandler",
+            "request": "launch",
+            "mainClass": "org.genevaers.ftl2jcl.CommandLineHandler",
+            "projectName": "petestframework"
+        },
+        {
+            "type": "java",
             "request": "attach",
             "name": "Attach by Process ID",
             "processId": "${command:PickJavaProcess}"
@@ -52,6 +59,23 @@
         },
         {
             "type": "java",
+            "name": "Launch TestFramework With Coverage",
+            "request": "launch",
+            "mainClass": "org.genevaers.testframework.CommandLineHandler",
+            "projectName": "petestframework",
+            "cwd": "${workspaceFolder}/PETestFramework",
+            "args": "-coverage"
+        },
+        {
+            "type": "java",
+            "name": "Launch Aggregate",
+            "request": "launch",
+            "mainClass": "org.genevaers.rcapps.Runner",
+            "projectName": "rcapps",
+            "cwd": "${workspaceFolder}/PETestFramework/out"
+        },
+        {
+            "type": "java",
             "name": "Launch RCG from playpen",
             "request": "launch",
             "mainClass": "org.genevaers.rcapps.Runner",
@@ -65,6 +89,22 @@
             "mainClass": "org.genevaers.rcapps.Runner",
             "projectName": "rcapps",
             "cwd": "${workspaceFolder}/../../../WEReports/RCAReport"
+        },
+        {
+            "type": "java",
+            "name": "Launch RCA compare from specified",
+            "request": "launch",
+            "mainClass": "org.genevaers.rcapps.Runner",
+            "projectName": "rcapps",
+            "cwd": "${workspaceFolder}/../../../RunControlPlayPen/compareResults/Report_header_with_ViewID_test[12115].xml"
+        },
+        {
+            "type": "java",
+            "name": "Test generated VDPXML",
+            "request": "launch",
+            "mainClass": "org.genevaers.rcapps.Runner",
+            "projectName": "rcapps",
+            "cwd": "${workspaceFolder}/../../../RunControlPlayPen/VDPXMLTest"
         }
     ]
 }

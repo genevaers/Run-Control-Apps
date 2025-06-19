@@ -24,11 +24,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
-/*
- * Make this a base type
- * Derived will be base on type
- * short integer string enum boolean map existing byte
- */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = IntegerMember.class, name = "integer"),
@@ -40,6 +35,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
         @JsonSubTypes.Type(value = ExistingMember.class, name = "existing"),
         @JsonSubTypes.Type(value = ByteMember.class, name = "byte")
 })
+
+/*
+ * Represents a member of a component.
+ * 
+ * Supplies the functions used in the FreeMarker template to generate a component class.
+ * 
+ * Derived classes are for each of the possible class datatypes of a Component. See the Subclasses section.
+ */
 public abstract class Member implements MemberGenerator {
 
     protected String name;
@@ -61,6 +64,10 @@ public abstract class Member implements MemberGenerator {
         this.vdpSource = vdpSource;
     }
 
+    /**
+     * Subclasses override this to supply the import string to the 
+     * class generation template.
+     */
     public String getImportString() {
         return null;
     }
@@ -79,4 +86,5 @@ public abstract class Member implements MemberGenerator {
         return gasEntry.toString();
     }
 
+    public abstract String getType();
 }

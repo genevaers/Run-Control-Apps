@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import freemarker.template.Configuration;
 
+/**
+ * Force implementers to generate their approriate outputs
+ */
 public interface SegmentWriter {
     
     public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, IOException;

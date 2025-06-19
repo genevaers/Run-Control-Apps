@@ -16,7 +16,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<!-- our apps -->
-		<revision>1.1.0_RC12</revision>
+		<revision>1.1.0_RC13</revision>
 	</properties>
 
 	<licenses>
@@ -242,6 +242,10 @@
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-javadoc-plugin</artifactId>
 			<version>3.11.1</version>
+			<configuration>
+          		<show>private</show>
+				<docfilessubdirs>true</docfilessubdirs>
+      		</configuration>
 			<reportSets>
 			  <reportSet>
 				<id>aggregate</id>
@@ -250,16 +254,10 @@
 				  <report>aggregate</report>
 				</reports>
 			  </reportSet>
-			  <reportSet>
-				<id>default</id>
-				<reports>
-				  <report>javadoc</report>
-				</reports>
-			  </reportSet>
 			</reportSets>
 		  </plugin>
 		</plugins>
-	  </reporting>
+	</reporting>
 	  
 	<profiles>
 		<profile>
@@ -319,13 +317,6 @@
 				<module>ZosIO</module>
 				<module>ZosUtilities</module>
 			</modules>
-			<dependencies>
-				<dependency>
-					<groupId>com.ibm</groupId>
-					<artifactId>jzos</artifactId>
-					<version>2.4.8</version>
-				</dependency>
-			</dependencies>
 		</profile>
 	</profiles>
 

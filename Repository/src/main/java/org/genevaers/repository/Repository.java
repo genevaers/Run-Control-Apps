@@ -53,6 +53,9 @@ import org.genevaers.repository.jltviews.UniqueKeys;
 
 import com.google.common.flogger.FluentLogger;
 
+/**
+ * A class of static functions to manage the Repository collections.
+ */
 public class Repository {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
@@ -541,8 +544,11 @@ public class Repository {
 	}
 
 	public static void addWarningMessage(CompilerMessage warn) {
-		logger.atWarning().log(warn.getDetail());
-		warnings.add(warn);
+		//Ignore JLT warnings
+		if(warn.getViewid() < 9000001) {
+			logger.atWarning().log(warn.getDetail());
+			warnings.add(warn);
+		}
 	}
 
 	public static List<CompilerMessage> getCompilerErrors() {
@@ -634,6 +640,12 @@ public class Repository {
 
 	public static int getMaxVdpLrId() {
 		return maxVdpXmLRID;
+	}
+
+	public static void setCurrentLookupPathState(int val) {
+		if(currentlp != null) {
+			currentlp.setStatus(val);
+		}
 	}
 
 }
