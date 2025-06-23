@@ -97,5 +97,17 @@ public class RepoDataProvider implements CompilerDataProvider{
     public ViewNode getView(int id) {
         return Repository.getViews().get(id);
     }
+
+    @Override
+    public void setEnvironmentName(String name) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setEnvironmentName'");
+    }
+
+    @Override
+    public String getEnvironmentName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEnvironmentName'");
+    }
     
 }

@@ -208,5 +208,17 @@ public class LazyDBReader implements CompilerDataProvider {
         throw new UnsupportedOperationException("Unimplemented method 'loadView'");
     }
 
+    @Override
+    public void setEnvironmentName(String name) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setEnvironmentName'");
+    }
+
+    @Override
+    public String getEnvironmentName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getEnvironmentName'");
+    }
+
     
 }

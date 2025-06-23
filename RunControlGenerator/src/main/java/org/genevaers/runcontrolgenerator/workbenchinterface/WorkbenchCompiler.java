@@ -36,12 +36,14 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.genevaers.compilers.extract.BuildGenevaASTVisitor;
 import org.genevaers.compilers.extract.astnodes.ExtractAST2Dot;
 import org.genevaers.compilers.format.astnodes.FormatBaseAST;
+import org.genevaers.genevaio.dataprovider.CompilerDataProvider;
 import org.genevaers.genevaio.dbreader.DBReaderBase;
 import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.genevaio.dbreader.LazyDBReader;
 import org.genevaers.genevaio.dbreader.WBConnection;
 import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
+import org.genevaers.genevaio.yamlreader.LazyYAMLReader;
 import org.genevaers.grammar.GenevaERSParser.GoalContext;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
@@ -72,7 +74,7 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 	protected WBCompilerType type;
 	private GoalContext tree;
 	protected ParseErrorListener errorListener;
-	private static LazyDBReader dataProvider = new LazyDBReader();;
+	private static CompilerDataProvider dataProvider;
 	private int envId;
 	private ViewType viewType;
 	private ColumnData columnData;
@@ -80,6 +82,7 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 	protected static ViewColumnSource currentViewColumnSource;
 	protected static ViewSource currentViewSource;
 	private static int environmentID;
+	private static String environmentName;
 	private static int sourceLR;
 	private static int sourceLF;
 	private static int currentColumnNumber;
@@ -90,10 +93,21 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
     public static void setSQLConnection(Connection c) {
 		WBConnection wbc = new WBConnection();
 		wbc.setSQLConnection(c);
-		dataProvider.setDatabaseConnection(wbc);
-		dataProvider.setParams(params);
+		if(dataProvider == null) {
+			dataProvider = new LazyDBReader();
+		}
+		((LazyDBReader) dataProvider).setDatabaseConnection(wbc);
+		((LazyDBReader) dataProvider).setParams(params);
 		BuildGenevaASTVisitor.setDataProvider(dataProvider);
     }
+
+	public static void useYAMLDatabase() {
+		if(dataProvider == null) {
+			dataProvider = new LazyYAMLReader();
+		}
+		logger.atInfo().log("Use YAML Dataprovider");
+		BuildGenevaASTVisitor.setDataProvider(dataProvider);
+	}
 
 	public static void setSchema(String schema) {
 		params.setSchema(schema);
@@ -109,6 +123,11 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 		environmentID = i;
 		params.setEnvironmentID(Integer.toString(i));
 		dataProvider.setEnvironmentID(i);
+	}
+
+	public static void setEnvironmentName(String n) {
+		environmentName = n;
+		dataProvider.setEnvironmentName(n);;
 	}
 
     public static void setSourceLRID(int i) {

@@ -1,5 +1,7 @@
 package org.genevaers.utilities;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,11 +108,15 @@ public class GersConfigration {
 
     public static final String RCA_RUNNAME = "gvbrca";
     public static final String RCA_HTMLREPORTFILENAME = RCA_REPORTDIR + RCA_RUNNAME + ".html";
+
+    private static final String GENEVAERS = ".genevaers";
     
     protected static Map<String, ConfigEntry> parmToValue = new TreeMap<>();
 
     private static boolean zos;
     private static String zosCodePage;
+
+    private static Path gersHome;
 
     public static void initialise() {
         clear();
@@ -461,4 +467,20 @@ public class GersConfigration {
             return false;
         }
     }
+	public static Path getGersHome() {
+        if (gersHome == null) {
+    		String home = System.getProperty("user.home");
+	    	Path homep = Paths.get(home);
+		    gersHome = homep.resolve(GENEVAERS);
+        }
+		return gersHome;
+	}
+	
+	private void makeGenevaERSDirectory() {
+		String home = System.getProperty("user.home");
+		Path homep = Paths.get(home);
+		gersHome = homep.resolve(GENEVAERS);
+		gersHome.toFile().mkdirs();
+	}
+
 }
