@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 mvn clean
-mvn install -DskipTests $1 $2
+mvn install -DskipTests $1 -Pz/os
 export rev=`grep "<revision>" pom.xml | awk -F'<revision>||</revision>' '{print $2}'`;
 echo RCA release number $rev;
 
