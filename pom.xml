@@ -165,7 +165,7 @@
 			<dependency>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-runtime</artifactId>
-				<version>4.13.1</version>
+				<version>4.13.2</version>
 			</dependency>
 			<dependency>
 				<groupId>com.googlecode.java-diff-utils</groupId>
@@ -278,8 +278,7 @@
 						</executions>
 						<configuration>
 							<licenses>
-								<license
-									implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
+								<license implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
 									<notes>Also allow the license url to be https.</notes>
 									<patterns>
 										<pattern>https://www.apache.org/licenses/LICENSE-2.0</pattern>
