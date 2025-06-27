@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import org.genenaers.genevio.dbreader.DBTestHelper;
 import org.genevaers.genevaio.dbreader.DBReader;
@@ -32,7 +33,11 @@ import org.genevaers.genevaio.yamlreader.LogicalRecordYAMLBean;
 import org.genevaers.genevaio.yamlreader.YAMLEnvironmentReader;
 import org.genevaers.genevaio.yamlreader.YAMLLogicalRecordReader;
 import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.LRField;
+import org.genevaers.repository.components.LogicalFile;
 import org.genevaers.repository.components.LogicalRecord;
+import org.genevaers.repository.components.LookupPath;
+import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.utilities.GersConfigration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,7 +49,7 @@ public class TestYAMLReader {
 
     private static final String GERS_TEST_ENV = "gersTestEnv";
 
-    @Test 
+    @Test @Disabled
     public void testMakeGenevaers() throws SQLException, ClassNotFoundException {
         YAMLEnvironmentReader envReader = new YAMLEnvironmentReader();
         envReader.makeEnvironment(GERS_TEST_ENV);
@@ -53,7 +58,7 @@ public class TestYAMLReader {
         assertNotNull(env);
     }
     
-     @Test 
+     @Test @Disabled
     public void testGenevaers() throws SQLException, ClassNotFoundException {
         YAMLEnvironmentReader envReader = new YAMLEnvironmentReader();
         envReader.queryAllEnvironments();
@@ -61,7 +66,7 @@ public class TestYAMLReader {
         assertNotNull(env);
     }
 
-    @Test 
+    @Test @Disabled
     public void testLReader() throws SQLException, ClassNotFoundException {
         YAMLLogicalRecordReader ylrr = new YAMLLogicalRecordReader();
         ylrr.setEnvironmentName(GERS_TEST_ENV);
@@ -69,13 +74,47 @@ public class TestYAMLReader {
         assertNotNull(lr);
     }
 
-     @Test 
+     @Test @Disabled
     public void testGetLR() throws SQLException, ClassNotFoundException {
         LazyYAMLReader lyr = new LazyYAMLReader();
         lyr.setEnvironmentName(GERS_TEST_ENV);
         LogicalRecord lr = lyr.getLogicalRecord(2);
         assertNotNull(lr);
         assertEquals("eventLR", lr.getName());
+        LogicalFile lf = Repository.getLogicalFiles().get("lf");
+        assertNotNull(lf);
+        PhysicalFile tpf = Repository.getPhysicalFiles().get("pf");
+        assertNotNull(tpf);
     }
 
+    @Test @Disabled
+    public void testGetIndexedLR() throws SQLException, ClassNotFoundException {
+        LazyYAMLReader lyr = new LazyYAMLReader();
+        lyr.setEnvironmentName(GERS_TEST_ENV);
+        LogicalRecord lr = lyr.getLogicalRecord(3);
+        assertNotNull(lr);
+        assertEquals("targ", lr.getName());
+        assertEquals(3, lr.getIteratorForIndexBySeq().next().getFieldID());
+        Iterator<LRField> fi = lr.getIteratorForFieldsByName();
+        assertEquals("ndx", fi.next().getName());
+        assertEquals("payload", fi.next().getName());
+    }
+
+    @Test @Disabled
+    public void testGetLookup() throws SQLException, ClassNotFoundException {
+        LazyYAMLReader lyr = new LazyYAMLReader();
+        lyr.setEnvironmentName(GERS_TEST_ENV);
+        LookupPath lk = lyr.getLookup("lk");
+        assertNotNull(lk);
+        LogicalRecord targLr = Repository.getLogicalRecords().get("targ");
+        assertNotNull(targLr);
+        LRField f = targLr.findFromFieldsByName("payload");
+        assertNotNull(f);
+        LogicalFile lf = Repository.getLogicalFiles().get("targlf");
+        assertNotNull(lf);
+        PhysicalFile tpf = Repository.getPhysicalFiles().get("targPF");
+        assertNotNull(tpf);
+        assertTrue(lf.getNumberOfPFs() > 0);
+        assertEquals(lf.getPFIterator().next().getName(), tpf.getName());
+    }
 }

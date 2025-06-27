@@ -284,6 +284,7 @@ public class JoinViewsManager {
 			jltv = exitJoins.getOrAddJoinifAbsent(LookupType.EXIT, lrid, lookup.getID());
 		} else {
 			LogicalFile lf = Repository.getLogicalFiles().get(lfid);
+			logger.atInfo().log("Lookup %s Lf %s has %d pfs", lookup.getName(), lf.getName(), lf.getNumberOfPFs());
 			if(lf.getPFIterator().next().getInputDDName().startsWith("$$")) {
 				//External files have an input DDname starting with $$
 				//Go figure...

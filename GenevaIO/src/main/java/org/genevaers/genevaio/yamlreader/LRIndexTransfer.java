@@ -1,5 +1,7 @@
 package org.genevaers.genevaio.yamlreader;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -23,19 +25,13 @@ public class LRIndexTransfer {
 	/*
 	 * Fields for table LRINDEX.
 	 */
+	@JsonIgnore
 	private Integer environmentId;
 	//private Integer lrIndexId;
+	private Integer id;
 	private Integer lrId;
 	private Integer effectiveStartDateLRFieldId;
 	private Integer effectiveEndDateLRFieldId;
-
-	public Integer getEnvironmentId() {
-		return environmentId;
-	}
-
-	public void setEnvironmentId(Integer environmentId) {
-		this.environmentId = environmentId;
-	}
 
 //	public Integer getLrIndexId() {
 //		return lrIndexId;
@@ -70,4 +66,19 @@ public class LRIndexTransfer {
 		this.effectiveEndDateLRFieldId = effectiveEndDateLRFieldId;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getEnvironmentId() {
+		return environmentId;
+	}
+
+	public void setEnvironmentId(Integer environmentId) {
+		this.environmentId = environmentId;
+	}
 }

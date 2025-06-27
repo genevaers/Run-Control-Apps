@@ -16,6 +16,7 @@ import org.genevaers.genevaio.dbreader.DatabaseConnection;
 import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
+import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
@@ -41,7 +42,7 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 	private static Map<String, LogicalRecordYAMLBean> lrbxfrsByName = new TreeMap<>();
 
 
-    public void addLRToRepo(String environmentName, int sourceLR) {
+    public void addLRToRepo(String environmentName, int lrid) {
             //    String query = "select "
             //     + "r.ENVIRONID, "
             //     + "r.LOGRECID, "
@@ -58,25 +59,42 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 		if(lrbxfrsByID.isEmpty()) {
 			queryAllLogicalRecords();
 		}
-		LogicalRecordYAMLBean lrb = lrbxfrsByID.get(sourceLR);
-        lr.setComponentId(lrb.getId());
-        lr.setName(lrb.getName());
-        lr.setStatus(LrStatus.fromdbcode(lrb.getLrStatusCode()));
-        if(lr.getStatus() == LrStatus.INACTIVE) {
-            Repository.addErrorMessage(new CompilerMessage(0, CompilerMessageSource.VIEW_PROPS, lr.getComponentId(), 0, 0, "Logical record " + lr.getName() + "[" + lr.getComponentId() + "] is not active"));
-        }
-        int le = lrb.getLookupExitId() != null ? lrb.getLookupExitId() : 0;
-        lr.setLookupExitID(le);
-        if(le > 0) {
-            requiredExits.add(le);
-        }
-        lr.setLookupExitParams(getDefaultedString(lrb.getLookupExitParams(), ""));
-        Repository.addLogicalRecord(lr);
-		addLRFields(lrb);
-		addIndexes(lrb);
+		if(lrid > 0) {
+			LogicalRecordYAMLBean lrb = lrbxfrsByID.get(lrid);
+			lr.setComponentId(lrb.getId());
+			lr.setName(lrb.getName());
+			lr.setStatus(LrStatus.fromdbcode(lrb.getLrStatusCode()));
+			if(lr.getStatus() == LrStatus.INACTIVE) {
+				Repository.addErrorMessage(new CompilerMessage(0, CompilerMessageSource.VIEW_PROPS, lr.getComponentId(), 0, 0, "Logical record " + lr.getName() + "[" + lr.getComponentId() + "] is not active"));
+			}
+			int le = lrb.getLookupExitId() != null ? lrb.getLookupExitId() : 0;
+			lr.setLookupExitID(le);
+			if(le > 0) {
+				requiredExits.add(le);
+			}
+			lr.setLookupExitParams(getDefaultedString(lrb.getLookupExitParams(), ""));
+			Repository.addLogicalRecord(lr);
+			addLRFields(lrb);
+			addIndexes(lrb);
+			lrb.getLfs().keySet().stream().forEach(lf -> requiredLFs.add(lf));
+		}
    }
 
     private void addIndexes(LogicalRecordYAMLBean lrb) {
+		LRIndex pndx = new LRIndex();
+		LRIndexTransfer nt = lrb.getIndex();
+		lrb.getIndexes().stream().forEach(x -> addIndexToRepo(x, nt));
+	}
+
+	private void addIndexToRepo(LRIndexFieldTransfer x, LRIndexTransfer nt) {
+		LRIndex pndx = new LRIndex();
+		pndx.setComponentId(nt.getId());
+		pndx.setEffectiveDateEnd(nt.getEffectiveEndDateLRFieldId()!=0);
+		pndx.setEffectiveDateStart(nt.getEffectiveStartDateLRFieldId()!=0);
+		pndx.setLrId(nt.getLrId());
+		pndx.setKeyNumber(x.getFldSeqNbr().shortValue());
+		pndx.setFieldID(x.getAssociatedComponentId());
+		Repository.addLRIndex(pndx);
 	}
 
 	private void addFieldToRepo(LRFieldTransfer f) {
@@ -108,7 +126,9 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 		lrb.getFields().values().stream().forEach(f -> addFieldToRepo(f));
 	}
 
-	public void addToRepo() {
+	public void addRequiredToRepo(String environmentName) {
+		logger.atInfo().log("Adding required LRs %s", requiredLRs.toString());
+		requiredLRs.stream().forEach(lr -> addLRToRepo(environmentName, lr));
         // LogicalRecord lr = new LogicalRecord();
         // lr.setComponentId(rs.getInt("LOGRECID"));
         // lr.setName(rs.getString("NAME"));
@@ -156,7 +176,7 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 	}
 
 	private void addToResults(List<LogicalRecordYAMLBean> result, File lr) {
-		LogicalRecordYAMLBean lrb = (LogicalRecordYAMLBean) YAMLizer.readYaml(lr.toPath(), "lr");
+		LogicalRecordYAMLBean lrb = (LogicalRecordYAMLBean) YAMLizer.readYamlLR(lr.toPath());
 		if(lrb.getId() > maxid) {
 			maxid = lrb.getId();
 		}

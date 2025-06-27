@@ -238,6 +238,10 @@ public class LogicalRecordYAMLBean {
 		this.indexFields = ndxs;
 	}
 	
+	public List<LRIndexFieldTransfer> getIndexes() {
+		return indexFields;
+	}
+	
 	public void clearIndexes() {
 		indexFields.clear();
 	}

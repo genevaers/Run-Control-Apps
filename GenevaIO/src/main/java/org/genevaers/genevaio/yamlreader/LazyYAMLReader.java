@@ -3,10 +3,7 @@ package org.genevaers.genevaio.yamlreader;
 import java.util.Map;
 
 import org.genevaers.genevaio.dataprovider.CompilerDataProvider;
-import org.genevaers.genevaio.dbreader.DBFieldReader;
-import org.genevaers.genevaio.dbreader.DBLRIndexReader;
 import org.genevaers.repository.Repository;
-import org.genevaers.repository.components.LogicalFile;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.ViewNode;
@@ -73,6 +70,7 @@ public class LazyYAMLReader implements CompilerDataProvider {
     private void loadLR(int id) {
        YAMLLogicalRecordReader lrReader = new YAMLLogicalRecordReader();
         lrReader.addLRToRepo(environmentName, id);
+        getDependenciesForLookup(null);
     }
 
     @Override
@@ -80,51 +78,49 @@ public class LazyYAMLReader implements CompilerDataProvider {
         //We'll need to have loaded the LRs like in WB -> some sort of init
         YAMLLogicalRecordReader lrReader = new YAMLLogicalRecordReader();
         lrReader.addLRToRepo(environmentName, sourceLR);
-        // DBLRIndexReader lIndexReader = new DBLRIndexReader();
-        // lIndexReader.addLRToRepo(databaseConnection, params, environmentID, sourceLR);
-        // DBFieldReader fieldReader = new DBFieldReader();
-        // fieldReader.addLRToRepo(databaseConnection, params, environmentID, sourceLR);
-    }
+     }
 
     @Override
     public LookupPath getLookup(String name) {
         LookupPath lk = Repository.getLookups().get(name);
         if(lk == null) {
-          loadLookup(environmentId, name);
+          loadLookup(environmentName, name);
           lk = Repository.getLookups().get(name);
         } 
         getDependenciesForLookup(lk);
         return lk;
     }
    private void getDependenciesForLookup(LookupPath lk) {
-        // YAMLLogicalRecordReader lrReader = new YAMLLogicalRecordReader();
-        // lrReader.addToRepo();
-        // YAMLLogicalFileReader lfReader = new YAMLLogicalFileReader();
-        // lfReader.addToRepo();
-        // YAMLPhysicalFileReader pFileReader = new YAMLPhysicalFileReader();
-        // pFileReader.addToRepo();
+        //Need to have build up a list of required LRs.
+        //Then below gets them.
+        YAMLLogicalRecordReader lrReader = new YAMLLogicalRecordReader();
+        lrReader.addRequiredToRepo(environmentName);
+        YAMLLogicalFileReader lfReader = new YAMLLogicalFileReader();
+        lfReader.addRequiredToRepo();
+        YAMLPhysicalFileReader pFileReader = new YAMLPhysicalFileReader();
+        pFileReader.addToRequiredRepo();
         // YAMLExitReader er = new YAMLExitReader();
         // er.addToRepo();
     }
 
-    private LogicalFile getLogicalFile(int lfid) {
-        LogicalFile lf = Repository.getLogicalFiles().get(lfid);
-        if(lf == null) {
-            loadLogicalFile(lfid);
-            lf = Repository.getLogicalFiles().get(lfid);
-        }
-        return lf;
-    }
+    // private LogicalFile getLogicalFile(int lfid) {
+    //     LogicalFile lf = Repository.getLogicalFiles().get(lfid);
+    //     if(lf == null) {
+    //         loadLogicalFile(lfid);
+    //         lf = Repository.getLogicalFiles().get(lfid);
+    //     }
+    //     return lf;
+    // }
 
 
-    private void loadLogicalFile(int lfid) {
-        YAMLLogicalFileReader lfReader = new YAMLLogicalFileReader();
-        lfReader.addLFtoRepo(environmentId, lfid);
-    }
+    // private void loadLogicalFile(int lfid) {
+    //     YAMLLogicalFileReader lfReader = new YAMLLogicalFileReader();
+    //     lfReader.addLFtoRepo(environmentId, lfid);
+    // }
 
-    private void loadLookup(int environmentId, String name) {
+    private void loadLookup(String environmentName, String name) {
         YAMLLookupsReader lkReader = new YAMLLookupsReader();
-        lkReader.addNamedLookupToRepo(environmentId, name);
+        lkReader.addNamedLookupToRepo(environmentName, name);
 
     }
 

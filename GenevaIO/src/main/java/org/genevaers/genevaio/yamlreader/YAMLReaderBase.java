@@ -30,6 +30,7 @@ public abstract class YAMLReaderBase {
 
     protected static Set<Integer> requiredLFs = new TreeSet<>();
     protected static Set<Integer> requiredPFs = new TreeSet<>();
+    protected static Set<String> requiredPfNames = new TreeSet<>();
     protected static Set<Integer> requiredLRs = new TreeSet<>();
     protected static Set<Integer> requiredExits = new TreeSet<>();
     protected static Set<Integer> lrlfAssociationIds = new TreeSet<>();
@@ -149,4 +150,5 @@ public abstract class YAMLReaderBase {
     public void setEnvironmentName(String n) {
         environmentName = n;
     }
+
 }
