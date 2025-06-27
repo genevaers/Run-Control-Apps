@@ -829,8 +829,8 @@ public class TestDriver {
 
 	public static void generateCoverage() {
 		if(GersEnvironment.isWindows()) {
-			Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT));
-			Path outPath = rootPath.resolve("out");
+			Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT)).normalize();
+			Path outPath = rootPath.resolve("out").normalize();
 			generateCoverageRCAPARM(outPath);
 			runWinRcaFrom(outPath);
 		} else {
@@ -842,8 +842,11 @@ public class TestDriver {
 		CommandRunner cr = new CommandRunner();
 		try {
 			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
-			String rcaString = "java -jar " + winrcapps + "/rcapps-latest.jar";
-			cr.run(rcaString, loc.toFile());
+			String rcaString = winrcapps + "/rcapps-latest.jar";
+			ProcessBuilder procBuilder = new ProcessBuilder("java","_jar", rcaString);
+			procBuilder.directory(loc.toFile());
+			Process proc = procBuilder.start();
+			cr.run(proc);
 			logger.atInfo().log(cr.getCmdOutput().toString());
 		} catch (InterruptedException | IOException e) {
 			logger.atSevere().log("Exception occurred in run RCA \n%s", e.getMessage());
