@@ -160,7 +160,7 @@
 			<dependency>
 				<groupId>com.google.flogger</groupId>
 				<artifactId>flogger-system-backend</artifactId>
-				<version>0.8</version>
+				<version>0.9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.antlr</groupId>
@@ -278,8 +278,7 @@
 						</executions>
 						<configuration>
 							<licenses>
-								<license
-									implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
+								<license implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
 									<notes>Also allow the license url to be https.</notes>
 									<patterns>
 										<pattern>https://www.apache.org/licenses/LICENSE-2.0</pattern>
