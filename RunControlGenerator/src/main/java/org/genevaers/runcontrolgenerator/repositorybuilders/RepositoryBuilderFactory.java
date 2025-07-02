@@ -31,6 +31,8 @@ public class RepositoryBuilderFactory {
 	public static RepositoryBuilder get() {
 
 		switch (GersConfigration.getInputType()) {
+			case "YAML":
+				return new YAMLBuilder();
 			case "WBXML":
 				return new WBXMLBuilder();
 			case "VDPXML":

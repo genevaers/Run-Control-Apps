@@ -87,6 +87,7 @@ public class ViewSortKeyRecordParser extends BaseParser {
 
 	@Override
 	public void addElement(String name, String text, Map<String, String> attributes) {
+				logger.atFine().log("name %s text %s", name, text);
 		short s;
 		switch (name.toUpperCase()) {
 			case "SORTCOLUMN":
@@ -115,7 +116,12 @@ public class ViewSortKeyRecordParser extends BaseParser {
 				}
 				break;
 			case "HEADER":
-				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.fromdbcode(text));
+				if(text.equals("NEWP")) {
+				logger.atFine().log("Fixed new page");
+					vsk.setSortBreakHeaderOption(SortBreakHeaderOption.NEWPAGE);
+				} else {
+					vsk.setSortBreakHeaderOption(SortBreakHeaderOption.fromdbcode(text));
+				}
 				break;
 			case "FOOTER":
 				if (text.equals("1"))

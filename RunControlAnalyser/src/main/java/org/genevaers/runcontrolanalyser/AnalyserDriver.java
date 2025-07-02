@@ -79,7 +79,7 @@ public class AnalyserDriver {
 				generateJltPrint(root);
 			}
 			if (GersConfigration.isVdpReport()) {
-				Repository.clearAndInitialise();
+				//Repository.clearAndInitialise();
 				generateVdpPrint(root);
 			}
 			if (GersConfigration.isRcaReport()) {

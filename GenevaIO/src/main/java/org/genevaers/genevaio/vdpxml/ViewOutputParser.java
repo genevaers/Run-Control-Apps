@@ -76,7 +76,7 @@ public class ViewOutputParser extends BaseParser {
 				break;
 
 			case "HEADERS":
-				logger.atFine().log("Parsing Headers");
+				logger.atFine().log("Parsing Headers for %s", viewNode.getViewDefinition().getName());
 				ViewHeaderFooterParser hfp = new ViewHeaderFooterParser();
 				hfp.setViewNode(viewNode);
 				hfp.parse(reader);

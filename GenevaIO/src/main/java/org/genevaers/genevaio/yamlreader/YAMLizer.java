@@ -132,4 +132,18 @@ public class YAMLizer {
         };
         return null;
     }
+
+    public static YAMLViewTransfer readView(Path vw) {
+        yamlMapper.findAndRegisterModules();
+        yamlMapper.setSerializationInclusion(Include.NON_NULL);
+        logger.atInfo().log("Read %s", vw);
+        // cache.contains ? cache.get : read from disk
+        try {
+        	return yamlMapper.readValue(vw.toFile(), YAMLViewTransfer.class);
+        } catch (IOException e) {
+            logger.atSevere().log("read view yaml failed %s ", e.getMessage());
+        };
+        return null;
+    }
+
 }

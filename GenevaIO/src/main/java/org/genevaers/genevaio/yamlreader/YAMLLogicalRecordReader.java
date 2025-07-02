@@ -43,17 +43,6 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 
 
     public void addLRToRepo(String environmentName, int lrid) {
-            //    String query = "select "
-            //     + "r.ENVIRONID, "
-            //     + "r.LOGRECID, "
-            //     + "r.NAME, "
-            //     + "r.LRTYPECD, "
-            //     + "r.LRSTATUSCD, "
-            //     + "r.LOOKUPEXITID, "
-            //     + "r.LOOKUPEXITSTARTUP "
-            //     + "from " + params.getSchema() + ".LOGREC r " 
-            //     + "where r.ENVIRONID = ? and r.LOGRECID = ?;";
- //           executeAndWriteToRepo(sqlConnection, query, params, sourceLR);
         LogicalRecord lr = new LogicalRecord();
 		YAMLReaderBase.environmentName = environmentName;
 		if(lrbxfrsByID.isEmpty()) {
@@ -145,18 +134,6 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
         // Repository.addLogicalRecord(lr);
     }
 
-	@Override
-	protected void addComponentToRepo(ResultSet rs) throws SQLException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'addComponentToRepo'");
-	}
-
-	@Override
-	public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'addToRepo'");
-	}
-
 	public List<LogicalRecordYAMLBean> queryAllLogicalRecords()  {
 		List<LogicalRecordYAMLBean> result = new ArrayList<LogicalRecordYAMLBean>();
 		if(lrBeans.isEmpty()) {
@@ -195,6 +172,31 @@ public class YAMLLogicalRecordReader extends YAMLReaderBase{
 			queryAllLogicalRecords();
 		}
 		return lrbxfrsByID.get(id);
+	}
+
+	public void addLRToRepo(String environmentName, String logicalRecord) {
+        LogicalRecord lr = new LogicalRecord();
+		YAMLReaderBase.environmentName = environmentName;
+		if(lrbxfrsByName.isEmpty()) {
+			queryAllLogicalRecords();
+		}
+			LogicalRecordYAMLBean lrb = lrbxfrsByName.get(logicalRecord);
+			lr.setComponentId(lrb.getId());
+			lr.setName(lrb.getName());
+			lr.setStatus(LrStatus.fromdbcode(lrb.getLrStatusCode()));
+			if(lr.getStatus() == LrStatus.INACTIVE) {
+				Repository.addErrorMessage(new CompilerMessage(0, CompilerMessageSource.VIEW_PROPS, lr.getComponentId(), 0, 0, "Logical record " + lr.getName() + "[" + lr.getComponentId() + "] is not active"));
+			}
+			int le = lrb.getLookupExitId() != null ? lrb.getLookupExitId() : 0;
+			lr.setLookupExitID(le);
+			if(le > 0) {
+				requiredExits.add(le);
+			}
+			lr.setLookupExitParams(getDefaultedString(lrb.getLookupExitParams(), ""));
+			Repository.addLogicalRecord(lr);
+			addLRFields(lrb);
+			addIndexes(lrb);
+			lrb.getLfs().keySet().stream().forEach(lf -> requiredLFs.add(lf));
 	}
 
 }

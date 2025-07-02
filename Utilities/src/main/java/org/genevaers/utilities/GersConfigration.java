@@ -110,6 +110,8 @@ public class GersConfigration {
     public static final String RCA_HTMLREPORTFILENAME = RCA_REPORTDIR + RCA_RUNNAME + ".html";
 
     private static final String GENEVAERS = ".genevaers";
+
+    public static final String VIEW_NAMES = "YAMLVIEWS";
     
     protected static Map<String, ConfigEntry> parmToValue = new TreeMap<>();
 
@@ -442,6 +444,8 @@ public class GersConfigration {
         boolean valid = true;
         switch(parmToValue.get(INPUT_TYPE).getValue()) {
             case "WBXML":
+            break;
+            case "YAML":
             break;
             case "VDPXML":
             break;

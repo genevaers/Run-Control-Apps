@@ -15,8 +15,12 @@ import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.enums.AccessMethod;
+import org.genevaers.repository.components.enums.DbmsRowFmtOptId;
+import org.genevaers.repository.components.enums.FieldDelimiter;
 import org.genevaers.repository.components.enums.FileRecfm;
 import org.genevaers.repository.components.enums.FileType;
+import org.genevaers.repository.components.enums.RecordDelimiter;
+import org.genevaers.repository.components.enums.TextDelimiter;
 
 public class YAMLPhysicalFileReader extends YAMLReaderBase {
 
@@ -39,17 +43,23 @@ public class YAMLPhysicalFileReader extends YAMLReaderBase {
         pf.setAccessMethod(pftxfr.getAccessMethodCode() != null ? AccessMethod.fromdbcode(pftxfr.getAccessMethodCode()) : AccessMethod.SEQUENTIAL);
         pf.setComponentId(pftxfr.getId());
         pf.setDataSetName(pftxfr.getDatasetName());
-        pf.setDatabase(pftxfr.getSubSystem());
+        pf.setDatabase(pftxfr.getSubSystem() != null ? pftxfr.getSubSystem() : "");
         pf.setExtractDDName(pftxfr.getInputDDName());
         pf.setFileType(FileType.fromdbcode(pftxfr.getFileTypeCode()));
-        pf.setInputDDName(pftxfr.getInputDDName());
+        pf.setInputDDName(pftxfr.getInputDDName() != null ? pftxfr.getInputDDName() : "");
         pf.setName(pftxfr.getName());
-        pf.setOutputDDName(pftxfr.getOutputDDName());
+        pf.setOutputDDName(pftxfr.getOutputDDName() != null ? pftxfr.getOutputDDName() : "");
         pf.setReadExitID(pftxfr.getReadExitId() != null ? pftxfr.getReadExitId() : 0);
-        pf.setReadExitIDParm(pftxfr.getReadExitParams());
+        pf.setReadExitIDParm(pftxfr.getReadExitParams() != null ? pftxfr.getReadExitParams() : "");
         pf.setRecfm(pftxfr.getRecfm() != null ? FileRecfm.fromdbcode(pftxfr.getRecfm()) : FileRecfm.VB);
         pf.setMaximumLength((short)pftxfr.getMaxRecordLen());
         pf.setMinimumLength((short)pftxfr.getMinRecordLen());
+        pf.setDataSetName("");
+        pf.setExtractDDName("");
+					pf.setFieldDelimiter(FieldDelimiter.FIXEDWIDTH);
+					pf.setRecordDelimiter(RecordDelimiter.CR);
+					pf.setTextDelimiter(TextDelimiter.INVALID);
+					pf.setDatabaseRowFormat(DbmsRowFmtOptId.DB2);
         Repository.addPhysicalFileOnly(pf);
     }
 
@@ -94,16 +104,5 @@ public class YAMLPhysicalFileReader extends YAMLReaderBase {
 	// 	return result;
 	// }
 
-    @Override
-    protected void addComponentToRepo(ResultSet rs) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addComponentToRepo'");
-    }
-
-    @Override
-    public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addToRepo'");
-    }
 
 }

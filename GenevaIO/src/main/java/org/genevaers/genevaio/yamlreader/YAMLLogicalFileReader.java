@@ -2,22 +2,17 @@ package org.genevaers.genevaio.yamlreader;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import org.genevaers.genevaio.dbreader.DatabaseConnection;
-import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LogicalFile;
 
 public class YAMLLogicalFileReader extends YAMLReaderBase{
 
     private static Map<Integer, YAMLLogicalFileTransfer> lfBeans = new TreeMap<>();
+    private static Map<String, YAMLLogicalFileTransfer> lfsByName = new TreeMap<>();
 	private static Map<Integer, String> lfIdsToNames = new TreeMap<>();
 
 	private static int maxid;
@@ -69,6 +64,7 @@ public class YAMLLogicalFileReader extends YAMLReaderBase{
             }
             lfIdsToNames.put(lft.getId(), lft.getName());
             lfBeans.put(lft.getId(), lft);
+            lfsByName.put(lft.getName(), lft);
         }
 	}
 
@@ -85,16 +81,14 @@ public class YAMLLogicalFileReader extends YAMLReaderBase{
 		}
 	}
 
-    @Override
-    protected void addComponentToRepo(ResultSet rs) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addComponentToRepo'");
-    }
-
-    @Override
-    public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addToRepo'");
+   public void addLFtoRepo(String environmentName, String logicalFile) {
+		if(lfsByName.size() == 0) {
+			queryAllLogicalFiles(environmentName);
+		}
+        YAMLLogicalFileTransfer lftxfr = lfsByName.get(logicalFile);
+        LogicalFile lf = makeLF(lftxfr);
+        Repository.getLogicalFiles().add(lf, lftxfr.getId(), logicalFile);
+        lftxfr.getPfs().values().stream().forEach(pf -> getAndAddPf(pf, lf));
     }
 
 }

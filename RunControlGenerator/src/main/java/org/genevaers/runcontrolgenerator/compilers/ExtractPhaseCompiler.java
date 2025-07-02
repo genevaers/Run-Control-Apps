@@ -44,6 +44,8 @@ import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 import org.genevaers.compilers.extract.emitters.LogicTableEmitter;
 import org.genevaers.genevaio.dataprovider.RepoDataProvider;
 import org.genevaers.genevaio.ltfile.LogicTable;
+import org.genevaers.genevaio.yamlreader.LazyYAMLReader;
+import org.genevaers.genevaio.yamlreader.YAMLizer;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LookupPath;
@@ -99,7 +101,14 @@ public class ExtractPhaseCompiler {
 
 	public static void buildTheAST() {
 		extractRoot = (ExtractBaseAST) ASTFactory.getNodeOfType(ASTFactory.Type.ERSROOT);
-		BuildGenevaASTVisitor.setDataProvider(new RepoDataProvider());
+		if(GersConfigration.getInputType().equals("YAML")) {
+			YAMLizer.setEnvironmentName(GersConfigration.getParm(GersConfigration.ENVIRONMENT_ID));
+			LazyYAMLReader lyr = new LazyYAMLReader();
+			lyr.setEnvironmentName(GersConfigration.getParm(GersConfigration.ENVIRONMENT_ID));
+			BuildGenevaASTVisitor.setDataProvider(lyr);
+		} else {
+			BuildGenevaASTVisitor.setDataProvider(new RepoDataProvider());
+		}
 		Iterator<LogicGroup> lgi = logicGroups.iterator();
 		while(lgi.hasNext()) {
 			LogicGroup lg = lgi.next();

@@ -1,12 +1,6 @@
 package org.genevaers.genevaio.yamlreader;
 
 import java.nio.file.Path;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.genevaers.genevaio.dbreader.DatabaseConnection;
-import org.genevaers.genevaio.dbreader.DatabaseConnectionParams;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
@@ -57,20 +51,9 @@ public class YAMLLookupsReader extends YAMLReaderBase{
 		lkpk.setKeyNumber(s.getKeySeqNbr().shortValue());
 		lkpk.setRounding(s.getScalingFactor().shortValue());
 		lkpk.setSigned(s.getSigned());
+		lkpk.setJustification(JustifyId.NONE);
 		//lkpk.setStartPosition(s.get); missing?
 		lkps.addKey(lkpk);
-	}
-
-	@Override
-	protected void addComponentToRepo(ResultSet rs) throws SQLException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'addComponentToRepo'");
-	}
-
-	@Override
-	public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'addToRepo'");
 	}
 
 }

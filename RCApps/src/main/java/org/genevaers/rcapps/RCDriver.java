@@ -23,6 +23,9 @@ package org.genevaers.rcapps;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolanalyser.RCAApp;
@@ -39,6 +42,8 @@ public class RCDriver {
     private static Path rcPath;
 
     private static String rcaTextType;
+
+    private static String envName;
 
     public static void initialise() {
         GersConfigration.initialise();
@@ -129,6 +134,7 @@ public class RCDriver {
             fw.write("# Auto generated Run Control Parms\n");
             fw.write(GersConfigration.GENERATE +"=Y\n");
             fw.write(GersConfigration.INPUT_TYPE +"=" + inputType + "\n");
+            fw.write(GersConfigration.ENVIRONMENT_ID +"=" + envName + "\n");
             fw.write(GersConfigration.XLT_REPORT + "=Y\n");
             fw.write(GersConfigration.JLT_REPORT + "=Y\n");
             fw.write(GersConfigration.VDP_REPORT + "=Y\n");
@@ -148,6 +154,24 @@ public class RCDriver {
 
     public static String getRCAreportFileName() {
         return GersConfigration.RCA_HTMLREPORTFILENAME;
+    }
+
+    public static void setEnvironmentName(String n) {
+        envName = n;
+    }
+
+    public static void setViewNames(List<String> views) {
+        try (FileWriter fw = new FileWriter(rcPath.resolve(GersConfigration.VIEW_NAMES).toFile())) {
+            Iterator<String> vi = views.iterator();
+            while (vi.hasNext()) {
+                String v = vi.next();
+                fw.write(v + "\n");    
+            }
+            fw.close();
+        } catch (IOException e) {
+            logger.atSevere().log("Unable to write RCA Parms %s", e.getMessage() );
+        }
+        
     }
 
 }

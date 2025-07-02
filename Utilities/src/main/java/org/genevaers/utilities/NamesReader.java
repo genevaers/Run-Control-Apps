@@ -26,10 +26,10 @@ import java.util.TreeSet;
 
 import com.google.common.flogger.FluentLogger;
 
-public abstract class IdsReaderBase {
+public class NamesReader {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-	Set<Integer> ids = new TreeSet<>();
+	static Set<String> names = new TreeSet<>();
 	GersConfigration rcc;
 	static List<String> linesRead = new ArrayList<>();
 
@@ -39,9 +39,23 @@ public abstract class IdsReaderBase {
 
 	static IDS_RESULT result = IDS_RESULT.OK;
 
-	public abstract Set<Integer> readIds(String parmName);
+	public static Set<String> getNamesFrom(String namesFile) {
+		result = IDS_RESULT.OK;
+		logger.atInfo().log("Read %s", namesFile);
+		names.clear();
+		if(new GersFile().exists(namesFile)) {
+			try(BufferedReader br = new BufferedReader(new GersFile().getReader(namesFile))) {
+				parseLines(br);
+			} catch (IOException e) {
+				logger.atSevere().withCause(e).log("Read failed. Cannot open %s", namesFile);
+			}
+		} else {
+			logger.atInfo().log("Names file %s not found", namesFile);
+		}
+		return names;
+	}
 
-	protected void parseLines(BufferedReader parmReader) throws IOException {
+	protected static void parseLines(BufferedReader parmReader) throws IOException {
 		String line = parmReader.readLine();
 		while (line != null) {
 			// Parse the line to extract the parm name and value
@@ -52,28 +66,23 @@ public abstract class IdsReaderBase {
 		}
 	}
 
-	private void parse(String line) {
+	private static void parse(String line) {
 		if (line.length() > 0 && line.charAt(0) != '#' && line.charAt(0) != '*') {
 			String[] parts = line.trim().split(" ");
 			// Anything in part 2 is a comment
 			String[] idStrings = parts[0].split(",");
 			for (int i = 0; i < idStrings.length; i++) {
-				try {
-					ids.add(Integer.valueOf(idStrings[i]));
-				} catch (NumberFormatException e) {
-					logger.atSevere().log("%s cannot be converted to an integer", idStrings[i]);
-					result = IDS_RESULT.FAIL;
-				}
+				names.add(idStrings[i]);
 			}
 		}
 
 	}
 
-	public IDS_RESULT getResult() {
+	public static IDS_RESULT getResult() {
 		return result;
 	}
 
-	public List<String> getLinesRead() {
+	public static List<String> getLinesRead() {
 		return linesRead;
 	}
 

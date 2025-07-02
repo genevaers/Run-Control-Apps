@@ -42,54 +42,9 @@ public abstract class YAMLReaderBase {
     protected static String environmentName;
 
 
-    protected void executeAndWriteToRepo(DatabaseConnection dbConnection, String query, DatabaseConnectionParams params, int id) {
-        try(PreparedStatement ps = dbConnection.prepareStatement(query);) {
-            ps.setInt(1, params.getEnvironmentIdAsInt());
-            ps.setInt(2, id);
-            executeAndAddResultSetToRepo(ps);
-        } catch (SQLException e) {
-            logger.atSevere().log("executeAndWriteToRepo %s", e.getMessage());
-        }
-    }
-
-    protected void executeAndWriteToRepo(DatabaseConnection dbConnection, String query, DatabaseConnectionParams params, String name) {
-        try(PreparedStatement ps = dbConnection.prepareStatement(query);) {
-            ps.setInt(1, params.getEnvironmentIdAsInt());
-            ps.setString(2, name.toUpperCase());
-            executeAndAddResultSetToRepo(ps);
-        } catch (SQLException e) {
-            logger.atSevere().log("executeAndWriteToRepo %s", e.getMessage());
-        }
-    }
-
-    protected void executeAndWriteToRepo(DatabaseConnection dbConnection, String query, DatabaseConnectionParams params, Set<Integer> idsIn) {
-        try(PreparedStatement ps = dbConnection.prepareStatement(query);) {
-            int parmNum = 1;
-            ps.setInt(parmNum++, params.getEnvironmentIdAsInt());
-            Iterator<Integer> ii = idsIn.iterator();
-            while(ii.hasNext()) {
-                ps.setInt(parmNum++, ii.next());
-            }
-            executeAndAddResultSetToRepo(ps);
-        } catch (SQLException e) {
-            logger.atSevere().log("executeAndWriteToRepo %s", e.getMessage());
-        }
-    }
-
-    private void executeAndAddResultSetToRepo(PreparedStatement ps) throws SQLException {
-        ResultSet rs = ps.executeQuery();
-        while(rs.next()) {
-            addComponentToRepo(rs);
-        }
-    }
-
-    protected abstract void addComponentToRepo(ResultSet rs) throws SQLException;
-
     protected static String getDefaultedString(String rsValue, String defVal) {
         return rsValue == null ? defVal : rsValue;
     }
-
-    abstract public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params);
 
     public static ViewNode getCurrentViewNode() {
         return currentViewNode;
