@@ -95,4 +95,8 @@ public class EnumField extends Field {
         return  DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + NameUtils.getCamelCaseName(name, false) +".toString()), compare);";  
     }
 
+    @Override
+    public String getType() {
+        return "enum";
+    }
 }

@@ -1,7 +1,6 @@
 package org.genevaers.repository;
 
 import java.util.Iterator;
-
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
@@ -38,7 +37,9 @@ import com.google.common.flogger.FluentLogger;
  * under the License.
  */
 
-
+/**
+ * A collection of static functions to help manipulate the Repository components.
+ */
 public class RepoHelper {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 

@@ -1,8 +1,10 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
-
+import javax.xml.stream.XMLStreamException;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -42,39 +44,60 @@ public class ViewRecordParser extends BaseParser {
 	private int prefid;
 	private int pid;
 
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "PARTITION":
-				pid = Integer.parseInt(attributes.getValue("ID"));
-				generateExtractOutputLogic(pid);
-				break;
-			case "PARTITIONREF":
-				prefid = Integer.parseInt(attributes.getValue("ID"));
-				generateExtractOutputLogic(prefid);
-				break;
-			case "EXITREF":
-				exitID = Integer.parseInt(attributes.getValue("ID"));
-				vd.setWriteExitId(exitID);
-				generateExtractOutputLogicWithWrite(exitID);
-				break;
-			default:
-				break;
-		}
-	}		
+	public ViewRecordParser() {
+		sectionName = "Views";
+	}
 
 	@Override
-	public void addElement(String name, String text) {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
+	}
+
+	@Override
+	public void addElement(String name, String text, Map<String, String> attributes) throws XMLStreamException {
 		switch (name.toUpperCase()) {
+			case "VIEW":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				break;
 			case "NAME":
+				logger.atFine().log("Parsing View " + text);
 				vd = new ViewDefinition();
 				vd.setComponentId(componentID);
-				if(Repository.isViewEnabled(componentID)) {
+				if (Repository.isViewEnabled(componentID)) {
 					vn = Repository.getViewNodeMakeIfDoesNotExist(vd);
 				}
 				vd.setName(text);
 				break;
-
+			case "CONTROLRECORDREF":
+				vd.setControlRecordId(Integer.parseInt(attributes.get("ID")));
+				break;
+			case "DATASOURCES":
+				logger.atFine().log("Parsing View Sources");
+				ViewSourceRecordParser vsp = new ViewSourceRecordParser();
+				vsp.setViewNode(vn);
+				vsp.parse(reader);
+				logger.atFine().log("Parsing View Sources completed");
+				break;
+			case "EXTRACT":
+				logger.atFine().log("Parsing View Extract");
+				ViewExtractParser vep = new ViewExtractParser();
+				vep.setViewNode(vn);
+				vep.parse(reader);
+				logger.atFine().log("Parsing View Extract completed");
+				break;
+				case "SORT":
+				logger.atFine().log("Parsing Sort Keys");
+				ViewSortKeyRecordParser vskp = new ViewSortKeyRecordParser();
+				vskp.setViewNode(vn);
+				vskp.parse(reader);
+				logger.atFine().log("Parsing Sort Keys completed");
+				break;
+				case "OUTPUT":
+				logger.atFine().log("Parsing Output");
+				ViewOutputParser vop = new ViewOutputParser();
+				vop.setViewNode(vn);
+				vop.parse(reader);
+				logger.atFine().log("Parsing Output completed");
+				break;
 			case "STATUS":
 				vd.setStatus(ViewStatus.fromdbcode(text.trim()));
 				break;
@@ -137,7 +160,7 @@ public class ViewRecordParser extends BaseParser {
 				vd.setGenerateDelimitedHeader(text.equals("0") ? false : true);
 				break;
 			case "FORMATFILTLOGIC":
-				if(Repository.isViewEnabled(componentID)) {
+				if (Repository.isViewEnabled(componentID)) {
 					vn.setFormatFilterLogic(removeBRLineEndings(text));
 				}
 				break;
@@ -151,79 +174,8 @@ public class ViewRecordParser extends BaseParser {
 		}
 	}
 
-    public void setContolRecord(int crid) {
+	public void setContolRecord(int crid) {
 		vd.setControlRecordId(crid);
-    }
-
-	private void generateExtractOutputLogic(int id) {
-		if (vn != null) {
-			String writeLogic = "";
-			switch (vn.getViewDefinition().getViewType()) {
-				case COPY:
-					if (id > 0) {
-						writeLogic = String.format("WRITE(SOURCE=INPUT, %s", getFileParm(vn, id));
-					} else {
-						writeLogic = "WRITE(SOURCE=INPUT,DEST=DEFAULT)";
-					}
-					break;
-				case SUMMARY:
-				case DETAIL:
-					writeLogic = String.format("WRITE(SOURCE=VIEW,DEST=EXT=%03d",
-							vn.getViewDefinition().getExtractFileNumber());
-					writeLogic += getWriteParm(vn) + ")";
-					break;
-				case EXTRACT:
-					if (vn.getOutputFile().getComponentId() > 0) {
-						writeLogic = String.format("WRITE(SOURCE=DATA, %s)", getFileParm(vn, id));
-					} else if (Repository.getPhysicalFiles().get(id) != null) {
-						writeLogic = String.format("WRITE(SOURCE=DATA, %s)", getFileParm(vn, id));
-					} else {
-						writeLogic = "WRITE(SOURCE=DATA,DEST=DEFAULT)";
-					}
-					break;
-				default:
-					// Error case
-					break;
-
-			}
-			Iterator<ViewSource> vsi = vn.getViewSourceIterator();
-			while (vsi.hasNext()) {
-				ViewSource vs = vsi.next();
-				vs.setExtractOutputLogic(writeLogic);
-			}
-		}
-	}
-
-	private String getWriteParm(ViewNode vn) {
-		String exitStr = "";
-		int exitID = vn.getViewDefinition().getWriteExitId();
-		if (exitID != 0) {
-			UserExit ex = Repository.getUserExits().get(exitID);
-			String wparms = vn.getViewDefinition().getWriteExitParams();
-			if(wparms.length() > 0) {
-				exitStr += String.format(",USEREXIT=({%s, \"%s\"})", ex.getName(), wparms);
-			} else {
-				exitStr += String.format(",USEREXIT={%s}", ex.getName());
-			}
-		}
-		return exitStr;
-	}
-
-	private String getFileParm(ViewNode vn, int partId) {
-		String fileStr;
-		PhysicalFile pf = Repository.getPhysicalFiles().get(partId);
-		fileStr = "DEST=FILE={" + pf.getLogicalFilename() + "." + pf.getName() + "}" + getWriteParm(vn);
-		return fileStr;
-	}
-
-	private void generateExtractOutputLogicWithWrite(int exitID) {
-		if(pid != 0) {
-			generateExtractOutputLogic(pid);
-		} else if (prefid != 0) {
-			generateExtractOutputLogic(prefid);
-		} else {
-			//In trouble here
-		}
 	}
 
 }

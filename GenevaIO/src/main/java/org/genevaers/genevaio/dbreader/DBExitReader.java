@@ -66,9 +66,10 @@ public class DBExitReader extends DBReaderBase {
         ue.setProgramType(ProgramType.fromdbcode(rs.getString("PROGRAMTYPECD")));
         ue.setExitType(ExitType.fromdbcode(rs.getString("EXITTYPECD")));
         ue.setOptimizable(rs.getInt("OPTIMIZEIND") == 0 ? false : true);
-        if(procedure) {
+        if(ue.getExecutable().length() > 0) {
             Repository.getProcedures().add(ue, ue.getComponentId(), ue.getExecutable());
-        } else {
+        }
+        if(ue.getName().length() > 0) {
             Repository.getUserExits().add(ue, ue.getComponentId(), ue.getName());
         }
     }

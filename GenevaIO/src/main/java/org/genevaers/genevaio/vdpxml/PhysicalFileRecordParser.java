@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -42,6 +45,10 @@ public class PhysicalFileRecordParser extends BaseParser {
 
 	private PhysicalFile pf;
 
+	public PhysicalFileRecordParser() {
+		sectionName = "Partitions";
+	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName.toUpperCase()) {
@@ -57,8 +64,11 @@ public class PhysicalFileRecordParser extends BaseParser {
 	}
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
+			case "PARTITION":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				break;
 			case "NAME":
 				pf = new PhysicalFile();
 				pf.setComponentId(componentID);
@@ -71,15 +81,14 @@ public class PhysicalFileRecordParser extends BaseParser {
 				pf.setRecfm(FileRecfm.VB);
 				pf.setName(text);
 				pf.setFileType(FileType.DISK); //default
-				RepoHelper.fillPF(pf);
+				pf.setAccessMethod(AccessMethod.SEQUENTIAL); //default
+				//RepoHelper.fillPF(pf);
 				Repository.getPhysicalFiles().add(pf, componentID, text);
 				break;
 			case "PARTITIONTYPE":
 				pf.setFileType(FileType.fromdbcode(text));
 				break;
-			case "ACCESSMETHODCD":
-				// Not sure what this one is
-				// fieldValue = parseField("DISKFILETYPECD", record);
+			case "ACCESSMETHOD":
 				pf.setAccessMethod(AccessMethod.fromdbcode(text.trim()));
 				break;
 			case "READEXITSTARTUP":
@@ -95,7 +104,7 @@ public class PhysicalFileRecordParser extends BaseParser {
 					pf.setDataSetName("");
 				}
 				break;
-			case "MINRECLEN":
+			case "MINRECORDLENGTH":
 				short s = (short) Integer.parseInt(text);
 				pf.setMinimumLength(s);
 				break;
@@ -117,20 +126,26 @@ public class PhysicalFileRecordParser extends BaseParser {
 				s = (short) Integer.parseInt(text);
 				pf.setLrecl(s);
 				break;
-			case "DBMSSUBSYS":
+			case "CONNECTION":
 				pf.setDatabaseConnection(text.trim());
 				break;
-			case "DBMSSQL":
-				pf.setSqlText(removeBRLineEndings(text.trim()));
+			case "QUERY":
+				//may be many segments we need to append them
+				String sql = pf.getSqlText();
+				sql = sql + removeBRLineEndings(text.trim());
+				pf.setSqlText(sql);
 				break;
-			case "DBMSTABLE":
+			case "TABLE":
 				pf.setDatabaseTable(text.trim());
 				break;
-			case "DBMSROWFMTCD":
+			case "ROWFORMAT":
 				pf.setDatabaseRowFormat(DbmsRowFmtOptId.fromdbcode(text.trim()));
 				break;
-			case "DBMSINCLNULLSIND":
+			case "INCLUDENULLS":
 				pf.setIncludeNulls(text.equals("1") ? true : false);
+				break;
+			case "EXITREF":
+				pf.setReadExitID(Integer.parseInt(attributes.get("ID")));
 				break;
 			case "CREATEDTIMESTAMP":
 				created = text;

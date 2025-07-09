@@ -155,19 +155,16 @@ public class VDPHandler extends DefaultHandler {
 					currentParser = new ViewSourceRecordParser();
 					currentViewSourceID = Integer.parseInt(attributes.getValue(0));
 					currentParser.setComponentID(currentViewSourceID);
-					((ViewSourceRecordParser) currentParser).setViewId(currentViewID);
-					((ViewSourceRecordParser) currentParser)
-							.setSequenceNumber(Integer.parseInt(attributes.getValue("seq")));
 				}
 				break;
 			case "ColumnAssignment":
-				if (Repository.isViewEnabled(currentViewID)) {
-					logger.atFine().log("ColumnAssignment");
-					currentParser = new ViewColumnSourceParser();
-					currentParser.setComponentID(Integer.parseInt(attributes.getValue(0)));
-					((ViewColumnSourceParser) currentParser).setViewId(currentViewID);
-					((ViewColumnSourceParser) currentParser).setViewSourceId(currentViewSourceID);
-				}
+				// if (Repository.isViewEnabled(currentViewID)) {
+				// 	logger.atFine().log("ColumnAssignment");
+				// 	currentParser = new ViewColumnSourceParser();
+				// 	currentParser.setComponentID(Integer.parseInt(attributes.getValue(0)));
+				// 	((ViewColumnSourceParser) currentParser).setViewId(currentViewID);
+				// 	((ViewColumnSourceParser) currentParser).setViewSourceId(currentViewSourceID);
+				// }
 				break;
 			case "Extract":
 				if (Repository.isViewEnabled(currentViewID)) {
@@ -176,25 +173,16 @@ public class VDPHandler extends DefaultHandler {
 				}
 				break;
 			case "ExtractColumn":
-				if (Repository.isViewEnabled(currentViewID)) {
-					logger.atFine().log("ExtractColumn");
-					currentParser = new ViewColumnRecordParser();
-					int colId = Integer.parseInt(attributes.getValue("ID"));
-					currentParser.setComponentID(colId);
-					((ViewColumnRecordParser) currentParser).setViewId(currentViewID);
-					int seqNum = Integer.parseInt(attributes.getValue("seq"));
-					((ViewColumnRecordParser) currentParser).setSequenceNumber(seqNum);
-				}
 				break;
 			case "SortColumn":
-				if (Repository.isViewEnabled(currentViewID)) {
-					logger.atFine().log("SortColumn");
-					currentParser = new ViewSortKeyRecordParser();
-					currentParser.setComponentID(Integer.parseInt(attributes.getValue("ID")));
-					((ViewSortKeyRecordParser) currentParser).setViewId(currentViewID);
-					((ViewSortKeyRecordParser) currentParser).setSeqNum(Integer.parseInt(attributes.getValue("seq")));
+				// if (Repository.isViewEnabled(currentViewID)) {
+				// 	logger.atFine().log("SortColumn");
+				// 	currentParser = new ViewSortKeyRecordParser();
+				// 	currentParser.setComponentID(Integer.parseInt(attributes.getValue("ID")));
+				// 	((ViewSortKeyRecordParser) currentParser).setViewId(currentViewID);
+				// 	((ViewSortKeyRecordParser) currentParser).setSeqNum(Integer.parseInt(attributes.getValue("seq")));
 
-				}
+				// }
 				break;
 			case "Output":
 				if (Repository.isViewEnabled(currentViewID)) {
@@ -208,7 +196,6 @@ public class VDPHandler extends DefaultHandler {
 					logger.atFine().log("FormatColumn");
 					currentParser = new ViewColumnRecordParser();
 					currentParser.setComponentID(Integer.parseInt(attributes.getValue("ID")));
-					((ViewColumnRecordParser) currentParser).setViewId(currentViewID);
 				}
 				break;
 			default:
@@ -229,7 +216,7 @@ public class VDPHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
 		if (currentParser != null) {
-			currentParser.addElement(qName, data.toString());
+//			currentParser.addElement(qName, data.toString(), attributes);
 		}
 
 		if (qName.equalsIgnoreCase("SAFRVDP")) {

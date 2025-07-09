@@ -22,10 +22,23 @@ import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 
 import org.genevaers.compilers.extract.emitters.CodeEmitter;
 import org.genevaers.genevaio.ltfile.LTFileObject;
+import org.genevaers.repository.components.enums.LtCompareType;
 
 public abstract class StringComparisonEmitter extends CodeEmitter{
 
     public abstract LTFileObject getLTEntry(String op, ExtractBaseAST lhs, ExtractBaseAST rhs);
     
 
+    public static LtCompareType getCompareType(String op) {
+        switch(op) {
+            case "CONTAINS":
+            return LtCompareType.CONTAINS;
+            case "BEGINS_WITH":
+            return LtCompareType.BEGINS;
+            case "ENDS_WITH":
+            return LtCompareType.ENDS;
+            default:
+            return LtCompareType.INVALID;
+        }
+    }
 }

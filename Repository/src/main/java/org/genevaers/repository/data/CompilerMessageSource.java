@@ -27,7 +27,8 @@ public enum CompilerMessageSource {
     COLUMN("ColAssign"),
     COLUMN_CALC("ColCalc"), 
     FORMAT_FILTER("FormatFilter"), 
-    VIEW_PROPS("View Properties");
+    VIEW_PROPS("View Properties"),
+    REPO_BUILDER("Repo Builder");
 
     private final String value;
 

@@ -97,4 +97,9 @@ public class StringField extends Field {
     public String getFieldNodeEntry(boolean prefix, boolean arrayValue) {
         return defaultStringNodeEntry(prefix, arrayValue);
     }
+
+    @Override
+    public String getType() {
+        return String.format("%s(%d)", TYPE, maxlength);
+    }
 }

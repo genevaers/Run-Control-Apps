@@ -46,11 +46,14 @@ import java.util.List;
 import org.genevaers.testframework.functioncodecoverage.FunctionCodeHit.HITS_STATE;
 import org.genevaers.utilities.GersEnvironment;
 
+import com.google.common.flogger.FluentLogger;
+
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.ThTag;
 import j2html.tags.specialized.TrTag;
 
 public class CoverageReportGenerator {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String HITS_STYLE = "text-align: right; border-style: solid; border-width: 1px;padding: 3;";
 
@@ -78,7 +81,7 @@ public class CoverageReportGenerator {
 	public static void main(String[] args) {
   
 		System.out.println("Coverage Report Generator");
-		File rootDir = Paths.get(GersEnvironment.get("LOCALROOT")).toFile();;
+		File rootDir = Paths.get(GersEnvironment.get("LOCALROOT")).normalize().toFile();;
 		CoverageReportGenerator generator = new CoverageReportGenerator();
  		generator.writeCoverageHTML(rootDir, "LTCov");
 	}
@@ -122,8 +125,7 @@ public class CoverageReportGenerator {
 								)).renderFormatted());
 				testHtml.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().log("Exception occurred in Function Code coverage writer \n%s", e.getMessage());
 			}
 			return output.getName();
 		} else {

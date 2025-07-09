@@ -58,10 +58,6 @@ under the License.
 			<artifactId>utilities</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.jt400</groupId>
-			<artifactId>jt400</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>
@@ -98,7 +94,7 @@ under the License.
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 		</dependency>
-	</dependencies>
+</dependencies>
 
 	<build>
 		<plugins>

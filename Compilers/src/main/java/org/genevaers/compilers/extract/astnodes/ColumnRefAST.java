@@ -195,7 +195,7 @@ public class ColumnRefAST extends FormattedASTNode implements CalculationSource,
 
     @Override
     public String getMessageName() {
-        return "column reference";
+        return "COL." + vc.getColumnNumber();
     }
 
     @Override

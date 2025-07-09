@@ -1,9 +1,6 @@
 ---
 name: "gvbRCAOnly"
 templates:
-  - name: "jcl/RCAL.ftl"
-    target: "${test}L.JCL"
-    type: "JCL"
-  - name: "cfg/mr91CFG.ftl"
+  - name: "cfg/CovRCACFG.ftl"
     target: "RCAPARM"
     type: "Config"

@@ -55,7 +55,7 @@ public class PhysicalFileRecordParser extends RecordParser {
 					pf.setFieldDelimiter(FieldDelimiter.FIXEDWIDTH);
 					pf.setRecordDelimiter(RecordDelimiter.CR);
 					pf.setTextDelimiter(TextDelimiter.INVALID);
-					pf.setDatabaseRowFormat(DbmsRowFmtOptId.NONE);
+					pf.setDatabaseRowFormat(DbmsRowFmtOptId.DB2);
 					pf.setRecfm(FileRecfm.VB);
 					break;
 				case "NAME":

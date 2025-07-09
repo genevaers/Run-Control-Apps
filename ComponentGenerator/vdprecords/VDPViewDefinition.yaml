@@ -11,9 +11,11 @@ fields:
   component_field: none
 - name: prefix.viewId
   type: mappingOnly
+  existing_java_type: view_id
   component_field: componentId
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: view_name
   type: string

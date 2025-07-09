@@ -21,12 +21,9 @@ package org.genevaers.genevaio.recordreader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-
 import org.apache.commons.lang3.StringUtils;
+import org.genevaers.utilities.GersCodePage;
 import org.genevaers.utilities.GersConfigration;
-
 import com.google.common.flogger.FluentLogger;
 
 public abstract class RecordFileWriter {
@@ -46,11 +43,7 @@ public abstract class RecordFileWriter {
 
 	public static void setSpacesEBCDIC() {
 		if(spacesConverted == false) {
-			Charset utf8charset = Charset.forName("UTF-8");
-			Charset ebccharset = Charset.forName("IBM-1047");
-			ByteBuffer inputBuffer = ByteBuffer.wrap(spaces.getBytes());
-			CharBuffer data = utf8charset.decode(inputBuffer);
-			spaces = new String(ebccharset.encode(data).array());	
+			spaces = new String(GersCodePage.asciiToEbcdic(spaces));
 			spacesConverted = true;
 		}
 	}
@@ -80,7 +73,7 @@ public abstract class RecordFileWriter {
 		//We can also introduce a factory to select the appropriate
 		//record writer to use too.
 		if (GersConfigration.isZos()) {
-			return asciiToEbcdic(str);
+			return GersCodePage.asciiToEbcdic(str);
 		} else {
 			if(str != null) {
 				retStr = str.getBytes();
@@ -93,14 +86,6 @@ public abstract class RecordFileWriter {
 		}
 	}
 
-	private byte[] asciiToEbcdic(String str) {
-		Charset utf8charset = Charset.forName("UTF-8");
-		Charset ebccharset = Charset.forName("IBM-1047");
-		ByteBuffer inputBuffer = ByteBuffer.wrap(str.getBytes());
-		CharBuffer data = utf8charset.decode(inputBuffer);
-		return ebccharset.encode(data).array();
-	}
-  
 	public FileRecord getRecordToFill() {
 		return record;
 	}

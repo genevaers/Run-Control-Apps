@@ -95,7 +95,7 @@ public class ViewSourceAstNode extends ExtractBaseAST implements EmittableASTNod
         //Nodes will need the repo...
         //Keep in the base as a static?
         ViewNode vw = Repository.getViews().get(vs.getViewId());
-        nv.setViewType(vw.viewDef.getViewType());
+        nv.setViewType(vw.getViewDefinition().getViewType());
         nv.setSourceLrId(vs.getSourceLRID());
         nv.setFileId(vs.getSourceLFID());
         nv.setSourceSeqNbr(vs.getSequenceNumber());

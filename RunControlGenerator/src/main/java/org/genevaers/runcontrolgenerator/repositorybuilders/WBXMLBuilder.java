@@ -23,6 +23,7 @@ package org.genevaers.runcontrolgenerator.repositorybuilders;
 import org.genevaers.genevaio.wbxml.WBXMLSaxIterator;
 import org.genevaers.repository.data.InputReport;
 import org.genevaers.utilities.GersConfigration;
+import org.genevaers.utilities.Status;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.common.flogger.StackSize;
@@ -34,16 +35,20 @@ public class WBXMLBuilder extends XMLBuilder{
     }
 
     @Override
-    protected void buildFromXML(InputReport ir) {
+    protected Status buildFromXML(InputReport ir) {
+        Status retval;
 		logger.atInfo().log("Read WBXML");
 		WBXMLSaxIterator wbReader = new WBXMLSaxIterator();
 		try {
 			wbReader.setInputReader(inputReader);
 			wbReader.addToRepsitory();
 			ir.setGenerationID(wbReader.getGenerationID());
+			retval = Status.OK;
 		} catch (Exception e) {
 			logger.atSevere().withStackTrace(StackSize.FULL).log("Repo build failed " + e.getMessage());
+			retval = Status.ERROR;
 		}
+		return retval;
 	}
 
     @Override

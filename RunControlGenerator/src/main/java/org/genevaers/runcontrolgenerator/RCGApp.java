@@ -60,9 +60,9 @@ public class RCGApp {
         if(GersConfigration.isRCGValid()) {
             result = rcg.runFromConfig();
             if (result == Status.OK) {
-                System.out.println("Run control generation completed");
+                logger.atInfo().log("Run control generation completed");
             } else {
-                System.out.println("Run control generation failed. See log for details.");
+                logger.atSevere().log("Run control generation failed. See log for details.");
             }
         } else {
             logger.atSevere().log("Invalid configuration processing stopped");

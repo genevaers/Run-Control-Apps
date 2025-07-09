@@ -544,7 +544,7 @@ public class ExtractAST2Dot {
     private static void doSubStringFunction(ExtractBaseAST node) {
         SubStringASTNode strNode = (SubStringASTNode) node;
         colour = STRINGCONST;
-        label = strNode.getType().toString() + "(" + strNode.getStartOffest() + "," + strNode.getLength() + ")";
+        label = strNode.getType().toString() + "(" + strNode.getStartOffest() + "," + strNode.getLengthString() + ")";
         idString = "Str_" + nodeNum++;
         reverseArrow = true;
     }

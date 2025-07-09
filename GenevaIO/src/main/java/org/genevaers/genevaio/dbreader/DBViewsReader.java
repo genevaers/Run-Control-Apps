@@ -190,6 +190,7 @@ public class DBViewsReader extends DBReaderBase {
         vd.setMaxExtractSummaryRecords(rs.getInt("EXTRACTSUMMARYBUF"));
         vd.setOutputLrId(rs.getInt("OUTPUTLRID"));
         vd.setDefaultOutputFileId(rs.getInt("PHYFILEID"));
+        requiredPFs.add(rs.getInt("PHYFILEID"));
         // this one can be dropped vd.setOutputDestinationId(outputDestinationId);
         // not sure whatvd.setDetailed(outputDetailInd);
         vd.setZeroValueRecordSuppression(rs.getInt("ZEROSUPPRESSIND") == 0 ? false : true);
@@ -204,6 +205,7 @@ public class DBViewsReader extends DBReaderBase {
         vd.setWriteExitId(rs.getInt("WRITEEXITID"));
         vd.setWriteExitParams(getDefaultedString(rs.getString("WRITEEXITSTARTUP"), ""));
         vd.setFormatExitId(rs.getInt("FORMATEXITID"));
+        requiredExits.add(rs.getInt("FORMATEXITID"));
         vd.setFormatExitParams(getDefaultedString(rs.getString("FORMATEXITSTARTUP"), ""));
         vd.setControlRecordId(rs.getInt("CONTROLRECID"));
 

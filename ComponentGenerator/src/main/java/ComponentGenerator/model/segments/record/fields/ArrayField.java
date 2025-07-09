@@ -169,4 +169,9 @@ public class ArrayField extends Field {
         fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(ccName, false) + "\"," + "cs.toString()), compare);");  
     }
 
+    @Override
+    public String getType() {
+        return "array of " + arrayType;
+    }
+
 }

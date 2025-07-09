@@ -96,18 +96,10 @@ public class LTRecordGenerator extends GeneratorBase{
 
     private void writeLTRecordDocumentation(String cr, Map<String, Object> nodeMap) {
 		Template template;
-		try {
-			template = getTemplate("ltDocumentation.ftl");
-			Path to = Paths.get("docs");
-			to = to.resolve(cr.replace(" ", "") + ".md");
-			generateTemplatedOutput(template, nodeMap, to);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		template = getTemplate("ltDocumentation.ftl");
+		Path to = Paths.get("docs");
+		to = to.resolve(cr.replace(" ", "") + ".md");
+		generateTemplatedOutput(template, nodeMap, to);
     }
 
     private Path getPathToWriteTo(RecordItem ltrentry) {

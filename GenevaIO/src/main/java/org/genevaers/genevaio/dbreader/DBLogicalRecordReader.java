@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.enums.LrStatus;
+import org.genevaers.repository.data.CompilerMessage;
+import org.genevaers.repository.data.CompilerMessageSource;
 
 public class DBLogicalRecordReader extends DBReaderBase {
 
@@ -51,6 +53,9 @@ public class DBLogicalRecordReader extends DBReaderBase {
         lr.setComponentId(rs.getInt("LOGRECID"));
         lr.setName(rs.getString("NAME"));
         lr.setStatus(LrStatus.fromdbcode(rs.getString("LRSTATUSCD")));
+        if(lr.getStatus() == LrStatus.INACTIVE) {
+            Repository.addErrorMessage(new CompilerMessage(0, CompilerMessageSource.VIEW_PROPS, lr.getComponentId(), 0, 0, "Logical record " + lr.getName() + "[" + lr.getComponentId() + "] is not active"));
+        }
         int le = rs.getInt("LOOKUPEXITID");
         lr.setLookupExitID(le);
         if(le > 0) {

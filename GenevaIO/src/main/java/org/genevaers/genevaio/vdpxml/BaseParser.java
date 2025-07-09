@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LookupPathKey;
 import org.xml.sax.Attributes;
@@ -51,8 +53,14 @@ abstract public class BaseParser {
 	protected String elementName;
 	protected static TreeMap<String, CatalogEntry> catalog;
 
+	protected String sectionName;
+
 	protected static Map<Integer, LRIndex> effdateStarts = new HashMap<>();
 	protected static Map<Integer, LRIndex> effdateEnds = new HashMap<>();
+
+	protected Map<String, String> attributes = new HashMap<>();
+
+	protected XMLStreamReader reader;
 
 	public BaseParser() {
 	}
@@ -88,23 +96,63 @@ abstract public class BaseParser {
 		this.componentName = componentName;
 	}
 
-	abstract public void addElement(String name, String text);
+	abstract public void addElement(String name, String text, Map<String, String> attributes)  throws XMLStreamException ;
 
 	public void endRecord() {
 		// override for special handling
 	}
 
 	public static void clearAndInitialise() {
-		//protected static TreeMap<String, CatalogEntry> catalog;
+		// protected static TreeMap<String, CatalogEntry> catalog;
 
 		effdateStarts = new HashMap<>();
 		effdateEnds = new HashMap<>();
-	
+
 		RecordParserData.clearAndInitialise();
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 	}
 
+	public void endElement() {}
 
+	public void parse(XMLStreamReader reader) throws XMLStreamException {
+		boolean notdone = true;
+		this.reader = reader;
+		int eventType = reader.getEventType();
+		while (notdone && reader.hasNext()) {
+
+			eventType = reader.next();
+
+			if (eventType == XMLEvent.START_ELEMENT) {
+				String elementName = reader.getName().getLocalPart();
+				getAttributes(reader);
+				int n = reader.next();
+				if (n == XMLEvent.CHARACTERS) {
+					String text = reader.getText();
+					addElement(elementName, text, attributes);
+				} else {
+					addElement(elementName, "", attributes);
+				}
+			}
+
+			if (eventType == XMLEvent.END_ELEMENT) {
+				String elementName = reader.getName().getLocalPart();
+				if (elementName.equals(sectionName)) {
+					// Time to return to top level
+					endElement();
+					notdone = false;
+				}
+			}
+		}
+
+	}
+
+	private void getAttributes(XMLStreamReader reader) {
+		attributes.clear();
+		for (int i=0; i<reader.getAttributeCount(); i++ ) {
+			attributes.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i)) ;
+		}
+	}
 }
+

@@ -144,7 +144,7 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 		if(vc.getExtractArea() == ExtractArea.AREACALC) {
         	vc.setExtractAreaPosition((short)1); //A legacy thing
 		} else {
-        	vc.setExtractAreaPosition((short)ci.getStartPosition());
+        	vc.setExtractAreaPosition((short)ci.getExtractAreaPosition());
 		}
         vc.setFieldLength((short)ci.getLength());
         vc.setFieldName(ci.getName());

@@ -123,7 +123,7 @@ public class LogicGroup implements Comparable<LogicGroup> {
                 sb.append(vsw.getLogString());
             }
         }
-        logger.atInfo().log("%s", sb.toString());
+        logger.atFine().log("%s", sb.toString());
     }
 
     private void sortViewSources() {

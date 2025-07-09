@@ -44,8 +44,7 @@ public class YAMLReader {
             SpecFiles specs = yr.readSpecFileList(new File("fmspeclist.yaml"));
             logger.atInfo().log("Read %s", specs.getName());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Error while reading YAML: \n%s", e.getMessage());
         }
 
     }

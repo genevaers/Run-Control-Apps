@@ -1,10 +1,10 @@
 package org.genevaers.genevaio.vdpxml;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
+
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -28,17 +28,19 @@ import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
-import org.genevaers.repository.components.PhysicalFile;
 import org.xml.sax.Attributes;
+
+import com.google.common.flogger.FluentLogger;
 
 /**
  * This class will parse a Join-Target Record element into a
  * LookupPathStepTransfer object.
  */
 public class LookupStepParser extends BaseParser {
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private LookupPathStep lookupStep;
-	private LookupPath currenLookupPath;
+	private LookupPath currentLookupPath;
 
 	private int currentLookupId;
 	private int stepNumber;
@@ -46,33 +48,49 @@ public class LookupStepParser extends BaseParser {
 
 	private boolean srcLR = true;
 	private LogicalRecord targetLR;
+	private LookupSourceKeyParser lkskp;
+	private LookupTargetKeyParser lktrgp;
+
+	public LookupStepParser() {
+		sectionName = "Steps";
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName.toUpperCase()) {
-			case "LOGICALRECORDREF":
-				if(srcLR) {
-					lookupStep = new LookupPathStep();
-					lookupStep.setStepNum(stepNumber);
-					currenLookupPath = Repository.getLookups().get(currentLookupId);
-					lookupStep.setSourceLRid(sourceLrid);
-					currenLookupPath.addStep(lookupStep);
-					srcLR = false;
-				} else {
-					lookupStep.setTargetLRid(Integer.parseInt(attributes.getValue("ID")));
-				}
-				break;
 			case "LOGICALFILEREF":
 				lookupStep.setTargetLFid(Integer.parseInt(attributes.getValue("ID")));
 				break;
 			default:
 				break;
 		}
-	}		
+	}
+
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) throws XMLStreamException {
 		switch (name.toUpperCase()) {
-			case "LOGICALRECORDREF":
+			case "STEP":
+				lookupStep = new LookupPathStep();
+				stepNumber = Integer.parseInt(attributes.get("Number"));
+				lookupStep.setStepNum(stepNumber);
+				currentLookupPath.addStep(lookupStep);
+				logger.atFiner().log("Add Step %d to Lookup %s",stepNumber, currentLookupPath.getName());
+				break;
+			case "SOURCE":
+				logger.atFine().log("Source");
+				lkskp = new LookupSourceKeyParser();
+				lkskp.setLookupID(componentID);
+				lkskp.setLookupStep(lookupStep);
+				lkskp.parse(reader);
+				logger.atFine().log("Source parsing completed for lookup " + currentLookupPath.getName());
+				break;
+			case "TARGET":
+				logger.atFine().log("Target");
+				lktrgp = new LookupTargetKeyParser();
+				lktrgp.setLookupKey(lkskp.getLookupKey());
+				lktrgp.setLookupStep(lookupStep);
+				lktrgp.parse(reader);
+				logger.atFine().log("Target parsing completed for lookup " + currentLookupPath.getName());
 				break;
 			case "PARAMETER":
 				targetLR.setLookupExitParams(text);
@@ -82,16 +100,31 @@ public class LookupStepParser extends BaseParser {
 		}
 	}
 
-    public void setLookupID(int id) {
-		currentLookupId = id;
-    }
+	@Override
+	public void endElement() {
+		int targlf = lktrgp.getTargetLF();
+		int targlr = lktrgp.getTargetLR();
+		currentLookupPath.setTargetLFid(targlf);
+		currentLookupPath.setTargetLRid(targlr);
+		// set target LF and LR for each key
+		Iterator<LookupPathKey> ki = lookupStep.getKeyIterator();
+		while (ki.hasNext()) {
+			LookupPathKey key = ki.next();
+			key.setTargetLrId(targlr);
+			key.setTargetlfid(targlf);
+		}
+	}
 
-    public void setStepNumber(int s) {
-        stepNumber = s;
-    }
+	public void setLookupID(int id) {
+		currentLookupId = id;
+	}
+
+	public void setStepNumber(int s) {
+		stepNumber = s;
+	}
 
 	public void setLrRef(int lrid) {
-		if(srcLR == false) {
+		if (srcLR == false) {
 			sourceLrid = lrid;
 			srcLR = true;
 		} else {
@@ -99,10 +132,15 @@ public class LookupStepParser extends BaseParser {
 			lookupStep.setTargetLRid(lrid);
 		}
 	}
-    public void setExitRef(int exitRef) {
+
+	public void setExitRef(int exitRef) {
 		int trgLR = lookupStep.getTargetLR();
 		targetLR = Repository.getLogicalRecords().get(trgLR);
 		targetLR.setLookupExitID(exitRef);
-    }
+	}
+
+	public void setLookup(LookupPath lookup) {
+		currentLookupPath = lookup;
+	}
 
 }

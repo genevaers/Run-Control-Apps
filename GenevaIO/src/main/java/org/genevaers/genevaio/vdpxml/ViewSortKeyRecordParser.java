@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -66,26 +69,13 @@ import org.xml.sax.Attributes;
 public class ViewSortKeyRecordParser extends BaseParser {
 
 	private ViewSortKey vsk;
-
-	private int currentViewId;
-
-	private ViewNode currentViewNode;
-
 	private int seqNum;
+	private ViewNode viewNode;
 
-	private void setDefault(ViewSortKey vsk) {
-		vsk.setDescDateCode(DateCode.NONE);
-		vsk.setDescDataType(DataType.ALPHANUMERIC);
-		vsk.setDescJustifyId(JustifyId.LEFT);
-		vsk.setLabel("");
-		vsk.setSkJustifyId(JustifyId.LEFT);
-		vsk.setSktDateCode(DateCode.NONE);
-		vsk.setSktDataType(DataType.ALPHANUMERIC);
-		vsk.setSktJustifyId(JustifyId.LEFT);
-		vsk.setSortKeyDateTimeFormat(DateCode.NONE);
-		vsk.setSortDisplay(SortKeyDispOpt.CATEGORIZE);
-		vsk.setPerformBreakLogic(PerformBreakLogic.NOBREAK);
+	public ViewSortKeyRecordParser() {
+		sectionName = "Sort";
 	}
+
 
 	public ViewSortKey getViewSortKey() {
 		return vsk;
@@ -93,113 +83,66 @@ public class ViewSortKeyRecordParser extends BaseParser {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "COLUMNREF":
-				vsk = new ViewSortKey();
-				vsk.setComponentId(componentID);
-				vsk.setViewSortKeyId(componentID);
-				vsk.setColumnId(Integer.parseInt(attributes.getValue("ID")));
-				vsk.setSequenceNumber((short)seqNum);
-				ViewColumn vc = Repository.getViews().get(currentViewId).getColumnByID(Integer.parseInt(attributes.getValue("ID")));
-				vsk.setSortKeyDataType(vc.getDataType());
-				vsk.setSkFieldLength(vc.getFieldLength());
-				vsk.setSkStartPosition(vc.getExtractAreaPosition());
-				setDefault(vsk);
-				Repository.getViews().get(currentViewId).addViewSortKey(vsk);
-				break;
-			default:
-				break;
-		}
-	}		
+	}
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
+		short s;
 		switch (name.toUpperCase()) {
+			case "SORTCOLUMN":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				seqNum = Integer.parseInt(attributes.get("seq"));
+				break;
+			case "COLUMNREF":
+				int colID = Integer.parseInt(attributes.get("ID"));
+				vsk = viewNode.getViewSortKeyFromColumnId(colID);	
+				vsk.setComponentId(componentID);
+				vsk.setViewSortKeyId(componentID);
+				vsk.setSequenceNumber((short) seqNum);
+				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.SAMEPAGE); //default
+				viewNode.addViewSortKeyBySeq(vsk);;
+				break;
 			case "SORTKEYLABEL":
 				vsk.setLabel(text.trim());
-				break;
-			case "KEYSEQNBR":
-				short s = (short) Integer.parseInt(text);
-				vsk.setSequenceNumber(s);
-				currentViewNode.addViewSortKey(vsk);
 				break;
 			case "ORDER":
 				vsk.setSortorder(SortOrder.fromdbcode(text.trim()));
 				break;
+			case "BREAK":
+				if (text.equals("1")) {
+					vsk.setPerformBreakLogic(PerformBreakLogic.BREAK);
+				} else {
+					vsk.setPerformBreakLogic(PerformBreakLogic.NOBREAK);
+				}
+				break;
+			case "HEADER":
+				if("NEWP".equalsIgnoreCase(text)){
+					text = "PNEW";
+				}
+				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.fromdbcode(text));
+				break;
+			case "FOOTER":
+				if (text.equals("1"))
+					vsk.setSortBreakFooterOption(SortBreakFooterOption.PRINT);
+				else
+					vsk.setSortBreakFooterOption(SortBreakFooterOption.NOPRINT);
+				break;
+			case "PREFIX":
+				vsk.setLabel(text);
+				break;
+			case "HARDCOPY":
+				vsk.setSortDisplay(SortKeyDispOpt.fromdbcode(text));
+				break;
+
 			case "DATATYPE":
 				vsk.setSortKeyDataType(DataType.fromdbcode(text.trim()));
 				break;
-			case "SKSIGNED":
-				vsk.setSortKeySigned(text.equals("1") ? true : false);
-				break;
-			case "SKSTARTPOS":
-				s = (short) Integer.parseInt(text);
-				vsk.setSkStartPosition(s);
-				break;
-			case "SKFLDLEN":
-				s = (short) Integer.parseInt(text);
-				vsk.setSkFieldLength(s);
-				break;
-			case "SKDECIMALCNT":
-				s = (short) Integer.parseInt(text);
-				vsk.setSktDecimalCount(s);
-				break;
-			case "SKFLDCONTENTCD":
-				vsk.setSortKeyDateTimeFormat(DateCode.fromdbcode(text));
-				break;
-			case "SORTKEYDISPLAYCD":
-				vsk.setSortDisplay(SortKeyDispOpt.fromdbcode(text.trim()));
-				break;
-			case "SORTBRKIND":
-				int sbi = Integer.parseInt(text);
-				int footerMask = 0x0001;
-				int re = sbi & footerMask;
-				if (re > 0) {
-					vsk.setSortBreakFooterOption(SortBreakFooterOption.PRINT);
-				} else {
-					vsk.setSortBreakFooterOption(SortBreakFooterOption.NOPRINT);
-				}
-				int breakMask = 0x0002;
-				re = sbi & breakMask;
-				if (re > 0) {
-					vsk.setPerformBreakLogic(PerformBreakLogic.NOBREAK);
-				} else {
-					vsk.setPerformBreakLogic(PerformBreakLogic.BREAK);
-				}
-				break;
-			case "FOOTER":
-					if( text.equals("1")  )
-						vsk.setSortBreakFooterOption(SortBreakFooterOption.PRINT);
-					else
-						vsk.setSortBreakFooterOption(SortBreakFooterOption.NOPRINT);
-					break;
-			case "BREAK":
-				int pbi = Integer.parseInt(text);
-				vsk.setPerformBreakLogic(PerformBreakLogic.BREAK);
-				switch (pbi) {
-					case 1:
-						vsk.setSortBreakHeaderOption(SortBreakHeaderOption.NEWPAGE);
-						break;
-					case 2:
-						vsk.setSortBreakHeaderOption(SortBreakHeaderOption.NONE);
-						break;
-					default:
-						vsk.setSortBreakHeaderOption(SortBreakHeaderOption.SAMEPAGE);
-						break;
-				}
-				break;
-			case "SORTTITLELRFIELDID":
-				vsk.setRtdLrFieldId(Integer.parseInt(text));
 			default:
 				break;
 		}
 	}
 
-	public void setViewId(int vid) {
-		currentViewId = vid;
-	}
-
-	public void setSeqNum(int s) {
-		seqNum = s;
+	public void setViewNode(ViewNode viewNode) {
+		this.viewNode = viewNode;
 	}
 }

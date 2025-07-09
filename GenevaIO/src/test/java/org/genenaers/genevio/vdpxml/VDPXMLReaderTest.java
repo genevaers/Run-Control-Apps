@@ -5,8 +5,7 @@ package org.genenaers.genevio.vdpxml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 
 /*
@@ -66,8 +65,8 @@ public class VDPXMLReaderTest {
         VDPXMLSaxIterator vdpxmlReader = new VDPXMLSaxIterator();
         Path root = Paths.get(resources);
         Path readme = root.resolve(TEST_FILE);
-        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(readme.toFile()))) {
-            vdpxmlReader.setInputBuffer(bis);
+        try(FileReader reader = new FileReader(readme.toFile())) {
+            vdpxmlReader.setInputReader(reader);
             vdpxmlReader.addToRepository();
         }  catch (IOException e ) {
             logger.atSevere().log("testOpenVDPXMLFile failed: %s",e.getMessage());

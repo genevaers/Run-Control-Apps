@@ -22,6 +22,7 @@ package org.genevaers.compilers.extract.emitters.assignmentemitters;
 
 import org.genevaers.compilers.extract.astnodes.ColumnAST;
 import org.genevaers.compilers.extract.astnodes.FormattedASTNode;
+import org.genevaers.compilers.extract.emitters.rules.AssignColumnFlipNumeric;
 import org.genevaers.compilers.extract.emitters.rules.CanAssignDates;
 import org.genevaers.compilers.extract.emitters.rules.Truncation;
 import org.genevaers.compilers.extract.emitters.rules.Rule.RuleResult;
@@ -33,6 +34,7 @@ public class SameTypeChecker extends AssignmentRulesChecker {
     public SameTypeChecker() {
         addRule(new CanAssignDates());
         addRule(new Truncation());
+        addRule(new AssignColumnFlipNumeric());
     }
 
     @Override
@@ -50,8 +52,8 @@ public class SameTypeChecker extends AssignmentRulesChecker {
         // }
         if (vc.getDateCode() != DateCode.NONE && frhs.getDateCode() != DateCode.NONE) {
             updateResult(result, apply(column, rhs));
-            stripOffDateCodes(column, frhs);
-         } else {
+            stripOffDateCodesIfTheSame(column, frhs);
+        } else {
             //need to strip here as well but know which side and generate warning
             if(vc.getDateCode() != DateCode.NONE) {
                 column.overrideDateCode(DateCode.NONE);
@@ -60,19 +62,12 @@ public class SameTypeChecker extends AssignmentRulesChecker {
                 frhs.overrideDateCode(DateCode.NONE);
             }
             updateResult(result, apply(column, rhs));
-            //generate warning
-            //If both sides had compatible dates ok
-            //  leave them
-            //else 
-            //    generate Error
-            //checkDateCodeCompatibility();
-            //Use bit map!!!!!!!!!!!!!!!!!!!
-        }
+         }
         return result;
     }
 
 
-    private void stripOffDateCodes(ColumnAST column, FormattedASTNode frhs) {
+    private void stripOffDateCodesIfTheSame(ColumnAST column, FormattedASTNode frhs) {
             // Stip off the content codes.
             // But in a copy not the original - or use an override type
             // Which is where the TypeASTNode should come in...
@@ -80,8 +75,11 @@ public class SameTypeChecker extends AssignmentRulesChecker {
             //if (vc.getFieldLength() != frhs.getLength()) {
                 // If the lengths are the same as well then just strip off the content codes
             //}
-        frhs.overrideDateCode(DateCode.NONE);
-        column.overrideDateCode(DateCode.NONE);
+            ViewColumn vc = column.getViewColumn();
+            if (vc.getDateCode() == frhs.getDateCode()) {
+                frhs.overrideDateCode(DateCode.NONE);
+                column.overrideDateCode(DateCode.NONE);
+            }
     }
 
     @Override

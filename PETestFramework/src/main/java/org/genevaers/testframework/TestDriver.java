@@ -19,7 +19,6 @@ package org.genevaers.testframework;
  * under the License.
  */
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,8 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,9 +49,11 @@ import org.genevaers.testframework.yamlreader.Spec;
 import org.genevaers.testframework.yamlreader.XMLFile;
 import org.genevaers.utilities.CommandRunner;
 import org.genevaers.utilities.FileProcessor;
+import org.genevaers.utilities.GersCodePage;
 import org.genevaers.utilities.GersConfigration;
 import org.genevaers.utilities.Substitution;
 import org.genevaers.utilities.GersEnvironment;
+import org.genevaers.utilities.GersFilesUtils;
 import org.genevaers.utilities.menu.Menu;
 import org.w3c.dom.NodeList;
 
@@ -79,19 +78,15 @@ public class TestDriver {
 	 *
 	 */
 	private static final String TEST_SRC = "target/generated-sources/org/genevaers/test/";
-	/**
-	 *
-	 */
-	private static final String DELALL = "DELALL";
 	private static final String LOCALROOT = "LOCALROOT";
-	private static final String TSO_USERID = "TSO_USERID";
+
+	private static final String WINDOWS_TEMPLATESET = "gvbrcaOnly.yaml";
 	private Map<String, String> envVars;
 
 	TestDriver() {
 		GersEnvironment.initialiseFromTheEnvironment();
 		envVars = GersEnvironment.getEnvironmentVariables();
 	}
-
 
 	private static Configuration cfg;
 
@@ -104,39 +99,35 @@ public class TestDriver {
 	private static String appname = "RCA";
 
 	public static boolean processSpecList() {
+		boolean run = false;
 		try {
+			GersConfigration.initialise();
 			initFreeMarkerConfiguration();
 			setupTestPaths();
 			checkExistsAndProcessSpeclist();
 			if (envVariablesAreValid()) {
 				putEventFiles();
+				run = true;
 			} else {
 				logger.atSevere().log("Invalid variable values");
 			}
 		} catch (Exception e) {
-			logger.atSevere().log("Exception in testing");
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception in testing");
 		}
-
-		// if we ran tests run overview no matter what
-		return GersEnvironment.get("RUNTESTS").compareToIgnoreCase("Y") == 0;
+		return run;
 	}
 
 	private static void putEventFiles() throws Exception {
 		String testHLQ = GersEnvironment.get("GERS_TEST_HLQ");
-		if(testHLQ.equalsIgnoreCase("LOCAL")) {
-        	logger.atInfo().log("Local testing");
+		if(GersEnvironment.isWindows()) {
+        	logger.atInfo().log("Local Windows testing");
 		} else {
 			String destHLQ = testHLQ + ".INPUT";
 			logger.atInfo().log("Write Event Files to " + destHLQ);
 			List<EventFile> eventFiles = getFileInfo(testPaths.getEventPath());
-			if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-				logger.atInfo().log("Ignore put event files for Windows");
-			} else {
-				for (EventFile ef : eventFiles) {
-					Path input = testPaths.getEventPath().resolve("data").resolve(ef.getName());
-					ZosHelper.putEventFile(destHLQ, input.toFile(), ef.getName(), ef.getLrecl());
-				}
+			for (EventFile ef : eventFiles) {
+				Path input = testPaths.getEventPath().resolve("data").resolve(ef.getName());
+				ZosHelper.putEventFile(destHLQ, input.toFile(), ef.getName(), ef.getLrecl());
 			}
 		}
 	}
@@ -156,7 +147,7 @@ public class TestDriver {
 		try {
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + TEST_SRC));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 	}
 
@@ -167,37 +158,55 @@ public class TestDriver {
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + "cfg"));
 			FileProcessor.deleteRecursive(new File(GersEnvironment.get(LOCALROOT) + File.separator + "out"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 	}
 
 	private static boolean envVariablesAreValid() {
 		boolean valid = true;
-		if (GersEnvironment.get("GERS_TEST_HLQ").isEmpty()) {
-			logger.atSevere().log("GERS_TEST_HLQ is empty. We need an HLQ");
-			valid = false;
-		}
-		if (GersEnvironment.get("GERS_ENV_HLQ").isEmpty()) {
-			logger.atSevere().log("GERS_ENV_HLQ is empty. We need an HLQ");
-			valid = false;
+		if(GersEnvironment.isWindows() == false) {
+			if (GersEnvironment.get("GERS_TEST_HLQ").isEmpty()) {
+				logger.atSevere().log("GERS_TEST_HLQ is empty. We need an HLQ");
+				valid = false;
+			}
+			if (GersEnvironment.get("GERS_ENV_HLQ").isEmpty()) {
+				logger.atSevere().log("GERS_ENV_HLQ is empty. We need an HLQ");
+				valid = false;
+			}
 		}
 		return valid;
 	}
 
 	private static void checkExistsAndProcessSpeclist() throws Exception {
 		String specFileListName = GersEnvironment.get("GERS_TEST_SPEC_LIST");
+		logger.atInfo().log("Using Specfile list " + specFileListName);
 		if (specFileListName != null) {
-			File specFileList = new File(GersEnvironment.get(LOCALROOT) + File.separator + specFileListName);
-			if (!specFileList.exists()) {
-				logger.atSevere().log("Specfile list doesn't exist " + specFileList);
-			} else {
-				processYamlSpecFileList(specFileList);
+			File baseDir = new File(GersEnvironment.get("LOCALROOT"));
+			File specFileList = new File(baseDir, specFileListName);
+
+			try {
+				String baseCanonicalPath = baseDir.getCanonicalPath();
+				String fileCanonicalPath = specFileList.getCanonicalPath();
+
+				if (!fileCanonicalPath.startsWith(baseCanonicalPath + File.separator)) {
+					logger.atSevere().log("Potential path traversal attempt: %s" , specFileListName);
+					return;
+				}
+
+				if (!specFileList.exists()) {
+					logger.atSevere().log("Specfile list doesn't exist: %s" , specFileList);
+				} else {
+					processYamlSpecFileList(specFileList);
+				}
+			} catch (IOException e) {
+				logger.atSevere().log("Error resolving file path: %s" , e.getMessage());
 			}
 		}
+
 	}
 
 	private static void processYamlSpecFileList(File specFileList) {
-		TestRepository.buildTheRepo(specFileList);
+		TestRepository.buildTheRepo(specFileList, GersEnvironment.isWindows() ? WINDOWS_TEMPLATESET : null);
 	}
 
 	private static void initFreeMarkerConfiguration() throws IOException {
@@ -208,7 +217,6 @@ public class TestDriver {
 		TestDataGenerator.setFreemarkerConfig(cfg);
 	}
 
-
 	public String getVersion() {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Properties properties = new Properties();
@@ -217,26 +225,21 @@ public class TestDriver {
 			properties.load(resourceStream);
 			ver = properties.getProperty("app.name") + ": " + properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 		return ver;
 	}
 
 	public static void runTest(GersTest testToRun) throws IOException {
-        logger.atInfo().log("Running test '%s'", testToRun.getName());
+		logger.atInfo().log("Running test '%s'", testToRun.getName());
 
 		String testHLQ = GersEnvironment.get("GERS_TEST_HLQ");
 		String testDataset = testHLQ + "." + testToRun.getDataSet();
 		TestDataGenerator.applyTemplatesToTest(testToRun);
-		if ( testHLQ.equalsIgnoreCase("LOCAL"))  {
+
+		if ( GersEnvironment.isWindows())  {
 			runLocalTest(testToRun);
 			return;
-		} else if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-			System.out.println("delete existing test datasets " + testDataset);
-			System.out.println("Run " + testToRun.getFullName());
-			return;
-		} else {
-			// ZosHelper.deleteDataSet(testDataset);
 		}
 
 		Path xmlDir = buildTheXMLFiles(testToRun);
@@ -249,11 +252,11 @@ public class TestDriver {
 		purgeOldJobs(testToRun);
 		submitJobsAndWaitForCompletion(testToRun);
 		runComparePhaseIfNeeded(testToRun);
-		if(heldJobs.maxReturnCodeDoesNotExceed(JES_WARNING)) {
+		if (heldJobs.maxReturnCodeDoesNotExceed(JES_WARNING)) {
 			getExpectedOutputs(testToRun);
 		} else {
-			if(heldJobs.getMaxRC() == testToRun.getExpectedresult().getRcAsInt()) {
-				logger.atInfo().log("Expect RC %d found", testToRun.getExpectedresult().getRcAsInt() );
+			if (heldJobs.getMaxRC() == testToRun.getExpectedresult().getRcAsInt()) {
+				logger.atInfo().log("Expect RC %d found", testToRun.getExpectedresult().getRcAsInt());
 				getExpectedErrorOutputs(testToRun);
 			}
 		}
@@ -261,53 +264,32 @@ public class TestDriver {
 	}
 
 	private static void runLocalTest(GersTest testToRun) throws IOException {
-		//ah build XMLs above is wrong because of 1047
-		//create a dir to execute test
+		// ah build XMLs above is wrong because of 1047
+		// create a dir to execute test
 		Path localTest = createLocalTestDirectory(testToRun);
-		Path outxmlPath = localTest.resolve("WBXMLI");
+		Path outxmlPath = localTest.resolve("WBXMLI").normalize();
 		outxmlPath.toFile().mkdirs();
 		logger.atInfo().log("Make dir " + outxmlPath.toString());
 		Path xmlfile;
 		List<Substitution> substs = new ArrayList<Substitution>();
 		for (XMLFile xml : testToRun.getXmlfiles()) {
-			xmlfile = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xml").resolve(xml.getName());
+			Path baseDir = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xml").normalize();
+			xmlfile = baseDir.resolve(xml.getName()).normalize();
+
+			if (!xmlfile.startsWith(baseDir)) {
+				throw new SecurityException("Path traversal attempt detected: " + xmlfile);
+			}
 
 			for (Replacement r : xml.getReplacements()) {
 				substs.add(new Substitution(r.getReplace(), r.getWith()));
 			}
-			FileProcessor.sed(xmlfile.toFile(), outxmlPath.resolve(xmlfile.getFileName()).toFile(), substs);
+			FileProcessor.sed(xmlfile.toFile(), outxmlPath.resolve(xmlfile.getFileName()).normalize().toFile(), substs);
 			substs.clear();
 		}
-		Path configFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").resolve(testToRun.getFullName());
-		Files.copy(configFolder.resolve(appname + "PARM"), localTest.resolve(appname + "PARM.cfg"), StandardCopyOption.REPLACE_EXISTING);
-		//copy config
-		//Create WBXMLI
-		//copy XML to above
-		//cd to or run gvbrca from test dir 
-		CommandRunner cr = new CommandRunner();
-		try {
-			String mr91String;
-			String rcaString;
-			if(GersEnvironment.get("OSNAME").startsWith("Win")) {
-				mr91String = "gvbrca.bat";
-				rcaString = "gvbrca.bat";
-			} else {
-				mr91String = "gvbrca";
-				rcaString = "gvbrca";
-			}
-			cr.run(mr91String, localTest.toFile());
-			logger.atInfo().log(cr.getCmdOutput().toString());
-			cr.clear();
-			cr.run(rcaString, localTest.toFile());
-			logger.atInfo().log(cr.getCmdOutput().toString());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// dittto gvbrca
+		Path configFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").resolve(testToRun.getFullName()).normalize();
+		Files.copy(configFolder.resolve(appname + "PARM"), localTest.resolve(appname + "PARM"), StandardCopyOption.REPLACE_EXISTING);
+		runWinRcaFrom(localTest);
 		processLocalResult(testToRun);
-
-		//how to we check a pretend pass? Just return code?
 	}
 
 	private static void processLocalResult(GersTest test) {
@@ -315,8 +297,8 @@ public class TestDriver {
 		Path outPath = rootPath.resolve("out");
 		// Look to see VDP and XLT generated -> Gennerated/Pass
 		Path resultFolder = outPath.resolve(test.getFullName());
-		Path vdp = resultFolder.resolve(GersConfigration.VDP_DDNAME);
-		Path xlt = resultFolder.resolve(GersConfigration.XLT_DDNAME);
+		Path vdp = resultFolder.resolve(GersConfigration.VDP_DDNAME).normalize();
+		Path xlt = resultFolder.resolve(GersConfigration.XLT_DDNAME).normalize();
 		logger.atInfo().log("Check existenc in " + resultFolder.toString());
 		if (vdp.toFile().exists() && xlt.toFile().exists()) {
 			test.getResult().setMessage("generated");
@@ -331,36 +313,35 @@ public class TestDriver {
 		try {
 			Template template = cfg.getTemplate("test/localResult.ftl");
 			Path resultFilePath;
-			Path resultPath = outPath.resolve(test.getFullName());
+			Path resultPath = outPath.resolve(test.getFullName()).normalize();
 			resultPath.toFile().mkdirs();
 			if (test.getResult().getMessage().startsWith("generated")) {
 				nodeMap.put("result", "SUCCESS");
 				logger.atInfo().log(Menu.GREEN + test.getResult().getMessage() + Menu.RESET);
-				resultFilePath = resultPath.resolve("pass.html");
+				resultFilePath = resultPath.resolve("pass.html").normalize();
 			} else {
 				nodeMap.put("result", "FAILCOMPARE");
 				logger.atSevere().log(Menu.RED + test.getResult().getMessage() + Menu.RESET);
-				resultFilePath = resultPath.resolve("fail.html");
+				resultFilePath = resultPath.resolve("fail.html").normalize();
 			}
 			nodeMap.put("outFiles", test.getFormatfiles());
 			Path cssPath = resultFilePath.relativize(outPath).resolve("w3.css");
 			nodeMap.put("cssPath", cssPath);
 			TemplateApplier.generateTestTemplatedOutput(template, nodeMap, resultFilePath);
 		} catch (IOException | TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 	}
 
 	private static Path createLocalTestDirectory(GersTest testToRun) {
-		Path localTest = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("out").resolve(testToRun.getFullName());
+		Path localTest = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("out").resolve(testToRun.getFullName()).normalize();
 		localTest.toFile().mkdirs();
 		return localTest;
 	}
 
 	private static void getExpectedErrorOutputs(GersTest testToRun) {
-		if(testToRun.getErrorfiles().size() > 0) {
-			for(OutputFile ef : testToRun.getErrorfiles()) {
+		if (testToRun.getErrorfiles().size() > 0) {
+			for (OutputFile ef : testToRun.getErrorfiles()) {
 				logger.atInfo().log("get %s from last job", ef.getDdname());
 				Path outFile = getOutFilePathForTest(ef.getDdname(), testToRun);
 				String outdata = heldJobs.getDatasetFromLastJob(ef.getDdname());
@@ -372,12 +353,12 @@ public class TestDriver {
 	}
 
 	private static void writeOutput(String outdata, Path outFile) {
-		try( FileWriter fw = new FileWriter(outFile.toFile()) ) {
+		try (FileWriter fw = new FileWriter(outFile.toFile())) {
 			logger.atInfo().log("write to " + outFile.toString());
 			fw.append(outdata);
 			fw.close();
 		} catch (IOException e) {
-			logger.atSevere().log(e.getMessage());
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 	}
 
@@ -392,7 +373,8 @@ public class TestDriver {
 	}
 
 	private static boolean isOkayToContinue(GersTest testToRun) {
-		return heldJobs.allJobsCompleted(testToRun.getNumExpectedJobs()) && heldJobs.maxReturnCodeDoesNotExceed(JES_WARNING);
+		return heldJobs.allJobsCompleted(testToRun.getNumExpectedJobs())
+				&& heldJobs.maxReturnCodeDoesNotExceed(JES_WARNING);
 	}
 
 	private static void runComparePhase(GersTest testToRun) throws IOException {
@@ -401,22 +383,27 @@ public class TestDriver {
 		Path superCJob = testJCLDirectory.resolve(compPrefix);
 		submitJobs(superCJob);
 		int numExpectedJobs = 1;
-		if( testToRun.getFormatfiles().size() > 0) {
+		if (testToRun.getFormatfiles().size() > 0) {
 			numExpectedJobs = testToRun.getExtractfiles().size();
 		}
-		waitForJobsWithTimeoutAndCollectFailures(compPrefix, numExpectedJobs, Integer.valueOf(testToRun.getTimeout()));
+       	String value = System.getenv("GERS_PETEST_TIMEOUT");
+		int timeout = Integer.valueOf(testToRun.getTimeout());
+		if (value == null) {
+			timeout = Integer.valueOf(value);
+		}
+		waitForJobsWithTimeoutAndCollectFailures(compPrefix, numExpectedJobs, timeout);
 		comparePhaseCheck(testToRun);
 	}
 
-
-	private static void waitForJobsWithTimeoutAndCollectFailures(String compPrefix, int numExpectedJobs, Integer timeout) {
+	private static void waitForJobsWithTimeoutAndCollectFailures(String compPrefix, int numExpectedJobs,
+			Integer timeout) {
 		waitForJobsWithTimeout(compPrefix, numExpectedJobs, timeout);
 		heldJobs.collectFailures();
 	}
 
 	private static void comparePhaseCheck(GersTest testToRun) {
-		List<ISFJobStep> steps = heldJobs.getJobSteps();	
-		if(heldJobs.getMaxRC() == 0) {
+		List<ISFJobStep> steps = heldJobs.getJobSteps();
+		if (heldJobs.getMaxRC() == 0) {
 			testToRun.getResult().setMessage("pass compare phase");
 		} else {
 			testToRun.getResult().setMessage("fail compare phase");
@@ -426,13 +413,14 @@ public class TestDriver {
 	}
 
 	private static void saveStepResult(List<ISFJobStep> steps, GersTest testToRun) {
-		//Need to mark the failed and passed based on the contents of the heldJobs failedsteps ddname
-		for(ISFJobStep s : steps) {
+		// Need to mark the failed and passed based on the contents of the heldJobs
+		// failedsteps ddname
+		for (ISFJobStep s : steps) {
 			String name = s.getStepName();
-			//Could this be done earlier as the test is run?
-			//Or init all to passed and then fail those that do fail
-			//since a map and can find
-			//!! negative logic here !!!
+			// Could this be done earlier as the test is run?
+			// Or init all to passed and then fail those that do fail
+			// since a map and can find
+			// !! negative logic here !!!
 			testToRun.setViewResult(Integer.parseInt(name.substring(1)), heldJobs.didStepPass(name));
 		}
 	}
@@ -441,7 +429,8 @@ public class TestDriver {
 		logger.atInfo().log("Copy the JCL files to %s", pds);
 		deletePdsIfExists(pds);
 		if (GersEnvironment.get("OSNAME").startsWith("z")) {
-			for (File f : testJCLDirectory.toFile().listFiles()) {
+			Path baseDir = testJCLDirectory.toAbsolutePath().normalize();
+			for (File f : baseDir.toFile().listFiles()) {
 				ZosHelper.convertA2EAndCopyFile2Dataset(f, "//'" + pds + "(" + f.getName() + ")'", "fb", "80");
 			}
 		}
@@ -451,7 +440,8 @@ public class TestDriver {
 		logger.atInfo().log("Copy the config files to %s", pds);
 		deletePdsIfExists(pds);
 		if (GersEnvironment.get("OSNAME").startsWith("z")) {
-			Path configFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").resolve(testToRun.getFullName());
+			Path baseConfigDir = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").normalize();
+			Path configFolder = baseConfigDir.resolve(testToRun.getFullName()).normalize();
 			for (File f : configFolder.toFile().listFiles()) {
 				ZosHelper.convertA2EAndCopyFile2Dataset(f, "//'" + pds + "(" + f.getName() + ")'", "fb", "80");
 			}
@@ -462,36 +452,36 @@ public class TestDriver {
 		logger.atInfo().log("Copy the XML to %s", pds);
 		deletePdsIfExists(pds);
 		if (GersEnvironment.get("OSNAME").startsWith("z")) {
-			for (File f : xmlDir.toFile().listFiles()) {
+			Path normXmlDir = xmlDir.normalize();
+			for (File f : normXmlDir.toFile().listFiles()) {
 				ZosHelper.convertA2EAndCopyFile2Dataset(f, "//'" + pds + "(" + f.getName() + ")'", "vb", "1000");
 			}
 		}
 	}
 
 	private static void deletePdsIfExists(String pds) {
-		String dataset = "//'" + pds  + "'";
+		String dataset = "//'" + pds + "'";
 		try {
-			if(ZFile.dsExists(dataset)) {
+			if (ZFile.dsExists(dataset)) {
 				ZFile.remove(dataset);
 			}
 		} catch (ZFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 	}
 
 	private static Path buildTheXMLFiles(GersTest testToRun) throws IOException {
-		Path xmlFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xmlout").resolve(testToRun.getFullName());
+		Path xmlFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xmlout").resolve(testToRun.getFullName()).normalize();
 		xmlFolder.toFile().mkdirs();
 
 		List<File> filesIn = new ArrayList<File>();
 		int xmlNum = 1;
 		List<Substitution> substs = new ArrayList<Substitution>();
 		for (XMLFile xml : testToRun.getXmlfiles()) {
-			File xmlfile = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xml").resolve(xml.getName()).toFile();
+			File xmlfile = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("xml").resolve(xml.getName()).normalize().toFile();
 			filesIn.add(xmlfile);
 			File outxmlfile = xmlFolder.resolve("XML" + xmlNum++).toFile();
-			substs.add(new Substitution("?>", " encoding=\"IBM-1047\"?>", 1, 1));
+			substs.add(new Substitution("?>", " ?>", 1, 1));
 			for (Replacement r : xml.getReplacements()) {
 				substs.add(new Substitution(r.getReplace(), r.getWith()));
 			}
@@ -503,16 +493,16 @@ public class TestDriver {
 
 	public static void runSpec(Spec specToRun) {
 		boolean specPassed = true;
-		for( GersTest t : specToRun.getTests()) {
+		for (GersTest t : specToRun.getTests()) {
 			try {
-                t.setSpecPath(specToRun);
+				t.setSpecPath(specToRun);
 				runTest(t);
 				specPassed &= t.getResult().getMessage().startsWith("pass") ? true : false;
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.atSevere().withCause(e);
 			}
 		}
-		if(specPassed) {
+		if (specPassed) {
 			specToRun.getResult().setMessage("pass");
 		} else {
 			specToRun.getResult().setMessage("fail");
@@ -521,12 +511,13 @@ public class TestDriver {
 
 	private static void submitJobsAndWaitForCompletion(GersTest testToRun) throws IOException {
 		Path firstJob = testJCLDirectory.resolve(testToRun.getName() + (testToRun.getDb2bind().equals("Y") ? "N" : "L"));
-		if (GersEnvironment.get("OSNAME").startsWith("Win")) {
+		if (GersEnvironment.isWindows()) {
 			System.out.println("Submit " + firstJob.toString());
 		} else {
 			submitJobs(firstJob);
 		}
-		waitForJobsWithTimeout(testToRun.getName(), testToRun.getNumExpectedJobs(), Integer.valueOf(testToRun.getTimeout()));
+		waitForJobsWithTimeout(testToRun.getName(), testToRun.getNumExpectedJobs(),
+				Integer.valueOf(testToRun.getTimeout()));
 	}
 
 	private static void submitJobs(Path mr91Job) throws IOException {
@@ -558,8 +549,8 @@ public class TestDriver {
 	private static void purgeOldJobs(GersTest testToRun) {
 		TestJobs tjs = new TestJobs(testToRun.getName());
 		tjs.run();
-		int p =tjs.purge();
-		logger.atInfo().log("purged %d jobs for %s",p, testToRun.getName());
+		int p = tjs.purge();
+		logger.atInfo().log("purged %d jobs for %s", p, testToRun.getName());
 	}
 
 	private static void waitForJobsWithTimeout(String prefix, int expectedNumJobs, int timeout) {
@@ -567,14 +558,14 @@ public class TestDriver {
 		int numCompleted = 0;
 		int timeoutCount = 2;
 		logger.atInfo().log("Expecting %d completed jobs for %s within %d seconds", expectedNumJobs, prefix, timeout);
-		snooze(2500); //Most tests seem to run within this time
+		snooze(2500); // Most tests seem to run within this time
 		int rc = 0;
-		while(numCompleted < expectedNumJobs && rc < 8 && timeoutCount < timeout) {
+		while (numCompleted < expectedNumJobs && rc < 8 && timeoutCount < timeout) {
 			heldJobs.run();
 			numCompleted = heldJobs.getNumJobs();
-			//could also look for abend/fail rc?
+			// could also look for abend/fail rc?
 			rc = heldJobs.getMaxRC();
-			if(rc > 4) {
+			if (rc > 4) {
 				logger.atInfo().log("(%d) RC %d for %s - %s", timeoutCount, rc, prefix, heldJobs.getResultRC());
 			} else {
 				logger.atInfo().log("(%d) %d completed jobs for %s", timeoutCount, numCompleted, prefix);
@@ -582,10 +573,10 @@ public class TestDriver {
 			snooze(1000);
 			timeoutCount++;
 		}
-		if(System.getenv("SHOWJOBS") != null && System.getenv("SHOWJOBS").equals("Y")) {
+		if (System.getenv("SHOWJOBS") != null && System.getenv("SHOWJOBS").equals("Y")) {
 			heldJobs.show();
 		}
-		if(timeoutCount == timeout) {
+		if (timeoutCount == timeout) {
 			logger.atSevere().log("%s timed out. Held jobs are:", prefix);
 			heldJobs.show();
 		}
@@ -594,7 +585,7 @@ public class TestDriver {
 	private static boolean getExpectedOutputs(GersTest testToRun) {
 		boolean found = true;
 		if (testToRun.getRunOnly().equals("Y") || testToRun.getComparephase().equalsIgnoreCase("Y")) {
-			found = true; //No output files to get
+			found = true; // No output files to get
 		} else {
 			String outFile = null;
 			String datasetBase = "//'" + GersEnvironment.get("GERS_TEST_HLQ") + "." + testToRun.getDataSet() + ".";
@@ -632,14 +623,13 @@ public class TestDriver {
 		return found;
 	}
 
-
 	private static void getOutputFile(String dataset, OutputFile f, String fileName, GersTest testToRun) {
 		Path outFile = getOutFilePathForTest(fileName, testToRun);
-		if (GersEnvironment.get("OSNAME").startsWith("Win")) {
+		if (GersEnvironment.isWindows()) {
 			System.out.println("Get output file from " + dataset + " to " + outFile.toFile().toString() + " :" + f.getRecfm() + "," + f.getLrecl());
 		} else {
-			if(convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
-				//try again it may have been busy
+			if (convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
+				// try again it may have been busy
 				snooze(1000);
 				logger.atInfo().log("retrying copy");
 				convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl());
@@ -648,10 +638,10 @@ public class TestDriver {
 	}
 
 	private static Path getOutFilePathForTest(String fileName, GersTest testToRun) {
-		Path testDirectory = Paths.get(testToRun.getFullName());
-		Path outFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("out").resolve(testDirectory);
+		Path testDirectory = Paths.get(testToRun.getFullName()).normalize();
+		Path outFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("out").resolve(testDirectory).normalize();
 		outFolder.toFile().mkdirs();
-		Path outFile = outFolder.resolve(fileName);
+		Path outFile = outFolder.resolve(fileName).normalize();
 		return outFile;
 	}
 
@@ -659,7 +649,7 @@ public class TestDriver {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		} // 1 second
 	}
 
@@ -669,7 +659,7 @@ public class TestDriver {
 			logger.atInfo().log("check %s exists", dataset);
 			found = ZFile.exists(dataset);
 		} catch (ZFileException e) {
-			e.printStackTrace();
+			logger.atSevere().withCause(e).log("Exception occurred");
 		}
 		return found;
 	}
@@ -678,22 +668,22 @@ public class TestDriver {
 		Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT));
 		Path outPath = rootPath.resolve("out");
 		Path baseFolder = rootPath.resolve("base").resolve(test.getFullName());
-		if(test.getRunOnly().equals("Y")) {
+		if (test.getRunOnly().equals("Y")) {
 			System.out.println(Menu.GREEN + "Run Only " + test.getName() + Menu.RESET);
 		} else {
-		//Get actual result
+			// Get actual result
 			if (test.hasComparePhase()) {
 			} else {
 				if (heldJobs.allJobsCompleted(test.getNumExpectedJobs())) {
-						if (heldJobs.getMaxRC() > test.getExpectedresult().getRcAsInt()) {
-							test.getResult().setMessage(heldJobs.getResultRC());
+					if (heldJobs.getMaxRC() > test.getExpectedresult().getRcAsInt()) {
+						test.getResult().setMessage(heldJobs.getResultRC());
+					} else {
+						if (compareOutFiles(baseFolder, test, outPath)) {
+							test.getResult().setMessage("pass");
 						} else {
-							if (compareOutFiles(baseFolder, test, outPath)) {
-								test.getResult().setMessage("pass");
-							} else {
-								test.getResult().setMessage("fail compare");
-							}
+							test.getResult().setMessage("fail compare");
 						}
+					}
 				} else if (heldJobs.getNumJobs() < test.getNumExpectedJobs()) {
 					if (heldJobs.getMaxRC() > 8) {
 						test.getResult().setMessage(heldJobs.getResultRC());
@@ -704,7 +694,6 @@ public class TestDriver {
 			}
 
 			test.verifyExpected();
-
 
 			// Messed up world of paths
 			// let's make them once somewhere and keep them around
@@ -724,24 +713,23 @@ public class TestDriver {
 			try {
 				Template template = cfg.getTemplate("test/result.ftl");
 				Path resultFilePath;
-				Path resultPath = outPath.resolve(test.getFullName());
+				Path resultPath = outPath.resolve(test.getFullName()).normalize();
 				resultPath.toFile().mkdirs();
 				if (test.getResult().getMessage().startsWith("pass")) {
 					nodeMap.put("result", "SUCCESS");
 					logger.atInfo().log(Menu.GREEN + test.getResult().getMessage() + Menu.RESET);
-					resultFilePath = resultPath.resolve("pass.html");
+					resultFilePath = resultPath.resolve("pass.html").normalize();
 				} else {
 					nodeMap.put("result", "FAILCOMPARE");
 					logger.atSevere().log(Menu.RED + test.getResult().getMessage() + Menu.RESET);
-					resultFilePath = resultPath.resolve("fail.html");
+					resultFilePath = resultPath.resolve("fail.html").normalize();
 				}
 				nodeMap.put("outFiles", test.getFormatfiles());
-				Path cssPath = resultFilePath.relativize(outPath).resolve("w3.css");
+				Path cssPath = resultFilePath.relativize(outPath).resolve("w3.css").normalize();
 				nodeMap.put("cssPath", cssPath);
 				TemplateApplier.generateTestTemplatedOutput(template, nodeMap, resultFilePath);
 			} catch (IOException | TemplateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.atSevere().withCause(e).log("Exception occurred");
 			}
 		}
 	}
@@ -758,48 +746,50 @@ public class TestDriver {
 	private static boolean outputFilesMatch(OutputFile of, Path baseFolder, GersTest test, Path outPath) {
 		boolean diffFound = false;
 		String outputFileName = test.getOutputFilePrefix() + of.getDdname();
-		if(of.getComparable().equalsIgnoreCase("y")) {
-			Path basePath = baseFolder.resolve(outputFileName);
+		if (of.getComparable().equalsIgnoreCase("y")) {
+			Path basePath = baseFolder.resolve(outputFileName).normalize();
 			if (!basePath.toFile().exists()) {
 				logger.atSevere().log("Base file does not exist " + basePath.toString());
 			} else {
-				Path outFilePath = outPath.resolve(test.getFullName()).resolve(outputFileName);
-				Path diffPath = outPath.resolve(test.getFullName()).resolve(outputFileName + ".diff");
+				Path outFilePath = outPath.resolve(test.getFullName()).resolve(outputFileName).normalize();
+				Path diffPath = outPath.resolve(test.getFullName()).resolve(outputFileName + ".diff").normalize();
 				try {
 					FileProcessor.toPrintableFile(outFilePath.toFile());
-					if(of.getStartkey() != null) {
+					if (of.getStartkey() != null) {
 						logger.atInfo().log("Keyed diff");
-						diffFound = FileProcessor.diff(basePath.toFile(), outFilePath.toFile(), diffPath.toFile(), of.getStartkey(), of.getStopkey(), false);
+						diffFound = FileProcessor.diff(basePath.toFile(), outFilePath.toFile(), diffPath.toFile(),
+								of.getStartkey(), of.getStopkey(), false);
 					} else {
-						diffFound = FileProcessor.diff(basePath.toFile(), outFilePath.toFile(), diffPath.toFile(), 0, 100000, true) ;
+						diffFound = FileProcessor.diff(basePath.toFile(), outFilePath.toFile(), diffPath.toFile(), 0,
+								100000, true);
 					}
-					if(diffFound){
-						System.out.println(Menu.RED + "ERROR differences found for " + outFilePath.toString() + Menu.RESET);
+					if (diffFound) {
+						System.out.println(
+								Menu.RED + "ERROR differences found for " + outFilePath.toString() + Menu.RESET);
 					} else {
 						System.out.println(Menu.GREEN + "PASS for " + outFilePath.toString() + Menu.RESET);
 					}
-			} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			  } catch (IOException e) {
+					logger.atSevere().log("Exception occurred in output files match \n%s", e.getMessage());
 				}
 			}
 		}
 		return !diffFound;
 	}
 
-    public static void runAllTests() {
+	public static void runAllTests() {
 		Iterator<Spec> si = TestRepository.getSpecIterator();
-		while(si.hasNext()) {
+		while (si.hasNext()) {
 			runSpec(si.next());
 		}
-    }
+	}
 
-	private static List<EventFile> getFileInfo(Path path)  {
+	private static List<EventFile> getFileInfo(Path path) {
 		List<EventFile> eventFiles = new ArrayList<EventFile>();
 		try (BufferedReader fr = new BufferedReader(new FileReader(path.resolve("datasetParms.txt").toFile()))) {
 			String line;
 			while ((line = fr.readLine()) != null) {
-				if(!line.startsWith("#")) {
+				if (!line.startsWith("#")) {
 					String[] bits = line.split(",");
 					EventFile eventFile = new EventFile();
 					eventFile.setName(bits[0]);
@@ -808,11 +798,10 @@ public class TestDriver {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("Exception occurred in get File info \n%s", e.getMessage());
 		}
 		return eventFiles;
-	}	
+	}
 
 	public static boolean convertE2AAndCopyDataset2File(String dataset, File target, String recfm, String lrecl) {
           boolean copied = false;
@@ -823,7 +812,7 @@ public class TestDriver {
               fileIn = new ZFile(dataset,"rb,type=record,recfm=" + recfm.toLowerCase() + ",lrecl=" + lrecl + ",noseek");
               byte[] recBuf = new byte[Integer.parseInt(lrecl)];
               while (fileIn.read(recBuf) != -1) {
-                  ByteBuffer convbb = ByteBuffer.wrap(ebcdicToAscii(recBuf));
+                  ByteBuffer convbb = ByteBuffer.wrap(GersCodePage.ebcdicToAscii(recBuf));
                   convbb.position(recBuf.length);
                   fw.writeArray(convbb);
               }
@@ -843,14 +832,44 @@ public class TestDriver {
           return copied;
       }
 
-      private static byte[] ebcdicToAscii(byte[] buf) {
-        Charset utf8charset = Charset.forName("ISO8859-1");
-        Charset ebccharset = Charset.forName("IBM-1047");
-        ByteBuffer inputBuffer = ByteBuffer.wrap(buf);
-        CharBuffer data = ebccharset.decode(inputBuffer);
-        return utf8charset.encode(data).array();
-      }
-  
+	public static void generateCoverage() {
+		if(GersEnvironment.isWindows()) {
+			Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT)).normalize();
+			Path outPath = rootPath.resolve("out").normalize();
+			generateCoverageRCAPARM(outPath);
+			runWinRcaFrom(outPath);
+		} else {
+			logger.atSevere().log("Only generate function code coverage on Windows");
+		}
+	}
 
+	private static void runWinRcaFrom(Path loc) {
+		CommandRunner cr = new CommandRunner();
+		try {
+			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
+			String rcaString = winrcapps + "/rcapps-latest.jar";
+			ProcessBuilder procBuilder = new ProcessBuilder("java","_jar", rcaString);
+			procBuilder.directory(loc.toFile());
+			Process proc = procBuilder.start();
+			cr.run(proc);
+			logger.atInfo().log(cr.getCmdOutput().toString());
+		} catch (InterruptedException | IOException e) {
+			logger.atSevere().log("Exception occurred in run RCA \n%s", e.getMessage());
+		}
+	}
+
+	private static void generateCoverageRCAPARM(Path outPath) {
+        logger.atInfo().log("Write RCAParms for coverage");
+        try (FileWriter fw = new FileWriter(outPath.resolve(GersConfigration.RCA_PARM_FILENAME).toFile())) {
+            fw.write("# Auto generated Run Control Parms\n");
+            fw.write(GersConfigration.GENERATE +"=N\n");
+            fw.write(GersConfigration.COVERAGE + "=Y\n");
+            fw.write(GersConfigration.AGGREGATE + "=Y\n");
+            fw.write(GersConfigration.LOG_LEVEL + "=DEBUG\n");
+            fw.close();
+        } catch (IOException e) {
+            logger.atSevere().log("Unable to write RCA Parms %s", e.getMessage());
+        }
+	}
 
 }

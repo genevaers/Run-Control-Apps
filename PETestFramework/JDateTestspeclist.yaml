@@ -1,0 +1,6 @@
+specFileSets:
+  - name: "All Formats Date Tests"
+    templateSetName: "gvbrcatoPE.yaml"
+    specs:
+      - "PeTests/Date/DateFormatTests.yaml"
+      - "PeTests/Date/TimeFormatTests.yaml"

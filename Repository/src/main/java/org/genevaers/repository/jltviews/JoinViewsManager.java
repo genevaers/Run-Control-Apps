@@ -259,9 +259,12 @@ public class JoinViewsManager {
 			return exitJoins.getJLTView(lrid, false);
 		} else {
 			LogicalFile lf = Repository.getLogicalFiles().get(lfid);
-			if(lf.getPFIterator().next().getInputDDName().startsWith("$$")) {
+			PhysicalFile pf = lf.getPFIterator().next();
+			if(pf.getInputDDName().startsWith("$$")) {
 				//External files have an input DDname starting with $$
 				//Go figure...
+				pf.setRequired(true);
+				lf.setRequired(true);
 				return externalJoins.getJLTView(lrid, false);
 			} else {
 				referenceJoins = referenceDataSet.computeIfAbsent(lfid, k -> makeReferenceJoinMap(LookupType.NORMAL, lfid));
@@ -451,6 +454,14 @@ public class JoinViewsManager {
 			Collection<ReferenceJoin> refViews = refd.getValue().getValues();
 			addToEntriesForReferenceViews(entries, refd.getKey(), refViews);
 		}
+        Iterator<ExternalJoin> extIt = externalJoins.getIterator();
+        int i = 1;
+        while (extIt.hasNext()) {
+            ExternalJoin extJoin = extIt.next();
+            LookupPath lk = Repository.getLookups().get(extJoin.getOrginalLookupId());
+            LogicalFile lf = Repository.getLogicalFiles().get(lk.getTargetLFID());
+			entries.add(extJoin.getReportEntry(lf.getID()));
+        }
 		return entries;
 	}
 
@@ -458,38 +469,7 @@ public class JoinViewsManager {
 		Iterator<ReferenceJoin> ri = refViews.iterator();
 		while (ri.hasNext()) {
 			ReferenceJoin ref = ri.next();
-			ReferenceReportEntry refEntry = new ReferenceReportEntry();
-			refEntry.setWorkDDName(String.format("REFR%03d", ref.getDdNum()));
-			refEntry.setViewID(ref.getRefViewNum());
-			refEntry.setViewName(ref.getView().getName());
-			PhysicalFile pf = Repository.getLogicalFiles().get(lfid).getPFIterator().next();
-			refEntry.setRefDDName(pf.getInputDDName());
-			refEntry.setRefPFID(pf.getComponentId());
-			refEntry.setRefPFName(pf.getName());
-			refEntry.setRefLRID(ref.getLRid());
-			refEntry.setRefLFID(lfid);
-			refEntry.setKeylen(ref.getKeyLength());
-			switch (ref.getEffDateCode()) {
-				case JLTView.EFF_DATE_BOTH:
-					refEntry.setEffStart("Y ");
-					refEntry.setEffEnd("Y ");
-					break;
-				case JLTView.EFF_DATE_START:
-					refEntry.setEffStart("Y ");
-					refEntry.setEffEnd("N ");
-					break;
-				case JLTView.EFF_DATE_END:
-					refEntry.setEffStart("N ");
-					refEntry.setEffEnd("Y ");
-					break;
-				case JLTView.EFF_DATE_NONE:
-					refEntry.setEffStart("N ");
-					refEntry.setEffEnd("N ");
-					break;
-				default:
-					break;
-			}
-			entries.add(refEntry);
+			entries.add(ref.getReportEntry(lfid));
 		}
 	}
 
@@ -546,5 +526,9 @@ public class JoinViewsManager {
 		}
 		jv.setSourceLFID(lfOfKey);
 		return jv;
+	}
+
+	public JLTViewMap<ExternalJoin> getExternalJoins() {
+		return externalJoins;
 	}
 }

@@ -35,6 +35,7 @@ public class CFEAEmitter extends ComparisonEmitter{
         calcNode.emit();
         LtFuncCodeFactory ltFact = LtFactoryHolder.getLtFunctionCodeFactory();
         LogicTableNameF1 cfea = (LogicTableNameF1) ltFact.getCFEA(calcNode.getAccName(), ((FieldReferenceAST) lhs).getRef(), op);
+        cfea.getArg().setLogfileId(ExtractBaseAST.getLtEmitter().getFileId());
         return cfea;
     }
 

@@ -93,7 +93,7 @@ public class MainMenu extends Menu{
     }
 
     private void showCommonSettings(StringBuilder menuStr) {
-        Menu.addMenuSummaryItem(menuStr, "GERS_GIT_REPO_DIR",System.getenv("GERS_GIT_REPO_DIR"),"");
+        Menu.addMenuSummaryItem(menuStr, "GERS_RCA_JAR_DIR",System.getenv("GERS_RCA_JAR_DIR"),"");
         Menu.addMenuSummaryItem(menuStr, "GERS_TEST_SPEC_LIST",System.getenv("GERS_TEST_SPEC_LIST"),"");
         Menu.addMenuSummaryItem(menuStr, "GERS_TEST_HLQ", System.getenv("GERS_TEST_HLQ"), "");
         Menu.addMenuSummaryItem(menuStr, "GERS_ENV_HLQ", System.getenv("GERS_ENV_HLQ"), "");

@@ -25,9 +25,13 @@ import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
 
+import com.google.common.flogger.FluentLogger;
+
 public class AssignmentRulesCheckerFactory {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private static ErrorChecker errorChecker = new ErrorChecker();
     private static DateChecker dateChecker = new DateChecker();
@@ -59,7 +63,9 @@ public class AssignmentRulesCheckerFactory {
         if (sameDataTypes(colDataType, rhs)) {
             return sameTypesChecker;
         } else {
-            if(colDataType != DataType.ALPHANUMERIC && rhs.isNumeric()) {
+            DateCode cdc = vc.getDateCode();
+            if((cdc != null && cdc != DateCode.NONE) || (rhs.getDateCode() != null && rhs.getDateCode() != DateCode.NONE)) {
+                logger.atFiner().log("Column number %d assignment via DateChecker", vc.getColumnNumber());
                 return dateChecker;
             } else {
                 if(!column.isNumeric()) {

@@ -124,7 +124,7 @@ class ErrorAndWarningTest extends RunCompilerBase {
     @Test void testWarnFlipFieldZonedTooBig() {
         runFromXMLOverrideLogic(9956, TestHelper.FIELD_TOO_BIG, "COLUMN = {Description}");
         List<CompilerMessage> warns = Repository.getWarnings();
-        assertEquals(1, warns.size());
+        assertEquals(2, warns.size());
         List<CompilerMessage> errs = Repository.getCompilerErrors();
         assertEquals(1, errs.size());
         assertTrue(errs.get(0).getDetail().contains("exceeds maximum"));
@@ -195,6 +195,9 @@ class ErrorAndWarningTest extends RunCompilerBase {
     @Test void testConstStringToDate() {
         runFromXMLOverrideLogic(9956, TestHelper.INCOMPATIBLE_DATES, "COLUMN = \"66\"");
         List<CompilerMessage> warns = Repository.getWarnings();
+        for (CompilerMessage compilerMessage : warns) {
+            System.out.println(compilerMessage.getDetail());
+        }
         assertEquals(1, warns.size());
         List<CompilerMessage> errs = Repository.getCompilerErrors();
         assertEquals(1, errs.size());

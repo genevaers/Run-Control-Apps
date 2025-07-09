@@ -75,16 +75,17 @@ public class DBHeaderFooter extends DBReaderBase {
 		rf.setRow(rs.getShort("ROWNUMBER"));
 		rf.setColumn(rs.getShort("COLNUMBER"));
 		rf.setFooterLength(rs.getShort("LENGTH"));
-		rf.setText(rs.getString("ITEMTEXT").trim());
+		String it = rs.getString("ITEMTEXT");
+		rf.setText(it != null ? it : "");
 	}
 
 	private void parseHeader(ResultSet rs) throws SQLException  {
 		rh.setComponentId(rs.getInt("HEADERFOOTERID"));
 		String field = rs.getString("STDFUNCCD").trim();
 		if(field.length() > 0) {
-			rh.setFunction(ReportFunction.fromdbcode(field));
+			rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(field)));
 		} else {
-			rh.setFunction(ReportFunction.INVALID);
+			rh.setFunction(0);
 		}
 		field = rs.getString("JUSTIFYCD").trim();
 		if(field.length() > 0) {
@@ -96,6 +97,6 @@ public class DBHeaderFooter extends DBReaderBase {
 		rh.setColumn(rs.getShort("COLNUMBER"));
 		rh.setTitleLength(rs.getShort("LENGTH"));
 		String it = rs.getString("ITEMTEXT");
-		rh.setText(it != null ? it.trim() : "");
+		rh.setText(it != null ? it : "");
 	}
 }

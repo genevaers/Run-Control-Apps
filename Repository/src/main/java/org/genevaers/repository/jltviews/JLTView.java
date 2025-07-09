@@ -37,6 +37,7 @@ import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupType;
 import org.genevaers.repository.components.OutputFile;
+import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewDefinition;
@@ -50,6 +51,7 @@ import org.genevaers.repository.components.enums.JustifyId;
 import org.genevaers.repository.components.enums.OutputMedia;
 import org.genevaers.repository.components.enums.ViewStatus;
 import org.genevaers.repository.components.enums.ViewType;
+import org.genevaers.repository.data.ReferenceReportEntry;
 
 import com.google.common.flogger.FluentLogger;
 
@@ -349,8 +351,8 @@ public class JLTView {
         int alignStartPosition = genFld.getStartPosition() + genFld.getLength();
         int genLen = alignStartPosition - 1;
         int alignmentLength = (8 - (genLen % 8))%8;
-        logger.atInfo().log("Generarion LR length %d", genLen);
-        logger.atInfo().log("Generarion LR needs alignment of %d", alignmentLength);
+        logger.atFine().log("Generation LR length %d", genLen);
+        logger.atFine().log("Generation LR needs alignment of %d", alignmentLength);
         LRField alignField = Repository.makeNewField(genLR);
         alignField.setName("QuadwordAlign");
         alignField.setDatatype(DataType.ALPHANUMERIC);
@@ -597,5 +599,45 @@ public class JLTView {
         }
 
         return keyLen;
+    }
+
+    public ReferenceReportEntry getReportEntry(int lfid) {
+        ReferenceReportEntry refEntry = new ReferenceReportEntry();
+		refEntry.setWorkDDName(String.format("REFR%03d", getDdNum()));
+		if(getView() != null) {
+			refEntry.setViewID(getRefViewNum());
+			refEntry.setViewName(getView().getName());
+		} else {
+			refEntry.setViewID(0);
+			refEntry.setViewName("(User-provided data)");
+		}
+		PhysicalFile pf = Repository.getLogicalFiles().get(lfid).getPFIterator().next();
+		refEntry.setRefDDName(pf.getInputDDName());
+		refEntry.setRefPFID(pf.getComponentId());
+		refEntry.setRefPFName(pf.getName());
+		refEntry.setRefLRID(getLRid());
+		refEntry.setRefLFID(lfid);
+		refEntry.setKeylen(getKeyLength());
+		switch (getEffDateCode()) {
+			case JLTView.EFF_DATE_BOTH:
+				refEntry.setEffStart("Y ");
+				refEntry.setEffEnd("Y ");
+				break;
+			case JLTView.EFF_DATE_START:
+				refEntry.setEffStart("Y ");
+				refEntry.setEffEnd("N ");
+				break;
+			case JLTView.EFF_DATE_END:
+				refEntry.setEffStart("N ");
+				refEntry.setEffEnd("Y ");
+				break;
+			case JLTView.EFF_DATE_NONE:
+				refEntry.setEffStart("N ");
+				refEntry.setEffEnd("N ");
+				break;
+			default:
+				break;
+		}
+        return refEntry;
     }
 }

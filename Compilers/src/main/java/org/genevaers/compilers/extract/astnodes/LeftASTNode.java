@@ -1,5 +1,7 @@
 package org.genevaers.compilers.extract.astnodes;
 
+import org.genevaers.genevaio.ltfile.LTFileObject;
+
 /*
  * Copyright Contributors to the GenevaERS Project.
 								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
@@ -20,9 +22,7 @@ package org.genevaers.compilers.extract.astnodes;
  */
 
 
-import org.genevaers.genevaio.ltfile.LTFileObject;
-
-public class LeftASTNode extends StringFunctionASTNode implements Assignable{
+public class LeftASTNode extends StringFunctionASTNode{
 
     public LeftASTNode() {
         type = ASTFactory.Type.LEFT;
@@ -37,10 +37,5 @@ public class LeftASTNode extends StringFunctionASTNode implements Assignable{
         return null;
     }
 
-    @Override
-    public int getAssignableLength() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAssignableLength'");
-    }
 
 }

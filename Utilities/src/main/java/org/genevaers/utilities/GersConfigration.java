@@ -1,7 +1,5 @@
 package org.genevaers.utilities;
 
-import java.net.URI;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +36,6 @@ public class GersConfigration {
     //General Parm names
     public static final String RCA_PARM_FILENAME = "RCAPARM";
 
-//    public static final String PARMFILE = "PARMFILE";
-//    public static final String ZOSPARMFILE = "ZOSPARMFILE";
-
     public static final String REPORT_FILE = "RCARPT";
     public static final String LOG_FILE = "RCALOG";
 
@@ -52,8 +47,11 @@ public class GersConfigration {
     public static final String XLTOLD_DDNAME = "XLTOLD";
     public static final String JLTOLD_DDNAME = "JLTOLD";
     public static final String VDPOLD_DDNAME = "VDPOLD";
+    public static final String LTCOV = "LTCOV";
     
     public static final String GENERATE = "GENERATE_RC_FILES";
+    public static final String WRITE_VDPXML = "GENERATE_VDPXML";
+    public static final String VDPXML_OUT_FILE = "VDPXML";
 
     //RCG Parms
     public static final String DOT_XLT = "DOT_XLT";
@@ -99,6 +97,7 @@ public class GersConfigration {
 
     public static final String COMPARE = "COMPARE";
     public static final String COVERAGE = "COVERAGE";
+    public static final String AGGREGATE = "AGGREGATE";
 
     public static final String XLT_REPORT_DDNAME = "XLTRPT";
     public static final String JLT_REPORT_DDNAME = "JLTRPT";
@@ -111,12 +110,14 @@ public class GersConfigration {
     protected static Map<String, ConfigEntry> parmToValue = new TreeMap<>();
 
     private static boolean zos;
+    private static String zosCodePage;
 
     public static void initialise() {
         clear();
 		String os = System.getProperty("os.name");
 		logger.atFine().log("Operating System %s", os);
 		zos = os.startsWith("z");
+        zosCodePage = new GersCodePage().getCodePage();
  
         parmToValue.put(GENERATE, new ConfigEntry("N", false));
 
@@ -147,9 +148,12 @@ public class GersConfigration {
         parmToValue.put(XLT_REPORT, new ConfigEntry("N", false));
         parmToValue.put(JLT_REPORT, new ConfigEntry("N", false));
         parmToValue.put(VDP_REPORT, new ConfigEntry("N", false));
+        parmToValue.put(WRITE_VDPXML, new ConfigEntry("N", false));
         parmToValue.put(COMPARE, new ConfigEntry("N", false));
         parmToValue.put(RCA_REPORT, new ConfigEntry("N", true));
         parmToValue.put(REPORT_FORMAT, new ConfigEntry("TXT", false));
+        parmToValue.put(COVERAGE, new ConfigEntry("N", false));
+        parmToValue.put(AGGREGATE, new ConfigEntry("N", false));
 
         parmToValue.put(DB_SCHEMA, new ConfigEntry("", false));
         parmToValue.put(ENVIRONMENT_ID, new ConfigEntry("", false));
@@ -184,43 +188,6 @@ public class GersConfigration {
         }
 	}
 
-    // public static String getXLTFileName() {
-    //     return getCWDPrefix() + parmToValue.get(XLT_DDNAME).getValue();
-    // }
-
-    // public static String getVdpDdname() {
-    //     return parmToValue.get(VDP_DDNAME).getValue();
-    // }
-
-    // public static String getVdpFileName() {
-    //     return getCWDPrefix() + parmToValue.get(VDP_DDNAME).getValue();
-    // }
-
-    // public static String getJLTFileName() {
-    //     return getCWDPrefix() + parmToValue.get(JLT_DDNAME).getValue();
-    // }
-
-	// public static void overrideVDPFile(String vdpFile) {
-    //     if(vdpFile.length() > 0) {
-    //         ConfigEntry pv = parmToValue.get(VDP_DDNAME);
-    //         pv.setValue(vdpFile);
-    //     }
-	// }
-
-	// public static void overrideXLTFile(String xltFile) {
-    //     if(xltFile.length() > 0) {
-    //         ConfigEntry pv = parmToValue.get(XLT_DDNAME);
-    //         pv.setValue(xltFile);
-    //     }
-	// }
-
-	// public static void overrideJLTFile(String jltFile) {
-    //     if(jltFile.length() > 0) {
-    //         ConfigEntry pv = parmToValue.get(JLT_DDNAME);
-    //         pv.setValue(jltFile);
-    //     }
-	// }
-
     public static String getParm(String parm) {
         ConfigEntry cfe = parmToValue.get(parm);
         if(cfe != null) {
@@ -238,6 +205,14 @@ public class GersConfigration {
         return linesRead;
     }
 
+    public static String getLinesReadString() {
+        StringBuilder read = new StringBuilder();
+        for (String string : linesRead) {
+            read.append(string+"\n");
+        }
+        return read.toString();
+    }
+
     public static List<String> getOptionsInEffect() {
         List<String> optsInEfect = new ArrayList<>();
         for(Entry<String, ConfigEntry> parm : parmToValue.entrySet()) {
@@ -250,6 +225,10 @@ public class GersConfigration {
 
     public static boolean isZos() {
         return zos;
+    }
+
+    public static String getZosCodePage() {
+        return zosCodePage;
     }
 
     public static void setCurrentWorkingDirectory(String cwd) {
@@ -279,6 +258,7 @@ public class GersConfigration {
         rcaRequested |= isXltReport();
         rcaRequested |= isJltReport();
         rcaRequested |= isRcaReport();
+        rcaRequested |= isAggregate();
         return rcaRequested;
     }
 
@@ -300,6 +280,14 @@ public class GersConfigration {
 
     public static boolean isRcaReport() {
         return parmToValue.get(RCA_REPORT).getValue().equalsIgnoreCase("Y");
+    }
+
+    public static boolean isCoverage() {
+        return parmToValue.get(COVERAGE).getValue().equalsIgnoreCase("Y");
+    }
+
+    public static boolean isAggregate() {
+        return parmToValue.get(AGGREGATE).getValue().equalsIgnoreCase("Y");
     }
 
     public static boolean isNumberModeStandard() {
@@ -365,8 +353,27 @@ public class GersConfigration {
         return parmToValue.get(DOT_FORMAT).getValue().equalsIgnoreCase("Y");
     }
 
+    public static boolean isWriteVDPXMLEnabled() {
+        return parmToValue.get(WRITE_VDPXML).getValue().equalsIgnoreCase("Y");
+    }
+
     public static String getWBXMLDirectory() {
         return getCWDPrefix() + WB_XML_FILES_SOURCE;
+    }
+
+    public static String getVDPXMLDirectory() {
+        return getCWDPrefix() + VDP_XML_FILES_SOURCE;
+    }
+
+    public static String getActiveXMLDirectory() {
+        switch(parmToValue.get(INPUT_TYPE).getValue()) {
+            case "WBXML":
+            return getWBXMLDirectory();
+            case "VDPXML":
+            return getVDPXMLDirectory();
+            default:
+            return "";
+        }
     }
 
 	public static String getParmFileName() {
@@ -448,7 +455,7 @@ public class GersConfigration {
     }
 
     public static boolean isRCAConfigValid() {
-        if(isVdpReport() || isXltReport() || isJltReport()) {
+        if(isVdpReport() || isXltReport() || isJltReport() || isAggregate()) {
             return true;
         } else {
             return false;

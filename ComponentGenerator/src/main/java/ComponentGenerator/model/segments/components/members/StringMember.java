@@ -40,5 +40,8 @@ public class StringMember extends Member {
         return getAndSetEntryForType(TYPE);
     }
 
- 
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 }

@@ -27,19 +27,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.genevaers.genevaio.report.ReportWriter;
+import org.genevaers.runcontrolanalyser.AnalyserDriver;
 import org.genevaers.runcontrolanalyser.RCAApp;
 import org.genevaers.runcontrolgenerator.RCGApp;
 
 public class Runner {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private static Status status = Status.OK;
+    private static StringBuilder header = new StringBuilder();
 
     public static void main(String[] args) {
-		System.out.printf("GenevaERS RunControls version %s\n", Runner.getVersion());
-		System.out.printf("Java Vendor %s\n", System.getProperty("java.vendor"));
-		System.out.printf("Java Version %s\n", System.getProperty("java.version"));
+		header.append(String.format("GenevaERS RunControls version %s\n", Runner.getVersion()));
+		header.append(String.format("Java Vendor %s\n", System.getProperty("java.vendor")));
+		header.append(String.format("Java Version %s\n", System.getProperty("java.version")));
         GersConfigration.initialise();
+        if(GersConfigration.isZos()) {
+            header.append(String.format("Code Page %s\n", GersConfigration.getZosCodePage()));
+        }
         Runner.run();
         exitWithRC();
     } 
@@ -53,24 +57,27 @@ public class Runner {
     private static void run() {
         ParmReader pr = new ParmReader();
         if(pr.RCAParmExists()) {
-            System.out.printf("Reading Run Control Parm\n");
+            header.append("Reading Run Control Parm\n");
             pr.populateConfigFrom(GersConfigration.getParmFileName());
             GenevaLog.initLogger(Runner.class.getName(), GersConfigration.getLogFileName(), GersConfigration.getLogLevel());
             GersConfigration.setLinesRead(pr.getLinesRead());
+            header.append(GersConfigration.getLinesReadString());
+            logger.atInfo().log(header.toString());
             if(GersConfigration.generatorRunRequested()) {
                 RCGApp.run();
                 status = RCGApp.getResult();
             }
             if(status != Status.ERROR && GersConfigration.analyserRunRequested())  {
                 RCAApp.run();
-                status = status == Status.OK ? RCAApp.ranOkay() : status;    
+                status = status == Status.OK ? RCAApp.ranOkay() : status; 
+                ReportWriter.setDiffs(AnalyserDriver.getNumVDPDiffs(), AnalyserDriver.getNumXLTDiffs(), AnalyserDriver.getNumJLTDiffs());   
             }
         } else {
             System.out.printf("Unable to find generator parm file\n");
         }
         ReportWriter.write(status);
         String res = status == Status.OK ? "OK" : "with issues";
-        System.out.printf("GenevaERS RunControls completed %s\n", res);
+        logger.atInfo().log("GenevaERS RunControls completed %s\n", res);
         GenevaLog.closeLogger(Runner.class.getName());
     }
 
@@ -99,7 +106,7 @@ public class Runner {
 			properties.load(resourceStream);
 			ver = properties.getProperty("build.version");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Exception in get version \n%s", e.getMessage());
 		}
 		return ver;
 	}

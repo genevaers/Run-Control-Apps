@@ -3,8 +3,7 @@ members:
 - name: componentId 
   type: integer
 - name: function
-  type: enum
-  existing_java_type: org.genevaers.repository.components.enums.ReportFunction
+  type: integer
 - name: justification
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.JustifyId

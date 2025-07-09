@@ -73,8 +73,7 @@ public class StringConcatinationAST extends FormattedASTNode implements Assignab
 
     @Override
     public int getMaxNumberOfDigits() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaxNumberOfDigits'");
+        return 99; //just for something
     }
 
 }

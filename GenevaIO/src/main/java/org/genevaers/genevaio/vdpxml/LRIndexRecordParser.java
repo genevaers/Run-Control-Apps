@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -39,26 +42,29 @@ public class LRIndexRecordParser extends BaseParser {
 	private int fieldID;
 	private String ndxName;
 
+	public LRIndexRecordParser() {
+		sectionName = "Index";
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName.toUpperCase()) {
-			case "INDEXFIELDREF":
-				fieldID = Integer.parseInt(attributes.getValue("ID"));
-				seqNumber = Integer.parseInt(attributes.getValue("seq"));
-				break;
 			default:
 				break;
 		}
 	}		
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
 			case "NAME":
 				ndxName = text;
 				break;
 			case "XID":
+				break;
+			case "INDEXFIELDREF":
+				fieldID = Integer.parseInt(attributes.get("ID"));
+				seqNumber = Integer.parseInt(attributes.get("seq"));
 				LRIndex xndx = new LRIndex();
 				xndx.setComponentId(componentID);
 				xndx.setFieldID(fieldID);

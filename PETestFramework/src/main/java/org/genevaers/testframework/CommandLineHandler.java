@@ -33,13 +33,10 @@ import org.apache.commons.cli.ParseException;
 import org.genevaers.utilities.GenevaLog;
 
 import com.google.common.flogger.FluentLogger;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 public class CommandLineHandler {
-    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-
-	public static void main(String[] args) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException, InterruptedException {
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+	public static void main(String[] args) throws  IOException, InterruptedException {
 		Options options = buildCommandLineOptions();
 		CommandLineParser parser = new DefaultParser();
 		try {
@@ -70,18 +67,22 @@ public class CommandLineHandler {
 		} else {
 			//Call the Runner that reads all of the specs
 			//and runs all of the tests
-			TestDriver.processSpecList();
-			TestDriver.runAllTests();
-			TestReporter reporter = new TestReporter();
-			try {
-				reporter.generate();
-				if(reporter.allPassed()) {
-					System.exit(0);
-				} else {
-					System.exit(4);
+			if(TestDriver.processSpecList()) {
+				TestDriver.runAllTests();
+				if(line.hasOption("coverage")) {
+					TestDriver.generateCoverage();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
+				TestReporter reporter = new TestReporter();
+				try {
+					reporter.generate();
+					if(reporter.allPassed()) {
+						System.exit(0);
+					} else {
+						System.exit(4);
+					}
+				} catch (Exception e) {
+					logger.atSevere().log("Exception in command line process: \n%s",e.getMessage());
+				}
 			}
 		}
 	}
@@ -98,9 +99,11 @@ public class CommandLineHandler {
 
 		Option help = new Option( "help", "print this message" );
 		Option menu = new Option( "menu", "run-menu",  false, "run from menu");
-		
+		Option coverage = new Option( "coverage", "run-coverage",  false, "run function code coverage");
+
 		options.addOption( help );
 		options.addOption(menu);
+		options.addOption(coverage);
 		return options;
 	}
 
@@ -112,7 +115,7 @@ public class CommandLineHandler {
 			properties.load(resourceStream);
             version = properties.getProperty("build.version") + " (" + properties.getProperty("build.timestamp") + ")";
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.atSevere().log("Exception in reading version \n%s",e.getMessage());
 		}
 		return version;
 	}

@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -24,6 +27,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ReportFooter;
 import org.genevaers.repository.components.ReportHeader;
+import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.enums.JustifyId;
 import org.genevaers.repository.components.enums.ReportFunction;
 
@@ -38,41 +42,56 @@ public class ViewHeaderFooterParser extends BaseParser {
 	private String itemText;
 
 	private int viewid;
+	private ViewNode viewNode;
+	private ReportHeader rh;
+
+	public ViewHeaderFooterParser() {
+		sectionName = "Headers";
+	}
 
 	@Override
-	public void addElement(String name, String text) {
-		switch (name) {
-			case "HEADERFOOTERID":
-				id = Integer.parseInt(text);
+	public void addElement(String name, String text, Map<String, String> attributes) {
+		switch (name.toUpperCase()) {
+			case "HEADER":
+				id = Integer.parseInt(attributes.get("ID"));
+				rh = new ReportHeader();
+				rh.setComponentId(id);
+				rh.setJustification(JustifyId.NONE);
+				viewNode.addReportHeader(rh);
 				break;
-			case "STDFUNCCD":
+			case "FUNCTION":
 				functonCode = text.trim();
+				if("DATE".equalsIgnoreCase(functonCode)){
+					functonCode = "PDATE";
+				}else if ("TIME".equalsIgnoreCase(functonCode)) {
+					functonCode = "PTIME";
+				}
+				rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(functonCode)));
 				break;
-			case "VIEWID":
-				viewid = Integer.parseInt(text);
-				break;
-			case "JUSTIFYCD":
+			case "ALIGNMENT":
 				justify = text.trim();
+				rh.setJustification(JustifyId.fromdbcode(justify));
 				break;
-			case "ROWNUMBER":
+			case "POSITION":
 				row = Integer.parseInt(text);
+				rh.setColumn((short) row);
 				break;
-			case "COLNUMBER":
+			case "LINE":
 				col = Integer.parseInt(text);
+				rh.setRow((short) col);
 				break;
 			case "LENGTH":
 				length = Integer.parseInt(text);
 				break;
-			case "ITEMTEXT":
+			case "TEXT":
 				itemText = text;
+				rh.setText(itemText);
+				rh.setTitleLength((short)text.length());
 				break;
-			case "HEADERFOOTERIND":
-				if (text.equals("1")) {
-					addHeaderToRepository();
-				} else {
-					addFooterToRepository();
-				}
-				break;
+			case "DATEFORMAT":
+			itemText = text;
+			//rh.setd(itemText);
+			break;
 			default:
 				break;
 		}
@@ -95,16 +114,16 @@ public class ViewHeaderFooterParser extends BaseParser {
 		rf.setRow((short) row);
 		rf.setFooterLength((short) length);
 		rf.setText(itemText != null ? itemText : "");
-		Repository.getViews().get(viewid).addReportFooter(rf);
+		viewNode.addReportFooter(rf);
 	}
 
 	private void addHeaderToRepository() {
 		ReportHeader rh = new ReportHeader();
 		rh.setComponentId(id);
 		if (functonCode.length() > 0) {
-			rh.setFunction(ReportFunction.fromdbcode(functonCode));
+			rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(functonCode)));
 		} else {
-			rh.setFunction(ReportFunction.INVALID);
+			rh.setFunction(0);
 		}
 		if (justify.length() > 0) {
 			rh.setJustification(JustifyId.fromdbcode(justify));
@@ -119,6 +138,10 @@ public class ViewHeaderFooterParser extends BaseParser {
 		} else {
 			rh.setText(itemText);
 		}
-		Repository.getViews().get(viewid).addReportHeader(rh);
+		viewNode.addReportHeader(rh);
+	}
+
+	public void setViewNode(ViewNode viewNode) {
+		this.viewNode = viewNode;
 	}
 }

@@ -111,9 +111,9 @@ public class ViewHeaderFooterParser extends RecordParser {
 		ReportHeader rh = new ReportHeader();
 		rh.setComponentId(id);
 		if (functonCode.length() > 0) {
-			rh.setFunction(ReportFunction.fromdbcode(functonCode));
+			rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(functonCode)));
 		} else {
-			rh.setFunction(ReportFunction.INVALID);
+			rh.setFunction(0);
 		}
 		if (justify.length() > 0) {
 			rh.setJustification(JustifyId.fromdbcode(justify));

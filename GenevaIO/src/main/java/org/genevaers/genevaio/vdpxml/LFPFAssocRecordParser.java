@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -35,7 +38,7 @@ public class LFPFAssocRecordParser extends BaseParser {
 	private int assocId;
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name) {
 			case "LFPFASSOCID":
 				assocId = Integer.parseInt(text);

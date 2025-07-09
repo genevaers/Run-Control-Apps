@@ -18,8 +18,6 @@ package ComponentGenerator.model.segments.components;
  */
 
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -30,20 +28,14 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.flogger.FluentLogger;
 
-import ComponentGenerator.model.ComponentWalker;
 import ComponentGenerator.model.generators.GeneratorBase;
-import ComponentGenerator.model.segments.ModelSegment;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 public class ComponentGenerator extends GeneratorBase{
 
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private ComponentSegment definition;
-	private ComponentWalker compWalker = new ComponentWalker();
-
-    public void writeOutputs(ComponentSegment compModel) {
+	public void writeOutputs(ComponentSegment compModel) {
 		logger.atConfig().log("Generate Java Component items");
 		definition = compModel;
 		Iterator<ComponentItem> compi = compModel.getComponents().iterator();
@@ -60,21 +52,13 @@ public class ComponentGenerator extends GeneratorBase{
 		logger.atInfo().log(" ");
     }
 
-    private void writeDocumentation(String cr, Map<String, Object> nodeMap) {
+	private void writeDocumentation(String cr, Map<String, Object> nodeMap) {
 		Template template;
-		try {
-			template = getTemplate("compDocumentation.ftl");
-			Path to = Paths.get("docs");
-			to = to.resolve("Java"+cr.replace(" ", "") + ".md");
-			generateTemplatedOutput(template, nodeMap, to);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+		template = getTemplate("compDocumentation.ftl");
+		Path to = Paths.get("docs");
+		to = to.resolve("Java" + cr.replace(" ", "") + ".md");
+		generateTemplatedOutput(template, nodeMap, to);
+	}
 
     private Path getPathToWriteTo(Map<String, Object> nodeMap) {
 		Path trg = Paths.get("docs/ltmac");

@@ -33,6 +33,11 @@ public class IntegerMember extends Member {
     private static final String TYPE = "int";
 
     @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    @Override
     public String getFieldEntry() {
         return defaultFieldEntryForType(TYPE);
     }

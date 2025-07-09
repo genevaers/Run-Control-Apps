@@ -1,5 +1,7 @@
 package org.genevaers.compilers.extract.emitters.rules;
 
+import org.genevaers.compilers.extract.astnodes.ASTFactory;
+
 /*
  * Copyright Contributors to the GenevaERS Project.
 								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
@@ -32,20 +34,22 @@ public class Truncation extends Rule{
 
     @Override
     public RuleResult apply(final ExtractBaseAST op1, final ExtractBaseAST op2) {
+        RuleResult result = RuleResult.RULE_PASSED;
         final ViewColumn vc = ((ColumnAST)op1).getViewColumn();
         FormattedASTNode frhs = (FormattedASTNode) op2;
-        int rhsDigits = frhs.getMaxNumberOfDigits();
-        if( rhsDigits > 0 && rhsDigits > ((ColumnAST)op1).getMaxNumberOfDigits()) {
-            if(op2.getType() == Type.NUMATOM) {
-                CompilerMessage err = ExtractBaseAST.makeCompilerMessage(String.format("Truncation error assigning to column %d from %s.", vc.getColumnNumber(), frhs.getMessageName()));
-                Repository.addErrorMessage(err);
-            } else {
-                CompilerMessage warn = ExtractBaseAST.makeCompilerMessage(String.format("Possible truncation assigning to column %d from %s.", vc.getColumnNumber(), frhs.getMessageName()));
-                Repository.addWarningMessage(warn);
+        if(frhs.getType() != ASTFactory.Type.BETWEENFUNC) {
+            int rhsDigits = frhs.getMaxNumberOfDigits();
+            if( rhsDigits > 0 && rhsDigits > ((ColumnAST)op1).getMaxNumberOfDigits()) {
+                if(op2.getType() == Type.NUMATOM) {
+                    CompilerMessage err = ExtractBaseAST.makeCompilerMessage(String.format("Truncation error assigning to column %d from %s.", vc.getColumnNumber(), frhs.getMessageName()));
+                    Repository.addErrorMessage(err);
+                } else {
+                    CompilerMessage warn = ExtractBaseAST.makeCompilerMessage(String.format("Possible truncation assigning to column %d from %s.", vc.getColumnNumber(), frhs.getMessageName()));
+                    Repository.addWarningMessage(warn);
+                }
+                result = RuleResult.RULE_WARNING;
             }
-            return RuleResult.RULE_WARNING;
-        } else {
-            return RuleResult.RULE_PASSED;
-        }
+         }
+        return result;
     }
 }

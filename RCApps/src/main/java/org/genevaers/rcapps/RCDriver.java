@@ -133,6 +133,7 @@ public class RCDriver {
             fw.write(GersConfigration.JLT_REPORT + "=Y\n");
             fw.write(GersConfigration.VDP_REPORT + "=Y\n");
             fw.write(GersConfigration.REPORT_FORMAT + "=" + rcaTextType + "\n");
+            fw.write(GersConfigration.COVERAGE + "=Y\n");
             fw.write(GersConfigration.RCA_REPORT + "=Y\n");
             fw.write(GersConfigration.LOG_LEVEL + "=STANDARD\n");
             fw.close();

@@ -44,7 +44,7 @@ public class GersEnvironment {
 		locroot = locroot.replace("\\", "/");
 
 		getEnvVarOrDefault("LOCALROOT", locroot);
-		getEnvVarOrDefault("GERS_TEST_SPEC_LIST", "Basespeclist.yaml");
+		getEnvVarOrDefault("GERS_TEST_SPEC_LIST", "JBasespeclistV4.yaml");
 		getEnvVarOrDefault("RUNTESTS", "N");
 		getEnvVarOrDefault("CLEARLOCAL", "N");
 		getEnvVarOrDefault("CLEARJUNIT", "Y");
@@ -75,12 +75,20 @@ public class GersEnvironment {
 		}
 		getEnvVarOrDefault("VDPXSD", pmhlq + ".GVBXSD(GVBSVDP)");
 		getEnvVarOrDefault("GERS_TEST_HLQ", "");
+		getEnvVarOrDefault("GERS_JOB_ACCT_INFO", "ACCT");
+		getEnvVarOrDefault("GERS_JOB_CLASS", "A");
+		getEnvVarOrDefault("GERS_MSG_LEVEL", "(1,1)");
+		getEnvVarOrDefault("GERS_MSG_CLASS", "H");
+		getEnvVarOrDefault("GERS_JAVA_HOME", "/Java/J17.0_64");
+		getEnvVarOrDefault("GERS_JVM_PROC_LIB", "AJV.V11R0M0.PROCLIB");
+		getEnvVarOrDefault("GERS_JZOS_LOAD_LIB", "AJV.V11R0M0.SIEALNKE");
 		getEnvVarOrDefault("GERS_DB2_SUBSYSTEM", "DM12");
 		getEnvVarOrDefault("GERS_DB2_LOAD_LIB", "DSN.V12R1M0.SDSNLOAD");
 		getEnvVarOrDefault("GERS_DB2_EXIT_LIB", "DSN.V12R1M0.SDSNEXIT");
 		getEnvVarOrDefault("GERS_DB2_RUN_LIB", "DSN121.RUNLIB.LOAD");
 		getEnvVarOrDefault("GERS_DB2_UTILITY", "DSNTIA12");
 		getEnvVarOrDefault("GERS_GIT_REPO_DIR", "");
+		getEnvVarOrDefault("GERS_RCA_JAR_DIR", "");
 		getEnvVarOrDefault("RUNOS", "ZOS");
 		getEnvVarOrDefault("TSO_SERVER", "sp13.svl.ibm.com");
 		getEnvVarOrDefault("OUTDIR", "out");
@@ -102,7 +110,7 @@ public class GersEnvironment {
 	}
 
 	private static String getEnvVarOrDefault(String env, String def) {
-		String value = System.getenv(env);
+        String value = System.getenv(env);
 		if (value == null) {
 			value = def;
 		}
@@ -127,6 +135,10 @@ public class GersEnvironment {
 			String msg = String.format("%s=%s%n", entry.getKey(), value);
 			System.out.print(msg);
 		}
+	}
+
+	public static boolean isWindows() {
+		return get("OSNAME").startsWith("Win");
 	}
 	
 	public static Map<String, String> getEnvironmentVariables() {

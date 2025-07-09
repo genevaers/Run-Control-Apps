@@ -12,6 +12,7 @@ import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.format.FormatAST2Dot;
 import org.genevaers.compilers.format.astnodes.FormatBaseAST;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
+import org.genevaers.genevaio.wbxml.RecordParser;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.calculationstack.CalcStack;
 import org.genevaers.repository.calculationstack.CalcStackEntry;
@@ -56,6 +57,7 @@ class RunFormatCompilerTest extends RunCompilerBase {
         Repository.clearAndInitialise();
         FormatBaseAST.resetStack();
         Repository.setGenerationTime(Calendar.getInstance().getTime());
+        RecordParser.clearAndInitialise();
         ExtractBaseAST.setCurrentColumnNumber((short)0);
         LtFactoryHolder.getLtFunctionCodeFactory().clearAccumulatorMap();
         java.nio.file.Path target = Paths.get("target/test-logs/");

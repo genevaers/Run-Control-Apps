@@ -81,8 +81,8 @@ public class WriteASTNode extends ExtractBaseAST implements EmittableASTNode {
 
         LogicTableWR wr = new LogicTableWR();
         wr.setRecordType(LtRecordType.WR);
+        ViewNode view = Repository.getViews().get(vs.getViewId());
         if(srcNode != null) {
-            ViewNode view = Repository.getViews().get(vs.getViewId());
             if(view.isFormat() && view.isExtractSummarized()) {
                 wr.setFunctionCode("WRSU");
                 wr.setExtrSumRecCnt(view.getViewDefinition().getMaxExtractSummaryRecords());
@@ -91,7 +91,11 @@ public class WriteASTNode extends ExtractBaseAST implements EmittableASTNode {
             }
         } else {
             //What are the rules for default? Always create a Source node and have it manage it?
-            wr.setFunctionCode("WRDT");
+            if(view.isFormat()) {
+                wr.setFunctionCode("WRXT");
+            } else {         
+                wr.setFunctionCode("WRDT");
+            }
         }
         wr.setViewId(vs.getViewId());
 

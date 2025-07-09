@@ -20,10 +20,12 @@ package ComponentGenerator.model.segments.record;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ComponentGenerator.model.segments.ModelSegment;
 
+/**
+ * Base class for Record segments.
+ * <p>VDP and logic table records are the same structure. A list of fields.</p>
+ */
 public abstract class RecordSegment extends ModelSegment {
 
     protected List<RecordItem> records;

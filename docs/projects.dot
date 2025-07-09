@@ -1,7 +1,7 @@
 digraph FrontendProjects {
     rankdir=TB
 //Nodes
-graph [label="Run Control Apps\n\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22 ranksep="2 equally" compound=true ];
+graph [label="Run Control Apps Package Hierarchy\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22 ranksep="2 equally" compound=true ];
 labeljust=center;
 
 // Applications
@@ -53,6 +53,7 @@ subgraph cluster_gio { label="GenevaIO" node [shape=plaintext]
     subgraph cluster_giow { label="Writers" node [shape=plaintext]
          HTML[label="HTML Writer" shape=rect style=filled color="lightblue1" ]
         DOT[label="DOT Writer" shape=rect style=filled color="lightblue1" ]
+        VXW[label="VDP XML Writer" shape=rect style=filled color="lightblue1" ]
     }
 
 }
@@ -62,7 +63,7 @@ subgraph cluster_repo { label="Repository" margin=18 node [shape=plaintext]
     REPOM[label="Metadata"  shape=rect style=filled color="lightblue1" ]
 }
 
-EPF -> WB [lhead=cluster_gior, ltail=cluster_rcg]
+EPF -> WB [lhead=cluster_gior, ltail=cluster_comp]
 FA -> VDPR [lhead=cluster_giovdp, ltail=cluster_fa]
 FA -> HTML [lhead=cluster_giow, ltail=cluster_fa]
 SPO -> VDPR [lhead=cluster_giovdp, ltail=cluster_rcg]
@@ -85,8 +86,8 @@ CI -> EPF
 DB2 -> REPOM [lhead=cluster_repo]
 
 
-EPF  -> { REPOC} [lhead=cluster_repo, ltail=cluster_rcg]
-FPF  -> LTW [lhead=cluster_giolt, ltail=cluster_rcg]
+EPF  -> { REPOC} [lhead=cluster_repo, ltail=cluster_comp]
+FPF  -> LTW [lhead=cluster_giolt, ltail=cluster_comp]
 
 
 REPOV -> REPOM [lhead=cluster_repo, ltail=cluster_giovdp]

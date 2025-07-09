@@ -34,8 +34,9 @@ public class CFPAEmitter extends ComparisonEmitter{
         CalculationAST calcNode = ((CalculationAST) rhs);
         calcNode.emit();
         LtFuncCodeFactory ltFact = LtFactoryHolder.getLtFunctionCodeFactory();
-        LogicTableNameF1 cfap = (LogicTableNameF1) ltFact.getCFPA(calcNode.getAccName(), ((FieldReferenceAST) lhs).getRef(), op);
-        return cfap;
+        LogicTableNameF1 cfpa = (LogicTableNameF1) ltFact.getCFPA(calcNode.getAccName(), ((FieldReferenceAST) lhs).getRef(), op);
+        cfpa.getArg().setLogfileId(ExtractBaseAST.getLtEmitter().getFileId());
+        return cfpa;
     }
 
 }

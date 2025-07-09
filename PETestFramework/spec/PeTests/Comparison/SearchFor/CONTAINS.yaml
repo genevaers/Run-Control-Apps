@@ -1,0 +1,57 @@
+---
+name: "CMCONT"
+title: "Contains for cases"
+description: "SFxx functions with SUBSTR"
+category: "PeTests/Comparison/SearchFor"
+cq: ""
+note: ""
+tests:
+- name: "CONTSUB"
+  header: "CONTAINS with SUBSTR SFxx"
+  description: "Contains (SFxx) with SUBSTR, LEFT, RIGHT "
+  source: "WBXML"
+  xmlfiles:
+  - name: "ContainsWithSubstr[1613].xml"
+  eventfiles:
+  - ddname: "CONCAT"
+    filename: "STRING"
+  reffiles:
+  - ddname: "CONTARG"
+    filename: "STRINGL"
+  extractfiles:
+  - ddname: "CMOUT01"
+    space: "TRK"
+    primary: "1"
+    secondary: "1"
+    recfm: "FB"
+    lrecl: "64"
+- name: "CONTCOL"
+  header: "CONTAINS SFxx with COL.n"
+  description: "Contains (SFxx) with COL.n "
+  source: "WBXML"
+  xmlfiles:
+  - name: "ContainsWithSubstrCOL[12249].xml"
+  eventfiles:
+  - ddname: "CONTAINS"
+    filename: "CONTAINS"
+  reffiles:
+  - ddname: "CONTAINL"
+    filename: "CONTAINL"
+  extractfiles:
+  - ddname: "EXTR001"
+    space: "TRK"
+    primary: "1"
+    secondary: "10"
+    recfm: "VB"
+    lrecl: "256"
+    comparable: "true"
+    workfile: "1"  
+  formatfiles:
+  - ddname: "F0012249"
+    space: "TRK"
+    primary: "1"
+    secondary: "1"
+    recfm: "FB"
+    lrecl: "100"
+    workfile: "1"
+ 

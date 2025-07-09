@@ -23,6 +23,11 @@ public class ByteMember extends Member{
     private static final String TYPE = "byte";
 
     @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    @Override
     public String getFieldEntry() {
         return defaultFieldEntryForType(TYPE);
     }

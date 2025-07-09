@@ -88,6 +88,10 @@ public class LookupPathAST extends FormattedASTNode implements EmittableASTNode{
         this.symbols = symbols;
     }
 
+    public SymbolList getSymbols() {
+        return symbols;
+    }
+
     public void setEffDateValue(EffDateValue effDateValue) {
         this.effDateValue = effDateValue;
     }

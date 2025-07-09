@@ -71,4 +71,9 @@ public class ByteField extends Field {
         return defaultNumericNodeEntry(prefix, arrayValue);
     }
 
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
 }

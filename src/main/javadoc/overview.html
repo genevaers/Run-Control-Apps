@@ -1,0 +1,82 @@
+<!--
+Copyright Contributors to the GenevaERS Project.
+								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
+								2008
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE>Run Control Apps Overview</TITLE>
+  </HEAD>
+  <BODY>
+    <h1>An overview of the Run Control Apps</h1>
+    <p>The Run Control Apps implement the first part of the GenevaERS Performance Engine workflow.</p>
+    <p>It's main function is to read the definition of the data transfers required and generate the Run Control files to manage the Performance Engine data flow.</p>
+    <img alt="Flow" src="../../../RunControlGenerator/docs/RCFileFlow.gv.svg">
+
+    <h2>Data Flows</h2>
+    <p>The Run Control Apps process Run Control Definition data in one or two phases.</p>
+    <p>The required phases and input sources are defined in an RCA Parm file.</p>
+
+    <h3>Phase 1</h3>
+    <p>The data defining the required RC Files is read directly from a database, or read from an XML file definition, and generates the Run Control (RC) Files.</p>
+    
+    <h3>Phase 2</h3>
+    <p>The set of Run Control (RC) Files is read and processed to write the Analysis Reports.</p>
+    <p>Only Phase 1 is required for the Performance Engine workflow.</p>
+    <p>Phase 2 may be run on its own to produce an analysis of a previously generated set of RC Files.</p>
+
+    <h3>Conclusion</h3>
+    <p>On completion of the one or two phases a report file detailing what was done is written. A more detailed Log file is also generated for debugging purposes.</p>
+
+
+    <h2>Main Components and Artifacts</h2>
+    <h3>Classes</h3>
+    <p>{@link org.genevaers.rcapps.Runner} is the <i>main</i> class of the RCApps. It reads the RCAPARM using the {@link org.genevaers.utilities.ParmReader} and executes the defined phases.</p>
+    <p>The {@link org.genevaers.runcontrolgenerator.RunControlGenerator} and {@link org.genevaers.runcontrolanalyser.RunControlAnalyser} provide the main functions.</p>
+
+    <h4>Workbench</h4>
+    <p>The Workbench is an Eclipse based application to manage the contents of the Database. See @see https://github.com/genevaers/Workbench</p>
+    <p>The Workbench can export selected contents in the form of a WB XML file. Which can later be used as input to the RunControlGenerator.</p>
+    
+    <h4>Database</h4>
+    <p>The database, either Db2 or Posgress, is used to store the Run Control Definition data.</p>
+    <p>The {@link org.genevaers.genevaio.dbreader.DBReader} class provides the mechanism to read the data directly from the database.</p>
+    
+    <h3>Legacy VDP XML flow</h3>
+    <p>The Run Control Apps also supports a legacy data flow base on VDP XML files.</p>
+    <p>The files may be both generated and read by the {@link org.genevaers.runcontrolgenerator.RunControlGenerator}.</p>
+
+    <h1>Project Hierarchy</h1>
+    <p>The code for the Run Control Apps is contained in a series of projects.</p>
+    <p>The diagram below attempts to capture the hierarchy.</p>
+    <img alt="Hierarchy" src="../../../docs/packages.svg">
+    <h2>Component Generator</h2>
+    <p>Note we use a Component Generator in order to avoid repeated manual maintenance of the records and components of the system.</p>
+    <p>It generates the classes and enums that model the Run Control Data used in the GenevaIO package and the Repository.</p>
+    <p>More details can be found in {@link ComponentGenerator}.</p>
+    <h2>Package Summary</h2>
+    <p>The following base level packages provide the framework for the RC Apps</p>
+    <p>{@link org.genevaers.rcapps} holds the main function and is the starting point for a run.</p>
+    <p>{@link org.genevaers.runcontrolgenerator} processes the Run Control Data definitions.</p>
+    <p>{@link org.genevaers.runcontrolanalyser} processes the Run Control Files.</p>
+    <p>{@link org.genevaers.compilers.extract} and {@link org.genevaers.compilers.format} a major part of the processing is in the compilation of logic text defining how data is transformed and moved.</p>
+    <p>{@link org.genevaers.genevaio.dbreader}, {@link org.genevaers.genevaio.vdpfile} and {@link org.genevaers.genevaio.ltfile} packages to hold the classes that read and write the RC data.</p>
+    <p>{@link org.genevaers.repository} package to keep an in memory store of the data required.</p>
+
+  </BODY>
+</HTML>

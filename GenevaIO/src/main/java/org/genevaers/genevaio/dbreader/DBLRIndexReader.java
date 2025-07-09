@@ -19,7 +19,6 @@ import java.sql.Connection;
  * under the License.
  */
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -27,26 +26,28 @@ import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRIndex;
 import org.genevaers.repository.components.LogicalRecord;
 
-public class DBLRIndexReader extends DBReaderBase{
+public class DBLRIndexReader extends DBReaderBase {
 
-    private int lrid;
-    private boolean effectiveDatesAdded = false;
+    private int lastlrid;
+    private boolean effectiveDatesMade = false;
+    private LRIndex efsi;
+    private LRIndex efei;
 
     @Override
     public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
         String query = "select distinct "
-            + "i.lrindexid, "
-            + "i.logrecid, "
-            + "f.lrindexfldid, "
-            + "f.fldseqnbr, "
-            + "f.lrfieldid, "
-            + "effdatestartfldid, "
-            + "effdateendfldid "
-            + "from " + params.getSchema() + ".lrindex i "
-            + "inner join  " + params.getSchema() + ".lrindexfld f "
-            + "on(f.environid = i.environid and f.lrindexid = i.lrindexid) "
-            + "where i.ENVIRONID = ? and i.logrecid in(" + getPlaceholders(requiredLRs.size()) + ") "
-            + "order by logrecid;";
+                + "i.lrindexid, "
+                + "i.logrecid, "
+                + "f.lrindexfldid, "
+                + "f.fldseqnbr, "
+                + "f.lrfieldid, "
+                + "effdatestartfldid, "
+                + "effdateendfldid "
+                + "from " + params.getSchema() + ".lrindex i "
+                + "inner join  " + params.getSchema() + ".lrindexfld f "
+                + "on(f.environid = i.environid and f.lrindexid = i.lrindexid) "
+                + "where i.ENVIRONID = ? and i.logrecid in(" + getPlaceholders(requiredLRs.size()) + ") "
+                + "order by logrecid;";
         executeAndWriteToRepo(dbConnection, query, params, requiredLRs);
         return hasErrors;
     }
@@ -57,48 +58,57 @@ public class DBLRIndexReader extends DBReaderBase{
         int id = rs.getInt("LRINDEXID");
         lri.setComponentId(id);
         int rslrid = rs.getInt("LOGRECID");
-        if(rslrid != lrid) {
-            lrid = rslrid;
-            effectiveDatesAdded = false;
+        if(lastlrid != rslrid) {
+            lastlrid = rslrid;
+            effectiveDatesMade = false;
         }
+        if (effectiveDatesMade == false) {
+            changingLRCheckAndAddEffectiveDateIndexes(rs);
+        }
+
         lri.setLrId(rs.getInt("LOGRECID"));
         lri.setKeyNumber(rs.getShort("FLDSEQNBR"));
         lri.setEffectiveDateStart(false);
         lri.setEffectiveDateEnd(false);
-        lri.setName("PK");
+        lri.setName("Primary");
         lri.setFieldID(rs.getInt("LRFIELDID"));
         Repository.addLRIndex(lri);
-        if(!effectiveDatesAdded) {
-            LogicalRecord lr = Repository.getLogicalRecords().get(lrid);
-            if(rs.getInt("EFFDATESTARTFLDID") > 0) {
-                LRIndex efsi = new LRIndex();
-                efsi.setComponentId(id);
-                efsi.setLrId(rs.getInt("LOGRECID"));
-                efsi.setKeyNumber((short)(lr.getValuesOfIndexBySeq().size() + 1));
-                efsi.setEffectiveDateEnd(false);
-                efsi.setFieldID(rs.getInt("EFFDATESTARTFLDID"));
-                efsi.setEffectiveDateStart(true);
-                efsi.setName("Starting Effective Date");
-                Repository.addLRIndex(efsi);
-                effectiveDatesAdded = true;
-            }
-            if(rs.getInt("EFFDATEENDFLDID") > 0) {
-                LRIndex efei = new LRIndex();
-                efei.setComponentId(id);
-                efei.setLrId(rs.getInt("LOGRECID"));
-                efei.setKeyNumber((short)(lr.getValuesOfIndexBySeq().size() + 1));
-                efei.setEffectiveDateStart(false);
-                efei.setFieldID(rs.getInt("EFFDATEENDFLDID"));
-                efei.setEffectiveDateEnd(true);
-                efei.setName("End Effective Date");
-                Repository.addLRIndex(efei);
-                effectiveDatesAdded = true;
-            }
+    }
+
+    private void changingLRCheckAndAddEffectiveDateIndexes(ResultSet rs) throws SQLException {
+        int id = rs.getInt("LRINDEXID");
+        int lrid = rs.getInt("LOGRECID");
+        LogicalRecord lr = Repository.getLogicalRecords().get(lrid);
+        Integer efstart = rs.getInt("effdatestartfldid");
+        if (efstart > 0) {
+            efsi = new LRIndex();
+            efsi.setComponentId(id);
+            efsi.setLrId(rs.getInt("LOGRECID"));
+            efsi.setKeyNumber((short) (lr.getValuesOfIndexBySeq().size() + 1));
+            efsi.setEffectiveDateEnd(false);
+            efsi.setFieldID(rs.getInt("EFFDATESTARTFLDID"));
+            efsi.setEffectiveDateStart(true);
+            efsi.setName("Starting Effective Date");
+            effectiveDatesMade = true;
+            effdateStarts.put(id, efsi);
+        }
+        if (rs.getInt("EFFDATEENDFLDID") > 0) {
+            efei = new LRIndex();
+            efei.setComponentId(id);
+            efei.setLrId(rs.getInt("LOGRECID"));
+            efei.setKeyNumber((short) (lr.getValuesOfIndexBySeq().size() + 1));
+            efei.setEffectiveDateStart(false);
+            efei.setFieldID(rs.getInt("EFFDATEENDFLDID"));
+            efei.setEffectiveDateEnd(true);
+            efei.setName("End Effective Date");
+            effdateEnds.put(id, efei);
+            effectiveDatesMade = true;
         }
     }
 
-    public void addLRToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params, int environmentID, int sourceLR) {
-                String query = "select distinct "
+    public void addLRToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params, int environmentID,
+            int sourceLR) {
+        String query = "select distinct "
                 + "i.lrindexid, "
                 + "i.logrecid, "
                 + "f.lrindexfldid, "
@@ -110,7 +120,7 @@ public class DBLRIndexReader extends DBReaderBase{
                 + "inner join  " + params.getSchema() + ".lrindexfld f "
                 + "on(f.environid = i.environid and f.lrindexid = i.lrindexid) "
                 + "where i.ENVIRONID = ? and i.logrecid = ?; ";
-                executeAndWriteToRepo(dbConnection, query, params, sourceLR);
-            }
-    
+        executeAndWriteToRepo(dbConnection, query, params, sourceLR);
+    }
+
 }

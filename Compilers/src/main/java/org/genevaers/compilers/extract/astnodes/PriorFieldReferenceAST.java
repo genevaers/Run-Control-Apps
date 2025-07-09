@@ -144,4 +144,9 @@ public class PriorFieldReferenceAST extends FieldReferenceAST{
         }
     }
 
+    @Override
+    public String getMessageName() {
+        return "PRIOR({" + ref.getName() + "})";
+    }
+
 }

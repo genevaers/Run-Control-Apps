@@ -204,7 +204,8 @@ public class TestHelper {
 			org.apache.commons.io.FileUtils.cleanDirectory(wbxmliPath.toFile());
 			File base = resoucesPath.resolve(xml).toFile();
 			org.apache.commons.io.FileUtils.copyFileToDirectory(base, wbxmliPath.toFile());
-			writeToParm(GersConfigration.INPUT_TYPE + "=WBXML\n"
+			writeToParm(GersConfigration.GENERATE + "=Y\n" 
+					+ GersConfigration.INPUT_TYPE + "=WBXML\n"
 					+ GersConfigration.WB_XML_FILES_SOURCE + "=" + wbxmliPath.toString() + "\n"
 					+ GersConfigration.DOT_JLT + "=Y" + "\n");
 			ParmReader pr = new ParmReader();

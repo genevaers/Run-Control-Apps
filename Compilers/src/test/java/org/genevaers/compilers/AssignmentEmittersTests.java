@@ -84,7 +84,7 @@ public class AssignmentEmittersTests {
         fld.setDatatype(DataType.PACKED);
         fldast.setRef(fld);
 		AssignmentRulesChecker dc = AssignmentRulesCheckerFactory.getChecker(cast, fldast);
-        assertTrue(dc instanceof DateChecker);
+        assertTrue(dc instanceof FlipDataChecker);
 	}
 
     @Test

@@ -10,15 +10,19 @@ fields:
   component_field: none
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: prefix.sequenceNbr
   type: mappingOnly
+  existing_java_type: sequence_nbr
   component_field: sequenceNumber
 - name: prefix.inputFileId
   type: mappingOnly
+  existing_java_type: input_file_id
   component_field: sourceLFID
 - name: prefix.viewId
   type: mappingOnly
+  existing_java_type: view_id
   component_field: viewId
 - name: view_src_lr_id
   type: integer

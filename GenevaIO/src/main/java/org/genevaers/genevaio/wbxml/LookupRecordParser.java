@@ -43,6 +43,7 @@ public class LookupRecordParser extends RecordParser {
 					lookup = new LookupPath();
 					componentID = Integer.parseInt(text);
 					lookup.setID(componentID);
+					lookup.setStatus(1);
 					break;
 				case "NAME":
 					componentName = text;

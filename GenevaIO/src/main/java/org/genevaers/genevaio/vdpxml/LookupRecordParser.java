@@ -1,7 +1,9 @@
 package org.genevaers.genevaio.vdpxml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -50,118 +52,34 @@ public class LookupRecordParser extends BaseParser {
 	private LogicalRecord targetLR;
 	private int srcLrId;
 
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "STEP":
-				stepNumber = Integer.parseInt(attributes.getValue("Number"));
-				source = true;
-				break;
-			case "SOURCE":
-				source = true;
-				break;
-			case "LOGICALRECORDREF":
-				if(source) {
-					lookupStep = new LookupPathStep();
-					lookupStep.setStepNum(stepNumber);
-					srcLrId = Integer.parseInt(attributes.getValue("ID"));
-					lookupStep.setSourceLRid(srcLrId);
-					lookup.addStep(lookupStep);
-				} else {
-					targLrId = Integer.parseInt(attributes.getValue("ID"));
-					lookupStep.setTargetLRid(targLrId);
-					lookup.setTargetLRid(targLrId);
-				}
-				break;
-			case "KEYFIELD":
-				seqNum = Integer.parseInt(attributes.getValue("seq"));
-				lookupKey = new LookupPathKey();
-				lookupKey.setStepNumber(stepNumber);
-				lookupKey.setComponentId(lookup.getID());
-				lookupKey.setDateTimeFormat(DateCode.NONE);
-				lookupKey.setJustification(JustifyId.LEFT);
-				lookupKey.setKeyNumber((short)seqNum);
-				lookupStep.addKey(lookupKey);
-				break;
-			case "FIELDREF":
-				lookupKey.setFieldId(Integer.parseInt(attributes.getValue("ID")));
-				break;
-			case "LOGICALFILEREF":
-				if(source == false) {
-					int lfid = Integer.parseInt(attributes.getValue("ID"));
-					lookupStep.setTargetLFid(lfid);
-					Iterator<LookupPathKey> ki = lookupStep.getKeyIterator();
-					while (ki.hasNext()) {
-						LookupPathKey k = ki.next();
-						k.setTargetlfid(lfid);
-						k.setTargetLrId(targLrId);
-						k.setSourceLrId(srcLrId);
-					}
-				}
-				break;
-			case "TARGET":
-				source = false;
-				break;
-			case "EXITREF":
-				targetLR = Repository.getLogicalRecords().get(targLrId);
-				targetLR.setLookupExitID(Integer.parseInt(attributes.getValue("ID")));
-				break;
-			default:
-				break;
-		}
-	}		
+	private LookupStepParser stepParser;
+
+	public LookupRecordParser() {
+		sectionName = "Lookups";
+	}
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) throws XMLStreamException {
 		switch (name.toUpperCase()) {
+			case "LOOKUP":
+			componentID = Integer.parseInt(attributes.get("ID"));
+			break;
 			case "NAME":
 				lookup = new LookupPath();
 				lookup.setID(componentID);
+				lookup.setStatus(1);
 				componentName = text;
 				lookup.setName(componentName);
 				Repository.getLookups().add(lookup, componentID, text);
 				break;
-			case "DATATYPE":
-				lookupKey.setDatatype(DataType.fromdbcode(text.trim()));
-				break;
-			case "SIGNEDDATA":
-				lookupKey.setSigned(text.equals("1") ? true : false);
-				break;
-			case "LENGTH":
-				short s = (short) Integer.parseInt(text);
-				lookupKey.setFieldLength(s);
-				if(lookupKey.getFieldId() == 0) {
-					lookupKey.setValueLength(s);
-				}
-				break;
-			case "DECIMALPLACES":
-				s = (short) Integer.parseInt(text);
-				lookupKey.setDecimalCount(s);
-				break;
-			case "FLDCONTENTCD":
-				lookupKey.setDateTimeFormat(DateCode.fromdbcode(text));
-				break;
-			case "ROUNDING":
-				s = (short) Integer.parseInt(text);
-				lookupKey.setRounding(s);
-				break;
-			case "JUSTIFYCD":
-				lookupKey.setJustification(JustifyId.fromdbcode(text));
-				break;
-			case "MASK":
-				lookupKey.setMask(text);
-				break;
-			case "SYMBOLICNAME":
-				lookupKey.setSymbolicName(text);
-				break;
-			case "SYMBOLICDEFAULT":
-			case "VALUE":
-			case "CONSTANT":
-				lookupKey.setValue(text);
-				break;
-			case "PARAMETER":
-				targetLR.setLookupExitParams(text);
-				break;
+			case "STEPS":
+				logger.atFine().log("Steps");
+				LookupStepParser lksp = new LookupStepParser();
+				lksp.setLookupID(componentID);
+				lksp.setLookup(lookup);
+				lksp.parse(reader);
+				logger.atFine().log("Steps parsing completed for LR " + lookup.getName());
+			break;
 			case "CREATEDTIMESTAMP":
 				created = text;
 				break;

@@ -76,8 +76,14 @@ public class ArgHelper {
         } else {
             //Strip leading 0s for numeric data types
             //This should be a more general function
-            if(key.getDatatype() != DataType.ALPHANUMERIC && key.getValue().startsWith("0")) {
-                arg.setValue(new Cookie(StringUtils.stripStart(key.getValue(), "0")));
+            String kv = key.getValue();
+            if(key.getDatatype() != DataType.ALPHANUMERIC && kv.startsWith("0")) {
+                String stripped = StringUtils.stripStart(key.getValue(), "0");
+                if(stripped.length() == 0) {
+                    arg.setValue(new Cookie("0"));
+                } else {
+                    arg.setValue(new Cookie(stripped));
+                }
             } else {
                 arg.setValue(new Cookie(key.getValue()));
             }

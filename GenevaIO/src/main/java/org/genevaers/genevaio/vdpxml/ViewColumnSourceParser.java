@@ -1,5 +1,6 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,6 +9,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.ViewColumn;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -27,6 +29,7 @@ import org.genevaers.repository.Repository;
  */
 
 import org.genevaers.repository.components.ViewColumnSource;
+import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.ColumnSourceType;
 import org.xml.sax.Attributes;
@@ -34,86 +37,79 @@ import org.xml.sax.Attributes;
 public class ViewColumnSourceParser extends BaseParser {
 
 	private ViewColumnSource vcs;
-	private int viewID;
-	private int viewSourceID;
 	private int colID;
-
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "COLUMNREF":
-				vcs = new ViewColumnSource();
-				vcs.setComponentId(componentID);
-				colID = Integer.parseInt(attributes.getValue("ID"));
-				vcs.setColumnID(colID);
-				vcs.setViewId(viewID);
-				vcs.setViewSourceId(viewSourceID);
-				Repository.getViews().get(viewID).addViewColumnSource(vcs);
-				break;
-			case "FIELDREF":
-				vcs.setViewSrcLrFieldId(Integer.parseInt(attributes.getValue("ID")));
-				break;
-			case "LOOKUPREF":
-				vcs.setSrcJoinId((Integer.parseInt(attributes.getValue("ID"))));
-				break;
-			default:
-				break;
-		}
-	}		
+	private ViewNode viewNode;
+		private ViewSource viewSource;
 	
-	@Override
-	public void addElement(String name, String text) {
-		switch (name.toUpperCase()) {
-			case "LOGIC":
-				//have to append by getting what is there first
-				String logic = vcs.getLogicText();
-				logic += text;
-				vcs.setLogicText(logic);
-				break;
-			case "VIEWSOURCEID":
-				vcs.setViewSourceId(Integer.parseInt(text));
-				break;
-			case "VIEWCOLUMNID":
-				vcs.setColumnID(Integer.parseInt(text));
-				break;
-			case "SOURCETYPE":
-				vcs.setSourceType(ColumnSourceType.values()[Integer.parseInt(text.trim())]);
-				break;
-			case "VALUE":
-				vcs.setSrcValue(text);
-				vcs.setValueLength(text.length());
-				break;
-			case "LOOKUPID":
-				vcs.setSrcJoinId(Integer.parseInt(text));
-				break;
-			case "LRFIELDID":
-				vcs.setViewSrcLrFieldId(Integer.parseInt(text));
-				break;
-			case "EXTRACTCALCLOGIC":
-				vcs.setLogicText(removeBRLineEndings(text));
-				break;
-			case "SORTTITLELOOKUPID":
-				vcs.setSortTitleLookupId(Integer.parseInt(text));
-				break;
-			case "SORTTITLELRFIELDID":
-				vcs.setSortTitleFieldId(Integer.parseInt(text));
-				break;
-			default:
-				break;
+		public ViewColumnSourceParser() {
+			sectionName = "ColumnAssignments";
 		}
-	}
-	public void setViewId(int currentViewID) {
-		viewID = currentViewID;
-	}
-	public void setViewSourceId(int vsid) {
-		viewSourceID = vsid;
-	}
-
-	public int getColID() {
-		return colID;
-	}
-
-	public ViewColumnSource getVcs() {
-		return vcs;
+		@Override
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
+			switch (qName.toUpperCase()) {
+				default:
+					break;
+			}
+		}
+	
+		@Override
+		public void addElement(String name, String text, Map<String, String> attributes) {
+			switch (name.toUpperCase()) {
+				case "COLUMNASSIGNMENT":
+					componentID = Integer.parseInt(attributes.get("ID"));
+					break;
+				case "COLUMNREF":
+					vcs = new ViewColumnSource();
+					colID = Integer.parseInt(attributes.get("ID"));
+					vcs.setComponentId(componentID);
+					vcs.setColumnID(colID);
+					vcs.setViewId(viewNode.getID());
+					vcs.setViewSourceId(viewSource.getComponentId());
+					viewNode.addViewColumnSource(vcs);
+					break;
+				case "SOURCETYPE":
+					vcs.setSourceType(ColumnSourceType.values()[Integer.parseInt(text.trim())]);
+					break;
+				case "FIELDREF":
+					vcs.setViewSrcLrFieldId(Integer.parseInt(attributes.get("ID")));
+					break;
+				case "LOOKUPREF":
+					vcs.setSrcJoinId((Integer.parseInt(attributes.get("ID"))));
+					break;
+				case "VALUE":
+					vcs.setValueLength(text.length());
+					vcs.setSrcValue(text);
+					break;
+				case "TITLEFIELDREF":
+					vcs.setSortTitleFieldId(Integer.parseInt(attributes.get("ID")));
+					break;
+				case "TITLELOOKUPREF":
+					vcs.setSortTitleLookupId(Integer.parseInt(attributes.get("ID")));
+					break;
+				case "LOGIC":
+					// have to append by getting what is there first
+					String logic = vcs.getLogicText();
+					logic += text;
+					vcs.setLogicText(logic);
+					break;
+				default:
+					break;
+			}
+		}
+	
+		public int getColID() {
+			return colID;
+		}
+	
+		public ViewColumnSource getVcs() {
+			return vcs;
+		}
+	
+		public void setViewNode(ViewNode viewNode) {
+			this.viewNode = viewNode;
+		}
+	
+		public void setViewSource(ViewSource vs) {
+			this.viewSource = vs;
 	}
 }

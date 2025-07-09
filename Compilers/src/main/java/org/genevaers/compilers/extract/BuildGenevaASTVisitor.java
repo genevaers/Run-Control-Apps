@@ -20,6 +20,7 @@ import java.util.Iterator;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -47,6 +48,7 @@ import org.genevaers.compilers.extract.astnodes.IfAST;
 import org.genevaers.compilers.extract.astnodes.LFAstNode;
 import org.genevaers.compilers.extract.astnodes.LeftASTNode;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
+import org.genevaers.compilers.extract.astnodes.LookupPathAST;
 import org.genevaers.compilers.extract.astnodes.LookupPathRefAST;
 import org.genevaers.compilers.extract.astnodes.NumAtomAST;
 import org.genevaers.compilers.extract.astnodes.RepeatAST;
@@ -544,6 +546,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         if(ctx.symbollist() != null) {
             lkRef.addChildIfNotNull(visitSymbollist(ctx.symbollist()));
             lkRef.setSymbols((SymbolList) visitSymbollist(ctx.symbollist()));
+            checkSymbolListValid(lkRef);
         }
         if(ctx.effDate() != null) {
             lkRef.addChildIfNotNull(visitEffDate(ctx.effDate()));
@@ -559,6 +562,9 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             lkRef.setLookup(lookup);
             lkRef.resolveLookup(lookup);
             Repository.getDependencyCache().addLookupIfAbsent(lkname, lookup);
+            if(lookup.isActive() == false) {
+                lkRef.addError("Lookup " + lkname + " is not active");
+            }
 		} else {
             logger.atSevere().log("addLookupReferenceToNode null lookup for %s\n", lkname);
         }		
@@ -579,6 +585,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         if(ctx.symbollist() != null) {
             lkfieldRef.addChildIfNotNull(visitSymbollist(ctx.symbollist()));
             lkfieldRef.setSymbols((SymbolList) visitSymbollist(ctx.symbollist()));
+            checkSymbolListValid(lkfieldRef);
         }
         if(ctx.effDate() != null) {
             lkfieldRef.addChildIfNotNull(visitEffDate(ctx.effDate()));
@@ -590,6 +597,15 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             logger.atSevere().log("visitLookupField null lookup for %s",fullName);
         }
         return lkfieldRef;
+    }
+
+    private void checkSymbolListValid(LookupPathAST lkref) {
+        for (String s : lkref.getSymbols().getSymbols()) {
+            //Is the symbol defined in the lookup?
+            if(lkref.getLookup().isSymbolNotDefined(s)) {
+                lkref.addError("Symbol " + s + " not defined in lookup " + lkref.getLookup().getName());
+            }
+        }
     }
 
 	@Override public ExtractBaseAST visitExprStringAtom(GenevaERSParser.ExprStringAtomContext ctx) { 
@@ -752,11 +768,12 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             String op = ctx.children.get(1).getText();
             ExtractBaseAST rhs = visit(ctx.children.get(2));
             if(StringDataTypeChecker.allows(lhs, rhs, op)) {
-                if(op.equalsIgnoreCase("CONTAINS")) {
+                if(op.equalsIgnoreCase("CONTAINS") || op.equalsIgnoreCase("BEGINS_WITH") || op.equalsIgnoreCase("ENDS_WITH")) {
                     StringComparisonAST strcmp = (StringComparisonAST)ASTFactory.getNodeOfType(ASTFactory.Type.STRINGCOMP);
                     strcmp.addChildIfNotNull(lhs);
                     strcmp.setComparisonOperator(op);
                     strcmp.addChildIfNotNull(rhs);
+                    restrictLeftAndRight(strcmp);
                     return strcmp; 
                 } else {
                     ExprComparisonAST exprcmp = (ExprComparisonAST)ASTFactory.getNodeOfType(ASTFactory.Type.EXPRCOMP);
@@ -773,6 +790,17 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         }
         //should be an error node 
         return retval;
+    }
+
+    private void restrictLeftAndRight(StringComparisonAST strcmp) {
+        // For the moment as a fix for MR95 limit the RHS of LEFT and RIGHT to strings
+        String op = strcmp.getOp();
+        if(op.equalsIgnoreCase("BEGINS_WITH") || op.equalsIgnoreCase("ENDS_WITH")) {
+            ExtractBaseAST rhs = (ExtractBaseAST)(strcmp.getChild(1));
+            if(rhs.getType() != ASTFactory.Type.STRINGATOM) {
+                strcmp.addError("Only string constants allowed after a 'BEGINS_WITH' or an 'ENDS_WITH'");
+            }
+        }
     }
 
     @Override public ExtractBaseAST  visitExprConcatString(GenevaERSParser.ExprConcatStringContext ctx) {
@@ -817,14 +845,31 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         //or len only ... so really just a left
         if(ctx.getChildCount() == 6) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
-            sn.setLength(ctx.getChild(4).getText());
+            resolveLength(ctx.getChild(4).getText(), sn);
         } else if(ctx.getChildCount() == 8) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
             sn.setStartOffest(ctx.getChild(4).getText());
-            sn.setLength(ctx.getChild(6).getText());
+            resolveLength(ctx.getChild(6).getText(), sn);
         }
         return sn;
-     }
+    }
+
+    private void resolveLength(String len, SubStringASTNode sn) {
+        Integer parsedLen = checkLengthOkay(len);
+        if(parsedLen == null || parsedLen.equals(0) || parsedLen < 0) {
+            sn.addError(String.format("The length %s is not valid", len));
+        } else {
+            sn.setLength(len);                
+        }
+    }
+
+    private Integer checkLengthOkay(String len) {
+        try {
+            return Integer.parseInt(len);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 
     @Override public ExtractBaseAST visitString(GenevaERSParser.StringContext ctx) { 
         StringAtomAST str = (StringAtomAST) ASTFactory.getNodeOfType(ASTFactory.Type.STRINGATOM);

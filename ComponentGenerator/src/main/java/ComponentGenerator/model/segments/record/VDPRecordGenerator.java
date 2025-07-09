@@ -33,12 +33,11 @@ import ComponentGenerator.model.segments.record.fields.FreemarkerFieldEntries;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 
 public class VDPRecordGenerator extends GeneratorBase {
 
-    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	private Record prefix;
 	private VDPRecordSegment model;
 
@@ -104,11 +103,7 @@ public class VDPRecordGenerator extends GeneratorBase {
 			to = to.resolve(recordItem.getName().replace(" ", "") + ".md");
 			generateTemplatedOutput(template, nodeMap, to);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.atSevere().log("File errors "+ e);
 		}
 	}
 

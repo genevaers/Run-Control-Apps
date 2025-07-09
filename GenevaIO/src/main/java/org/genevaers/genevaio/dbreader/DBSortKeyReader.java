@@ -86,7 +86,20 @@ public class DBSortKeyReader extends DBReaderBase {
             //vsk.setSortBreakFooterOption(sortBreakFooterOption);
             //There is a sort display option here that is not available 
             //Set via the SORTKEYDISPLAYCD
-            vsk.setSortBreakHeaderOption(SortBreakHeaderOption.values()[rs.getInt("PAGEBRKIND")]);
+            // This is the sort break header option
+            // 0 = Print header line on Same Page     [value 1]
+            // 1 = Print header line on New Page      [value 2]
+            // 2 = Don't display a header line at all [value 3]
+            //   = Print title line 1                 [value 4]
+            //   = Print title line 2                 [value 5]
+            //   = Print title line 3                 [value 6]
+            int sBreakIndicator = rs.getInt("PAGEBRKIND");
+            SortBreakHeaderOption tHeaderDisp = SortBreakHeaderOption.SAMEPAGE;
+            if (sBreakIndicator == 1)
+                tHeaderDisp = SortBreakHeaderOption.NEWPAGE;
+            else if (sBreakIndicator == 2)
+                tHeaderDisp = SortBreakHeaderOption.NONE;
+            vsk.setSortBreakHeaderOption(tHeaderDisp);
             //vsk.setDisplaySubtotalCount(subtotalCountInd);
             vsk.setLabel(getDefaultedString(rs.getString("SORTKEYLABEL"), ""));
 			vsk.setSortDisplay(SortKeyDispOpt.fromdbcode(getDefaultedString(rs.getString("SORTKEYDISPLAYCD"), "CAT")));

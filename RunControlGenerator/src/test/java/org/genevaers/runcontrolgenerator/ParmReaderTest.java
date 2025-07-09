@@ -36,14 +36,6 @@ import org.genevaers.utilities.IdsReader.IDS_RESULT;
 
 public class ParmReaderTest {
 
-    @Test public void testReadParm() throws IOException {
-        GersConfigration.clear();;
-        GersConfigration.initialise();
-        ParmReader pr = new ParmReader();
-        pr.populateConfigFrom(TestHelper.TEST_PARM);
-        assertEquals(ParmReader.PARM_RESULT.OK,  pr.getResult());
-    }
-
     @Test public void testWBXMLInput() throws IOException {
         GersConfigration.clear();;
         GersConfigration.initialise();

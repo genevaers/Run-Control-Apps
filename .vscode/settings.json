@@ -6,5 +6,6 @@
         "GenevaIO",
         "Compilers"
     ],
-    "java.project.explorer.showNonJavaResources": true
+    "java.project.explorer.showNonJavaResources": true,
+    "cSpell.customDictionaries": {}
 }

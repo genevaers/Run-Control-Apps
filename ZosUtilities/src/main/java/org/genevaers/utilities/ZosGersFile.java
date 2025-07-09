@@ -37,7 +37,7 @@ public class ZosGersFile extends GersFile{
 
     public Writer getWriter(String name) throws IOException {
         ZFile dd = new ZFile("//DD:" + name, "w");
-		return new OutputStreamWriter(dd.getOutputStream(), "IBM-1047");
+		return new OutputStreamWriter(dd.getOutputStream(), GersConfigration.getZosCodePage());
     }
 
     public Reader getReader(String name) {

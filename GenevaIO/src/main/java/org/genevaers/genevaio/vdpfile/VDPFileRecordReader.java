@@ -17,13 +17,10 @@ package org.genevaers.genevaio.vdpfile;
  * under the License.
  */
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import com.ibm.as400.access.AS400Text;
-
-import org.genevaers.genevaio.vdpfile.record.VDPRecord;
+import org.genevaers.utilities.GersCodePage;
 
 public class VDPFileRecordReader {
 	protected byte[] stringBuffer = new byte[8192];
@@ -43,34 +40,17 @@ public class VDPFileRecordReader {
 		return ASCIItext==false;
 	}
 	
-	protected  String ebcdicToAscii(byte[] buffer, Charset charSet, int nameLen)  throws Exception {
-		  AS400Text textConverter = new AS400Text(nameLen, "IBM-1047");
-		  String asciiBuffer = ((String)textConverter.toObject(buffer)).substring(0, nameLen);
-		  return asciiBuffer;
-	}
-
 	//convert only length characters
 	protected  String convertStringIfNeeded(byte[] buffer, int nameLen) throws Exception {
 		String retStr;
 		if(isEBCDIC()) {
-			retStr = ebcdicToAscii(buffer, StandardCharsets.ISO_8859_1, nameLen);
+			retStr = new String(GersCodePage.ebcdicToAscii(buffer));
 		} else {
 			retStr = new String(buffer, 0, nameLen, StandardCharsets.ISO_8859_1);
 		}
 		return retStr ;
 	}
 	
-	//Convert the full buffer 
-	protected  String convertStringIfNeeded(byte[] buffer) throws Exception {
-		String retStr;
-		if(isEBCDIC()) {
-			retStr = ebcdicToAscii(buffer, StandardCharsets.ISO_8859_1, buffer.length);
-		} else {
-			retStr = new String(buffer, StandardCharsets.ISO_8859_1);
-		}
-		return retStr ;
-	}
-
 	public byte[] getStringBuffer() {
 		return stringBuffer;
 	}

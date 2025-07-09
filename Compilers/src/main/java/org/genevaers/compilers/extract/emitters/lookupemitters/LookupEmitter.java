@@ -208,11 +208,10 @@ public class LookupEmitter extends CodeEmitter {
             LogicTableF1 lks = lkse.emit(key);
             String val = lookupAST.getSymbolValue(key.getSymbolicName());
             if(val != null) {
+                logger.atFine().log("Lookup %s Found SYMBOL %s value %s", lookup.getName(), key.getSymbolicName(), val);
                 EmitterArgHelper.setArgValueFrom(lks.getArg(), val);
             } else {
-                //Error if symbolic name not found at all...
-                //  How to track... tick off the ones found
-                //  then at end show the unused?
+                logger.atSevere().log("Lookup %s did not find SYMBOL %s value?", lookup.getName(), key.getSymbolicName());
             }
             ExtractBaseAST.getLtEmitter().addToLogicTable(lks);
         } else {

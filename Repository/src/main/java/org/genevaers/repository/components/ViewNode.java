@@ -37,9 +37,24 @@ import org.genevaers.repository.components.enums.RecordDelimiter;
 import org.genevaers.repository.components.enums.TextDelimiter;
 import org.genevaers.repository.components.enums.ViewType;
 
+/**
+ * The main component of GenevaERS is the View.
+ * <p>The View defines how data is read from its sources and optionally transformed before being written to iys define outputs.</p>
+ * <p>The ViewNode class is a collection of the components that make up a view.</p>
+ * <ul>
+ *   <li>Columns</li>
+ *   <li>View Sources</li>
+ *   <li>Sort Keys</li>
+ *   <li>View Column Sources</li>
+ * </ul>
+ * <p>In addition a View also has an OutputFile that defines where its output is directed.</p>
+ * <p>And optionally some format filter logic. Which will result in a CalcStack which holds the compiled logic text.</p>
+ * <p>The data defining a view, and its dependent components, is stored in either a database or one of two XML formats.</p>
+ * <p>The first phase of executing the Run Control Generator is to convert the above data into their component instances.</p>
+ */
 public class ViewNode extends ComponentNode{
 
-	public ViewDefinition viewDef = new ViewDefinition();
+	private ViewDefinition viewDef = new ViewDefinition();
 
 	private Map<Integer, ViewColumn> columns = new TreeMap<Integer, ViewColumn>();
 	private Map<Integer, ViewColumn> columnsByID = new TreeMap<Integer, ViewColumn>();
@@ -84,8 +99,14 @@ public class ViewNode extends ComponentNode{
 	}
 
 	public void addViewSortKey(ViewSortKey vsk) {
-		sortKeys.put(vsk.getSequenceNumber(), vsk);
+		if(vsk.getSequenceNumber() != 0) {
+			sortKeys.put(vsk.getSequenceNumber(), vsk);
+		}
 		sortKeysByColumnID.put(vsk.getColumnId(), vsk);
+	}
+
+	public void addViewSortKeyBySeq(ViewSortKey vsk) {
+		sortKeys.put(vsk.getSequenceNumber(), vsk);
 	}
 
 	/*
@@ -317,6 +338,10 @@ public class ViewNode extends ComponentNode{
     public void addReportHeader(ReportHeader rh) {
 		reportHeaders.add(rh);
     }
+
+	public int getNumberOfHeaders() {
+		return reportHeaders.size();
+	}
 
 	public boolean hasReportHeaders() {
 		return !reportHeaders.isEmpty();

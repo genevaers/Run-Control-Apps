@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -24,32 +27,38 @@ import javax.xml.stream.events.XMLEvent;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
 import org.genevaers.repository.components.enums.JustifyId;
+import org.genevaers.repository.components.enums.PerformBreakLogic;
+import org.genevaers.repository.components.enums.SortKeyDispOpt;
 import org.genevaers.repository.components.enums.SubtotalType;
 
 public class ViewColumnRecordParser extends BaseParser {
 
 	private ViewColumn vc;
 
-	private int currentViewId = 0;
-
-	private ViewNode currentViewNode;
-
-	private int seqNum;
 	private boolean formalDetails = false;
 
+	private ViewNode viewNode;
+
+	private ViewSortKey vsk;
+	boolean sortkey = false;
+	boolean sortkeyTitle = false;
+
+	public ViewColumnRecordParser() {
+		sectionName = "ExtractColumns";
+	}
+
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
-			case "NAME":
-				currentViewNode = Repository.getViews().get(currentViewId);
-				vc = currentViewNode.getColumnByID(componentID);
-				formalDetails = true;
-				break;
-			case "AREA":
+			case "EXTRACTCOLUMN":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				int seqNum = Integer.parseInt(attributes.get("seq"));
+				logger.atFine().log("ExtractColumn " + seqNum);
 				vc = new ViewColumn();
 				vc.setComponentId(componentID);
 				vc.setName("");
@@ -59,21 +68,47 @@ public class ViewColumnRecordParser extends BaseParser {
 				vc.setDateCode(DateCode.NONE);
 				vc.setSubtotalType(SubtotalType.NONE);
 				vc.setHeaderJustifyId(JustifyId.CENTER);
-				currentViewNode = Repository.getViews().get(currentViewId);
-				vc.setViewId(currentViewId);
+				vc.setViewId(viewNode.getID());
 				vc.setColumnNumber(seqNum);
-				vc.setExtractArea(ExtractArea.fromdbcode(text.trim()));
 				vc.setExtractAreaPosition((short) 1);
 				vc.setStartPosition((short) 1);
-				currentViewNode.addViewColumn(vc);
-				formalDetails = false;
+				viewNode.addViewColumn(vc);
+				sortkey = false;
+				sortkeyTitle = false;
+				break;
+			case "NAME":
+				vc.setName(text);
+				formalDetails = true;
+				break;
+			case "AREA":
+				vc.setExtractArea(ExtractArea.fromdbcode(text.trim()));
+				if (vc.getExtractArea() == ExtractArea.SORTKEY) {
+					vsk = new ViewSortKey();
+					//vsk.setComponentId(vc.getComponentId());
+					//vsk.setViewSortKeyId(vc.getComponentId());
+					vsk.setColumnId(vc.getComponentId());
+					vsk.setSortKeyDataType(vc.getDataType());
+					vsk.setSkFieldLength(vc.getFieldLength());
+					vsk.setSkStartPosition(vc.getExtractAreaPosition());
+					setDefault(vsk);
+					viewNode.addViewSortKey(vsk);
+					sortkey = true;
+				}
 				break;
 			case "DATATYPE":
-				vc.setDataType(DataType.fromdbcode(text.trim()));
-				if (vc.getDataType() == DataType.ALPHANUMERIC) {
-					vc.setJustifyId(JustifyId.LEFT);
+				if (sortkey) {
+					if (sortkeyTitle) {
+						vsk.setSktDataType(DataType.fromdbcode(text.trim()));
+					} else {
+						vsk.setSortKeyDataType(DataType.fromdbcode(text.trim()));
+					}
 				} else {
-					vc.setJustifyId(JustifyId.RIGHT);
+					vc.setDataType(DataType.fromdbcode(text.trim()));
+					if (vc.getDataType() == DataType.ALPHANUMERIC) {
+						vc.setJustifyId(JustifyId.LEFT);
+					} else {
+						vc.setJustifyId(JustifyId.RIGHT);
+					}
 				}
 				break;
 			case "SIGNEDDATA":
@@ -81,19 +116,29 @@ public class ViewColumnRecordParser extends BaseParser {
 				break;
 			case "POSITION":
 				short s = (short) Integer.parseInt(text.trim());
-				if(formalDetails) {
-					vc.setStartPosition(s);
-				} else {
-					vc.setExtractAreaPosition(s);
+				if (sortkey) {
+					vsk.setSkStartPosition(s);
 				}
+				vc.setExtractAreaPosition(s);
+				
 				break;
 			case "LENGTH":
 				s = (short) Integer.parseInt(text.trim());
-				vc.setFieldLength(s);
+				if (sortkey) {
+					if (sortkeyTitle) {
+						vsk.setSktFieldLength(s);
+					} else {
+						vsk.setSkFieldLength(s);
+					}
+				} else {
+					vc.setFieldLength(s);
+				}
 				break;
 			case "ORDINAL":
 				s = (short) Integer.parseInt(text.trim());
 				vc.setOrdinalPosition(s);
+				break;
+			case "ORDINALPOSITION":
 				break;
 			case "DECIMALPLACES":
 				s = (short) Integer.parseInt(text.trim());
@@ -109,51 +154,32 @@ public class ViewColumnRecordParser extends BaseParser {
 			case "ALIGNMENT":
 				vc.setJustifyId(JustifyId.fromdbcode(text.trim()));
 				break;
-			case "DEFAULTVALUE":
-				vc.setDefaultValue(text);
-				break;
-			case "VISIBLE":
-				vc.setHidden(text.equals("1") ? false : true);
-				break;
-			case "SUBTOTALTYPECD":
-				vc.setSubtotalType(SubtotalType.fromdbcode(text.trim()));
-				break;
-			case "SPACESBEFORECOLUMN":
-				s = (short) Integer.parseInt(text.trim());
-				vc.setSpacesBeforeColumn(s);
-				break;
-			case "SUBTLABEL":
-				vc.setSubtotalPrefix(text);
-				break;
-			case "MASK":
-				vc.setReportMask(text);
-				break;
-			case "HEADERALIGNMENT":
-				vc.setHeaderJustifyId(JustifyId.fromdbcode(text));
-				break;
-			case "HEADERLINE1":
-				vc.setHeaderLine1(text);
-				break;
-			case "HEADERLINE2":
-				vc.setHeaderLine2(text);
-				break;
-			case "HEADERLINE3":
-				vc.setHeaderLine3(text);
-				break;
-			case "FORMATCALCLOGIC":
-				vc.setColumnCalculation(removeBRLineEndings(text));
+			case "SORTTITLEKEY":
+				logger.atFine().log("Column %s has sort key title Found");
+				vsk.setRtdLrFieldId(Integer.parseInt(attributes.get("ID")));
+				sortkeyTitle = true;
 				break;
 			default:
 				break;
 		}
 	}
 
-    public void setViewId(int vid) {
-        currentViewId = vid;
-    }
+	public void setViewNode(ViewNode viewNode) {
+		this.viewNode = viewNode;
+	}
 
-    public void setSequenceNumber(int s) {
-		seqNum = s;
-    }
+	private void setDefault(ViewSortKey vsk) {
+		vsk.setDescDateCode(DateCode.NONE);
+		vsk.setDescDataType(DataType.ALPHANUMERIC);
+		vsk.setDescJustifyId(JustifyId.LEFT);
+		vsk.setLabel("");
+		vsk.setSkJustifyId(JustifyId.LEFT);
+		vsk.setSktDateCode(DateCode.NONE);
+		vsk.setSktDataType(DataType.ALPHANUMERIC);
+		vsk.setSktJustifyId(JustifyId.LEFT);
+		vsk.setSortKeyDateTimeFormat(DateCode.NONE);
+		vsk.setSortDisplay(SortKeyDispOpt.CATEGORIZE);
+		vsk.setPerformBreakLogic(PerformBreakLogic.NOBREAK);
+	}
 
 }

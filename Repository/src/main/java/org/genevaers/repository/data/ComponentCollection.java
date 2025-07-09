@@ -23,6 +23,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Class to collect components by both ID and case insensitive name.
+ */
 public class ComponentCollection<T> {
 
 	private Map<Integer, T> components = new TreeMap<>();

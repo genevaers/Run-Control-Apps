@@ -1,7 +1,6 @@
 package org.genevaers.compilers.extract.astnodes;
 
 import org.genevaers.compilers.base.EmittableASTNode;
-import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LogicTableName;
 
 /*
@@ -22,7 +21,6 @@ import org.genevaers.genevaio.ltfile.LogicTableName;
  */
 
 
-import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.LtRecordType;
 
 public class AccumulatorAST extends ExtractBaseAST implements EmittableASTNode{
@@ -37,12 +35,6 @@ public class AccumulatorAST extends ExtractBaseAST implements EmittableASTNode{
         BIN4
     }
     
-    //force implementing classes to genrate an accumulator name
-    public String generateName(ViewSource viewSource, int vc) {
-        name = String.format("g_%d_%d_%d_%d_%d", viewSource.getViewId(), viewSource.getSourceLFID(), viewSource.getSourceLRID(), vc, currentAccumNumber++);
-        return name;
-    }
-
     //Force implementing classes to emit an accumulator
     public void emitDeclation() {
         LogicTableName ltn = new LogicTableName();

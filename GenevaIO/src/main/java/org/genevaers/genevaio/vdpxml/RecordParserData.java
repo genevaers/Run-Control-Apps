@@ -131,6 +131,8 @@ public class RecordParserData {
 					lksk.setSourceLrId(lkstep.getSourceLR());
 					lksk.setStepNumber((short) lkstep.getStepNum());
 				}
+				lk.setTargetLFid(lkstep.getTargetLF());
+				lk.setTargetLRid(lkstep.getTargetLR());
 			}
 		}
 	}

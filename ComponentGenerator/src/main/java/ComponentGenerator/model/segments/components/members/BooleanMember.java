@@ -25,6 +25,11 @@ public class BooleanMember extends Member {
     private static final String TYPE = "boolean";
 
     @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    @Override
     public String getFieldEntry() {
         return defaultFieldEntryForType(TYPE);
     }

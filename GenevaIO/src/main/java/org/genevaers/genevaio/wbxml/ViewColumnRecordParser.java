@@ -109,7 +109,7 @@ public class ViewColumnRecordParser extends RecordParser {
 					vc.setJustifyId(JustifyId.fromdbcode(text.trim()));
 					break;
 				case "DEFAULTVAL":
-					vc.setDefaultValue(text);
+					vc.setDefaultValue(""); //not used
 					break;
 				case "VISIBLE":
 					vc.setHidden(text.equals("1") ? false : true);

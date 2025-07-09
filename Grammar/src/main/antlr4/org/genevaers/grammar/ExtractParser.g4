@@ -40,8 +40,8 @@ exprBoolUnary   : ( NOT )? exprBoolAtom
                 ;
 
 exprBoolAtom    : ( LPAREN exprBoolOr RPAREN )
-                  | arithComp
                   | stringComp
+                  | arithComp
                   | isFunctions
                   | isFounds
                 ;

@@ -21,6 +21,9 @@ package ComponentGenerator;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+/**
+ * Colours and formatting for the Generator.
+ */
 public class LogFormatter extends Formatter{
 
 	public static final String ANSI_RESET = "\u001B[0m";

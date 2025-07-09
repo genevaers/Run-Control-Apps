@@ -1,8 +1,11 @@
 package org.genevaers.testframework.menu.main;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008
@@ -27,7 +30,10 @@ import org.genevaers.utilities.GersEnvironment;
 import org.genevaers.utilities.menu.Menu;
 import org.genevaers.utilities.menu.MenuItem;
 
+import com.google.common.flogger.FluentLogger;
+
 public class ShowCurrentTests extends MenuItem {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     public ShowCurrentTests() {
         color = Ansi.Color.MAGENTA;
@@ -42,11 +48,18 @@ public class ShowCurrentTests extends MenuItem {
         try {
             reporter.generate();
         } catch (Exception e) {
-            e.printStackTrace();
+             logger.atSevere().log("Exception in generating report: %s", e.getMessage());
         }
         try {
-            BufferedReader in = new BufferedReader(
-                    new FileReader(GersEnvironment.get("LOCALROOT") + "/out/fmoverview.txt"));
+            String baseDir = GersEnvironment.get("LOCALROOT");
+            Path basePath = Paths.get(baseDir).toRealPath();
+			Path targetPath = basePath.resolve("/out/fmoverview.txt").normalize();
+
+            if (!targetPath.startsWith(basePath)) {
+                 throw new SecurityException("Path traversal attempt detected: " + targetPath);
+            }
+
+            BufferedReader in = new BufferedReader(new FileReader(targetPath.toFile()));
             String line = null;
             while ((line = in.readLine()) != null) {
                 System.out.println(line);
@@ -55,8 +68,7 @@ public class ShowCurrentTests extends MenuItem {
             Menu.promptedRead("Enter to continue");
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Exception in show current tests: %s", e.getMessage());
         }
         return true;
     }

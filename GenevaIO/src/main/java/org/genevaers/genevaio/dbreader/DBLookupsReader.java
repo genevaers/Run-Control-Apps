@@ -47,6 +47,7 @@ public class DBLookupsReader extends DBReaderBase{
             String query = "SELECT 	distinct "
                 + "l.LOOKUPID, "
                 + "l.NAME, "
+                + "l.VALIDIND as VALID, "
                 + "l.SRCLRID as LKUPSRCLR, "
                 + "DESTLRLFASSOCID, "
                 + "s.STEPSEQNBR, "
@@ -129,8 +130,8 @@ public class DBLookupsReader extends DBReaderBase{
         lpKey.setKeyNumber(rs.getShort("KEYSEQNBR"));
         lpKey.setTargetLrId(rs.getInt("LOGRECID"));
         requiredLRs.add(rs.getInt("LOGRECID"));
-        lpKey.setSourceLrId(rs.getInt("LKUPSRCLR"));
-        requiredLRs.add(rs.getInt("LKUPSRCLR"));
+        lpKey.setSourceLrId(rs.getInt("STEPSRCLR"));
+        requiredLRs.add(rs.getInt("STEPSRCLR"));
         lpKey.setFieldId(rs.getInt("LRFIELDID"));
         lpKey.setDatatype(DataType.fromdbcode(getDefaultedString(rs.getString("VALUEFMTCD"), "NONE")));
         lpKey.setSigned(rs.getInt("SIGNED") == 0 ? false : true);
@@ -142,10 +143,16 @@ public class DBLookupsReader extends DBReaderBase{
         lpKey.setDateTimeFormat(DateCode.fromdbcode(getDefaultedString(rs.getString("FLDCONTENTCD"), "NONE")));
         lpKey.setJustification(JustifyId.fromdbcode(getDefaultedString(rs.getString("JUSTIFYCD"), "NONE")));
         lpKey.setMask(getDefaultedString(rs.getString("MASK"), ""));
-        lpKey.setValueLength(rs.getShort("VALUELEN"));
-        lpKey.setValue(getDefaultedString(rs.getString("VALUE"), ""));
+        String value = rs.getString("VALUE");
+        if(value != null && value.length() > 0) {
+            lpKey.setValueLength(value.length());
+            lpKey.setValue(value);
+        } else {
+            lpKey.setValueLength(0);
+        }
         lpKey.setSymbolicName(getDefaultedString(rs.getString("SYMBOLICNAME"), ""));
         Repository.addLookupPathKey(lpKey);
+        Repository.setCurrentLookupPathState(rs.getInt("VALID"));
     }
     
     public boolean addNamedLookupToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params, int environmentID, String name) {
@@ -154,6 +161,7 @@ public class DBLookupsReader extends DBReaderBase{
             String query = "SELECT 	distinct "
                 + "l.LOOKUPID, "
                 + "l.NAME, "
+                + "l.VALIDIND as VALID, "
                 + "l.SRCLRID as LKUPSRCLR, "
                 + "DESTLRLFASSOCID, "
                 + "s.STEPSEQNBR, "

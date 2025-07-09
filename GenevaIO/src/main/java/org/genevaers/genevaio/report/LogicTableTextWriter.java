@@ -182,6 +182,23 @@ public class LogicTableTextWriter extends TextRecordWriter {
 		ignoreTheseDiffs.put("CTC_lrId", true); 
 		ignoreTheseDiffs.put("SKC_lrId", true); 
 		ignoreTheseDiffs.put("SKC_logfileId", true); 
+		ignoreTheseDiffs.put("CTA_fieldLength", true); 
+		ignoreTheseDiffs.put("DTX_columnId", true); 
+		ignoreTheseDiffs.put("CFLX_columnId", true); 
+		ignoreTheseDiffs.put("CFEX_columnId", true); 
+		ignoreTheseDiffs.put("CFAX_columnId", true); 
+		ignoreTheseDiffs.put("CFPX_columnId", true); 
+		ignoreTheseDiffs.put("CFXA_columnId", true); 
+		ignoreTheseDiffs.put("CFXE_columnId", true); 
+		ignoreTheseDiffs.put("CFXL_columnId", true); 
+		ignoreTheseDiffs.put("CFXP_columnId", true); 
+		ignoreTheseDiffs.put("SFXE_columnId", true); 
+		ignoreTheseDiffs.put("SFXL_columnId", true); 
+		ignoreTheseDiffs.put("SFXP_columnId", true); 
+		ignoreTheseDiffs.put("SFEX_columnId", true); 
+		ignoreTheseDiffs.put("SFLX_columnId", true); 
+		ignoreTheseDiffs.put("SFPX_columnId", true); 
+		ignoreTheseDiffs.put("EN_fileId", true); 
 	}
 
 
@@ -202,6 +219,10 @@ public class LogicTableTextWriter extends TextRecordWriter {
 							updateRowState = false;
 						}
 					} else {
+						if (n.getParent().getFieldNodeType() == FieldNodeType.FUNCCODE) {
+							System.out.println(((FunctionCodeNode)n.getParent()).getFunctionCode());
+						}
+						System.out.println(getDiffKey(n));
 						if (ignoreTheseDiffs.get(getDiffKey(n)) != null) {
 							n.setState(ComparisonState.IGNORED);
 						} else if (n.getParent().getFieldNodeType() == FieldNodeType.FUNCCODE) {

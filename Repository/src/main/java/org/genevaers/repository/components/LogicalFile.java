@@ -17,11 +17,9 @@ package org.genevaers.repository.components;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,7 +27,11 @@ import java.util.TreeMap;
 
 import org.genevaers.repository.components.enums.FileType;
 
-
+/**
+ * A Logical File is a collection of PhycicalFile components.
+ * <p>Physcial Files are stored by both sequence number and by name.</p>
+ * <p>Within a VDP there are no Logical File records. There are denormailsed Physcial File records that duplicate the LF id and name.</p>
+ */
 public class LogicalFile extends ComponentNode {
 
 	private int id = 0;

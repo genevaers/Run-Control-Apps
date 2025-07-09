@@ -1,5 +1,7 @@
 package org.genevaers.compilers.extract.astnodes;
 
+
+
 /*
  * Copyright Contributors to the GenevaERS Project.
 								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
@@ -24,8 +26,6 @@ import org.genevaers.genevaio.ltfile.LTFileObject;
 
 public class SubStringASTNode extends StringFunctionASTNode implements Assignable{
 
-    String startOffest = "0";
-
     public SubStringASTNode() {
         type = ASTFactory.Type.SUBSTR;
     }
@@ -34,22 +34,13 @@ public class SubStringASTNode extends StringFunctionASTNode implements Assignabl
     public LTFileObject getAssignmentEntry(ColumnAST col, ExtractBaseAST rhs) {
         if(getNumberOfChildren() == 1) {
             Concatable cc =  (Concatable) getChildIterator().next();
-            cc.getSubstreEntry(col, (ExtractBaseAST) cc, Short.valueOf(getStartOffest()), (short)getLength());
+            cc.getSubstreEntry(col, (ExtractBaseAST) cc, Short.valueOf(startOffest), (short)getLength());
         }
         return null;
     }
 
-    public String getStartOffest() {
-        return startOffest;
-    }
-
-    public void setStartOffest(String startOffest) {
-        this.startOffest = startOffest;
-    }
-
     @Override
-    public int getAssignableLength() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAssignableLength'");
+    public int getChildStartPosition() {
+        return super.getChildStartPosition() + getStartOffestInt();
     }
- }
+}

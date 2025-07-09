@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -29,9 +32,16 @@ public class CRRecordParser extends BaseParser {
 
 	private ControlRecord cr;
 
+	public CRRecordParser() {
+		sectionName = "ControlRecords";
+	}
+
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
+			case "CONTROLRECORD":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				break;
 			case "NAME":
 				cr = new ControlRecord();
 				cr.setComponentId(componentID);

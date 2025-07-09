@@ -55,4 +55,8 @@ public class RulesChecker {
         return ruleResult.ordinal() > allPassed.ordinal() ? ruleResult : allPassed;
     }
 
+    public void clearRules() {
+        localRules.clear();;
+    }
+
 }

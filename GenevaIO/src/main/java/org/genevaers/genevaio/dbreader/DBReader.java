@@ -96,6 +96,7 @@ public class DBReader {
             hasErrors |= exitReader.addToRepo(dbConnection, params);
             logger.atFine().log("Exits read");
         }
+        DBReaderBase.fixupEffectiveDateIndexes();
     }
 
     /** 

@@ -45,7 +45,7 @@ import com.google.common.flogger.FluentLogger;
 
 public class DBPhysicalFileReader extends DBReaderBase {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    Map<Integer, List<Integer>> lf2pf = new HashMap<>();
+    private Map<Integer, List<Integer>> lf2pf = new HashMap<>();
 
     @Override
     public boolean addToRepo(DatabaseConnection dbConnection, DatabaseConnectionParams params) {
@@ -67,7 +67,7 @@ public class DBPhysicalFileReader extends DBReaderBase {
         requiredLFs.remove(0);
         if(requiredLFs.size() > 0) {
             String pfsFromLfs = "select LOGFILEID, PHYFILEID from " + params.getSchema() + ".LFPFASSOC "
-                    + "where ENVIRONID=? and LOGFILEID in (" + getPlaceholders(requiredLFs.size()) + ");";
+                    + "where ENVIRONID=? and LOGFILEID in (" + getPlaceholders(requiredLFs.size()) + ") order by PARTSEQNBR;";
             try (PreparedStatement ps = dbConnection.prepareStatement(pfsFromLfs);){
                 int parmNum = 1;
                 ps.setInt(parmNum++, params.getEnvironmentIdAsInt());
@@ -105,12 +105,23 @@ public class DBPhysicalFileReader extends DBReaderBase {
             requiredExits.add(re);
         }
         pf.setReadExitIDParm(getDefaultedString(rs.getString("READEXITSTARTUP"), ""));
-        pf.setInputDDName(getDefaultedString(rs.getString("DDNAMEINPUT"), ""));
+        String ddi = rs.getString("DDNAMEINPUT");
+        if(ddi != null && ddi.length() > 0) {
+            pf.setInputDDName(ddi.trim());
+        } else {
+            pf.setInputDDName(String.format("I%07d", pf.getComponentId()));
+        }
         pf.setDataSetName(getDefaultedString(rs.getString("DSN"), ""));
         pf.setMinimumLength(rs.getShort("MINRECLEN"));
         pf.setMaximumLength(rs.getShort("MAXRECLEN"));
-        pf.setOutputDDName(getDefaultedString(rs.getString("DDNAMEOUTPUT"), ""));
+        String ddo = rs.getString("DDNAMEOUTPUT");
+        if(ddo != null && ddo.length() > 0) {
+            pf.setOutputDDName(ddo.trim());
+        } else {
+            pf.setOutputDDName(String.format("O%07d", pf.getComponentId()));
+        }
         pf.setRecfm(FileRecfm.fromdbcode(getDefaultedString(rs.getString("RECFM"), "VB")));
+        pf.setLrecl(rs.getShort("LRECL"));
         pf.setDatabaseConnection(getDefaultedString(rs.getString("DBMSSUBSYS"), ""));
         pf.setSqlText(getDefaultedString(rs.getString("DBMSSQL"), ""));
         pf.setDatabaseTable(getDefaultedString(rs.getString("DBMSTABLE"), ""));

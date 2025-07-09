@@ -27,6 +27,7 @@ import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.genevaio.ltfile.LTFileObject;
 import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.ltfile.LogicTableNameF1;
+import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
 import org.genevaers.repository.components.enums.ExtractArea;
@@ -96,7 +97,7 @@ public class CalculationAST  extends FormattedASTNode implements Assignable, Cal
     private void generateAccumulatorName() {
         if(accName == null) {
             if(currentViewColumn != null) {
-                accName = LtFactoryHolder.getLtFunctionCodeFactory().generateAccumulatorName(currentViewSource, currentViewColumn.getColumnNumber());
+                accName = LtFactoryHolder.getLtFunctionCodeFactory().generateAccumulatorName(currentViewSource, currentViewColumnSource.getColumnNumber());
             } else {
                 accName = LtFactoryHolder.getLtFunctionCodeFactory().generateAccumulatorName(currentViewSource, 0);
             }
@@ -172,8 +173,7 @@ public class CalculationAST  extends FormattedASTNode implements Assignable, Cal
 
     @Override
     public int getAssignableLength() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFormattedLength'");
+        return 31;
     }
 
     @Override

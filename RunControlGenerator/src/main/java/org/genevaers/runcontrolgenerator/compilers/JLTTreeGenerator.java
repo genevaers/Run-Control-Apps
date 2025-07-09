@@ -35,6 +35,7 @@ import org.genevaers.compilers.extract.emitters.LogicTableEmitter;
 import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LogicalFile;
+import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupType;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.enums.AccessMethod;
@@ -44,7 +45,9 @@ import org.genevaers.repository.components.enums.FileRecfm;
 import org.genevaers.repository.components.enums.FileType;
 import org.genevaers.repository.components.enums.RecordDelimiter;
 import org.genevaers.repository.components.enums.TextDelimiter;
+import org.genevaers.repository.jltviews.ExternalJoin;
 import org.genevaers.repository.jltviews.JLTView;
+import org.genevaers.repository.jltviews.JLTViewKey;
 import org.genevaers.repository.jltviews.JLTViewMap;
 import org.genevaers.repository.jltviews.ReferenceJoin;
 
@@ -85,6 +88,16 @@ public class JLTTreeGenerator {
         while (refi.hasNext()) {
             Entry<Integer, JLTViewMap<ReferenceJoin>> refEntry = refi.next();
             buildJoinsForLF(refEntry);
+        }
+        JLTViewMap<ExternalJoin> extJoins = Repository.getJoinViews().getExternalJoins();
+        Iterator<ExternalJoin> extIt = extJoins.getIterator();
+        int i = 1;
+        while (extIt.hasNext()) {
+            ExternalJoin extJoin = extIt.next();
+            extJoin.setDDNumber(joinNumber++);
+            LookupPath lk = Repository.getLookups().get(extJoin.getOrginalLookupId());
+            LogicalFile lf = Repository.getLogicalFiles().get(lk.getTargetLFID());
+            Repository.getJoinViews().addJoinTarget((byte)1, lf.getID(), lf.getName());
         }
     }
 
@@ -143,6 +156,14 @@ public class JLTTreeGenerator {
             else 
                 return rthHeader;
         }
+    }
+
+    public REHHeader getRehHeader() {
+        return rehHeader;
+    }
+
+    public RTHHeader getRthHeader() {
+        return rthHeader;
     }
 
     // Take the repo infomation and build the JLT

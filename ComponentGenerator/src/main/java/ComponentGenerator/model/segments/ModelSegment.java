@@ -17,7 +17,9 @@ package ComponentGenerator.model.segments;
  * under the License.
  */
 
-
+/**
+ * Base class for a model segment
+ */
 public abstract class ModelSegment implements SegmentWriter, SegmentYamlReader {
 
     private String packageName;

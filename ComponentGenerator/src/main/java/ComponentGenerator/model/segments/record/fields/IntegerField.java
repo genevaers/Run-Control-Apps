@@ -75,4 +75,8 @@ public class IntegerField extends Field {
         return defaultNumericNodeEntry(prefix, arrayValue);
     }
 
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 }

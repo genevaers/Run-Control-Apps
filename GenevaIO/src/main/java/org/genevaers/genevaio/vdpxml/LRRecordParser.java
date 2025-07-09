@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -32,26 +35,52 @@ import org.genevaers.repository.components.enums.LrStatus;
 public class LRRecordParser extends BaseParser {
 
 	private LogicalRecord lr;
-
-	@Override
-	public void addElement(String name, String text) {
-		switch (name.toUpperCase()) {
-			case "NAME":
-				lr = new LogicalRecord();
-				lr.setComponentId(componentID);
-				Repository.addLogicalRecord(lr);
-				lr.setLookupExitID(0);
-				componentName = text;
-				lr.setName(componentName);
+	private LRIndexRecordParser ip;
+	private LRFieldRecordParser fp;
+	
+		public LRRecordParser() {
+			sectionName = "LogicalRecords";
+		}
+	
+		@Override
+		public void addElement(String name, String text, Map<String, String> attributes)  throws XMLStreamException {
+			switch (name.toUpperCase()) {
+				case "LOGICALRECORD":
+				componentID = Integer.parseInt(attributes.get("ID"));
 				break;
-			case "LRSTATUS":
-				lr.setStatus(LrStatus.fromdbcode(text));
+				case "NAME":
+					lr = new LogicalRecord();
+					lr.setComponentId(componentID);
+					componentName = text;
+					lr.setName(componentName);
+					Repository.addLogicalRecord(lr);
+					lr.setLookupExitID(0);
+					break;
+				case "LRSTATUS":
+					lr.setStatus(LrStatus.fromdbcode(text));
+					break;
+				case "LOOKUPEXITID":
+					lr.setLookupExitID(Integer.parseInt(text));
+					break;
+				case "LOOKUPEXITSTARTUP":
+					lr.setLookupExitParams(text);
+					break;
+				case "INDEX":
+					logger.atFine().log("Index");
+					ip  = new LRIndexRecordParser();
+					int ndxid = Integer.parseInt(attributes.get("ID"));
+					ip.setComponentID(ndxid);
+					lr.setPrimaryKey(ndxid);
+					ip.setCurrentLrId(lr.getComponentId());
+					ip.parse(reader);
+					logger.atFine().log("Index parsing completed for LR " + lr.getName());
 				break;
-			case "LOOKUPEXITID":
-				lr.setLookupExitID(Integer.parseInt(text));
-				break;
-			case "LOOKUPEXITSTARTUP":
-				lr.setLookupExitParams(text);
+				case "FIELDS":
+					logger.atFine().log("Fields");
+					fp  = new LRFieldRecordParser();
+					fp.setCurrentLrId(lr.getComponentId());
+					fp.parse(reader);
+					logger.atFine().log("Fields parsing completed for LR " + lr.getName());
 				break;
 			case "CREATEDTIMESTAMP":
 				created = text;

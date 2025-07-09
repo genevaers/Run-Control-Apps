@@ -1,6 +1,9 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
@@ -19,7 +22,6 @@ package org.genevaers.genevaio.vdpxml;
  * under the License.
  */
 
-import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 import org.xml.sax.Attributes;
@@ -27,74 +29,54 @@ import org.xml.sax.Attributes;
 public class ViewSourceRecordParser extends BaseParser {
 
 	private ViewSource vs;
-	private int lrlfAssocid;
-	private int lfpfAssocid;
 
-	private int viewid;
 	private int sequenceNumber;
+	private ViewNode viewNode;
+
+	public ViewSourceRecordParser() {
+		sectionName = "DataSources";
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
+	}
+
+	@Override
+	public void addElement(String name, String text, Map<String, String> attributes) throws XMLStreamException {
+		switch (name.toUpperCase()) {
+			case "DATASOURCE":
+				sequenceNumber = Integer.parseInt(attributes.get("seq"));
+				componentID = Integer.parseInt(attributes.get("ID"));
+				break;
 			case "LOGICALFILEREF":
 				vs = new ViewSource();
 				vs.setComponentId(componentID);
-				vs.setSourceLFID(Integer.parseInt(attributes.getValue("ID")));
-				vs.setViewId(viewid);
-				vs.setSequenceNumber((short)sequenceNumber);
-				ViewNode vn = Repository.getViews().get(viewid);
-				vn.addViewSource(vs);
+				vs.setSourceLFID(Integer.parseInt(attributes.get("ID")));
+				vs.setViewId(viewNode.getID());
+				vs.setSequenceNumber((short) sequenceNumber);
+				viewNode.addViewSource(vs);
 				break;
 			case "LOGICALRECORDREF":
-				vs.setSourceLRID(Integer.parseInt(attributes.getValue("ID")));
-				break;
-				default:
-				break;
-		}
-	}		
-
-	@Override
-	public void addElement(String name, String text) {
-		switch (name.toUpperCase()) {
-			case "INLRLFASSOCID":
-				// This assoc id doesn't make any sense until later
-				// when we parse the lflf associations
-				// Need to preserve for a fixup later
-				lrlfAssocid = Integer.parseInt(text.trim());
-				RecordParserData.vs2lrlf.put(componentID, lrlfAssocid);
+				vs.setSourceLRID(Integer.parseInt(attributes.get("ID")));
 				break;
 			case "FILTER":
 				vs.setExtractFilter(vs.getExtractFilter() + text);
-				vs.setSequenceNumber((short)sequenceNumber);
+				vs.setSequenceNumber((short) sequenceNumber);
 				break;
-			case "EXTRACTFILTLOGIC":
-				vs.setExtractFilter(removeBRLineEndings(text));
-				break;
-
-			// Save this too for later fix ups
-			case "OUTLFPFASSOCID":
-				lfpfAssocid = Integer.parseInt(text);
-				RecordParserData.vs2lfpf.put(componentID, lfpfAssocid);
-				break;
-			case "WRITEEXITID":
-				vs.setWriteExitId(Integer.parseInt(text.trim()));
-				break;
-			case "WRITEEXITPARM":
-				vs.setWriteExitParams(text);
-				break;
-			case "EXTRACTOUTPUTLOGIC":
-				vs.setExtractOutputLogic(removeBRLineEndings(text));
+			case "COLUMNASSIGNMENTS":
+				logger.atFine().log("Parsing View Column Sources");
+				ViewColumnSourceParser vsp = new ViewColumnSourceParser();
+				vsp.setViewNode(viewNode);
+				vsp.setViewSource(vs);
+				vsp.parse(reader);
+				logger.atFine().log("Parsing View Column Sources completed");
 				break;
 			default:
 				break;
 		}
 	}
 
-	public void setViewId(int currentViewID) {
-		viewid = currentViewID;
-	}
-
-	public void setSequenceNumber(int seq) {
-		sequenceNumber = seq;
+	public void setViewNode(ViewNode vn) {
+		this.viewNode = vn;
 	}
 }

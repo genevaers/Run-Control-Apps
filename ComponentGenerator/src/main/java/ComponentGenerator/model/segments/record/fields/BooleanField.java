@@ -138,4 +138,8 @@ public class BooleanField extends Field {
         }
     }
 
+    @Override
+    public String getType() {
+        return TYPE;
+    }
 }

@@ -19,7 +19,9 @@ package org.genevaers.repository.components;
 
 
 import java.util.Comparator;
-
+/**
+ * Comparator used in Lookup generation.
+ */
 public class FieldPositionComparator implements Comparator<LRField>{
 
     /**

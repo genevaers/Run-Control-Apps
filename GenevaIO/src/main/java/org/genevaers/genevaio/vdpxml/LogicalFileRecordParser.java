@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -36,25 +39,32 @@ public class LogicalFileRecordParser extends BaseParser {
 	private LogicalFile lf;
 	private PhysicalFile pf;
 
+	public LogicalFileRecordParser() {
+		sectionName = "LogicalFiles";
+	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "PARTITIONREF":
-				logger.atFine().log("Logical Files");
-				String a0 = attributes.getValue("seq");
-				int pfid = Integer.parseInt(attributes.getValue("ID"));
-				pf = Repository.getPhysicalFiles().get(pfid);
-				lf.addPF(pf);
-				pf.setLogicalFilename(lf.getName());
-				break;
-			default:
-				break;
-		}
+		// switch (qName.toUpperCase()) {
+		// 	case "PARTITIONREF":
+		// 		logger.atFine().log("Logical Files");
+		// 		String a0 = attributes.get("seq");
+		// 		int pfid = Integer.parseInt(attributes.get("ID"));
+		// 		pf = Repository.getPhysicalFiles().get(pfid);
+		// 		lf.addPF(pf);
+		// 		pf.setLogicalFilename(lf.getName());
+		// 		break;
+		// 	default:
+		// 		break;
+		// }
 	}		
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
+			case "LOGICALFILE":
+				componentID = Integer.parseInt(attributes.get("ID"));
+				break;
 			case "NAME":
 				lf = new LogicalFile();
 				lf.setID(componentID);
@@ -62,10 +72,13 @@ public class LogicalFileRecordParser extends BaseParser {
 				Repository.getLogicalFiles().add(lf, componentID, text);
 				break;
 			case "PARTITIONREF":
-				//int pfid = Integer.parseInt(;
-				//PhysicalFile pf = Repository.getPhysicalFiles().get(pfid);
-				//lf.addPF(pf);
-				break;
+				logger.atFine().log("Logical Files");
+				String a0 = attributes.get("seq");
+				int pfid = Integer.parseInt(attributes.get("ID"));
+				pf = Repository.getPhysicalFiles().get(pfid);
+				lf.addPF(pf);
+				pf.setLogicalFilename(lf.getName());
+			break;
 			case "CREATEDTIMESTAMP":
 				created = text;
 				break;

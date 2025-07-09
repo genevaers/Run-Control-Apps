@@ -1,6 +1,6 @@
 <#assign aDateTime = .now>
 <#assign aDate = aDateTime?date>
-<#assign aTime = aDateTime?time>
+<#assign aTime = aDateTime?iso_utc>
 ~RCARPT
  
 GenevaERS - The Single-Pass Optimization Engine
@@ -13,8 +13,8 @@ Program ID:      GVBRCA (${rcaversion})
 Program Title:   Run-Control App
 Built:           ${buildtimestamp}
  
-Executed:        ${aDate} : ${aTime}
- 
+Executed:        ${aDate?iso_utc} ${aTime?substring(11, 16)}
+
 Report DD Name:  RCARPT
 Report Title:    GVBRCA Control Report
  
@@ -133,14 +133,14 @@ Ref Work  Runtime                                            Ref       Ref     >
 DD Name   View ID  View Name                                 DD Name   PF ID   >PF Name                                           LR ID    LF ID    Len  Dt  Dt
 ========  -------  ----------------------------------------  --------  ------- >------------------------------------------------  -------  -------  ---  --  --
 <#list refviews as r>
-${r.workDDName}   ${r.viewID?c}  ${r.viewName?right_pad(40)}  ${r.refDDName?right_pad(8)}  ${r.refPFID?c?left_pad(7)} >${r.refPFName?right_pad(48)}  ${r.refLRID?c?left_pad(7)}  ${r.refLFID?c?left_pad(7)}  ${r.keylen?c?left_pad(3)}  ${r.effStart}  ${r.effEnd}
+${r.workDDName}   <#if r.viewID gt 0>${r.viewID?c?left_pad(7)}<#else>       </#if>  ${r.viewName?right_pad(40)}  ${r.refDDName?right_pad(8)}  ${r.refPFID?c?left_pad(7)} >${r.refPFName?right_pad(48)}  ${r.refLRID?c?left_pad(7)}  ${r.refLFID?c?left_pad(7)}  ${r.keylen?c?left_pad(3)}  ${r.effStart}  ${r.effEnd}
 </#list>
-<#if reh??>
+<#--<#if reh??>
 ${reh.outputFile.outputDDName}   ${reh.ID?c}  ${reh.name?right_pad(40)}
 </#if>
 <#if rth??>
 ${rth.outputFile.outputDDName}   ${rth.ID?c}  ${rth.name?right_pad(40)}
-</#if>
+</#if><#-->
 <#else>
 <none>
 </#if>

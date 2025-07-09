@@ -19,7 +19,9 @@ package org.genevaers.repository.components;
  * under the License.
  */
 
-
+/**
+ * During reference phase generation we need to classify LookupPaths into types as defined here.
+ */
 public enum LookupType {
     NORMAL,
     EXIT,

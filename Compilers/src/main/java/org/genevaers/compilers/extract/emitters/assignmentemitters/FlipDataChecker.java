@@ -26,17 +26,24 @@ import java.util.List;
 import org.genevaers.compilers.extract.astnodes.ColumnAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FormattedASTNode;
+import org.genevaers.compilers.extract.emitters.rules.AssignColumnFlipNumeric;
 import org.genevaers.compilers.extract.emitters.rules.ConstStringToDateColumnError;
+import org.genevaers.compilers.extract.emitters.rules.FieldFlipNumeric;
 import org.genevaers.compilers.extract.emitters.rules.FieldZonedMaxLength;
 import org.genevaers.compilers.extract.emitters.rules.Rule;
+import org.genevaers.compilers.extract.emitters.rules.Truncation;
 import org.genevaers.compilers.extract.emitters.rules.Rule.RuleResult;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.enums.DataType;
 
 public class FlipDataChecker extends AssignmentRulesChecker {
 
     public FlipDataChecker() {
         addRule(new ConstStringToDateColumnError());
+        addRule(new Truncation());
+        addRule(new AssignColumnFlipNumeric());
+        addRule(new FieldFlipNumeric());
     }
 
     @Override
@@ -45,9 +52,11 @@ public class FlipDataChecker extends AssignmentRulesChecker {
         ViewColumn vc = column.getViewColumn();
         result = updateResult(result, apply(column, rhs));
         if (result != RuleResult.RULE_ERROR) {
+            if(vc.getDataType() != DataType.ALPHANUMERIC && !rhs.isNumeric()) {
+                Repository.addWarningMessage(ExtractBaseAST.makeCompilerMessage(String.format("Treating field {%s} as ZONED.", rhs.getMessageName())));
+            }
             List<Rule> flippedRules = new ArrayList<>();
             flippedRules.add(new FieldZonedMaxLength());
-            Repository.addWarningMessage(ExtractBaseAST.makeCompilerMessage(String.format("Treating field {%s} as ZONED.", rhs.getMessageName())));
             result = updateResult(result, applyRulesTo(flippedRules, column, rhs));
         }
 

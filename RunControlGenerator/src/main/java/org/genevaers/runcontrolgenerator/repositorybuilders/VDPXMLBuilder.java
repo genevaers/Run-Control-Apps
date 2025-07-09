@@ -36,11 +36,12 @@ public class VDPXMLBuilder extends XMLBuilder{
     }
 
     @Override
-    protected void buildFromXML(InputReport ir) {
+    protected Status buildFromXML(InputReport ir) {
         Status retval;
         VDPXMLSaxIterator vdpxmlReader = new VDPXMLSaxIterator();
 		try {
-            vdpxmlReader.setInputBuffer(inputBuffer);
+			vdpxmlReader.setInputReader(inputReader);
+            //vdpxmlReader.setInputBuffer(inputBuffer);
             vdpxmlReader.addToRepository();
             ir.setGenerationID(vdpxmlReader.getGenerationID());
 			retval = Status.OK;
@@ -48,6 +49,7 @@ public class VDPXMLBuilder extends XMLBuilder{
 			logger.atSevere().withStackTrace(StackSize.FULL).log("Repo build failed " + e.getMessage());
 			retval = Status.ERROR;
 		}
+        return retval;
 	}
 
     @Override

@@ -128,8 +128,8 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
                 arg.setFieldContentId(getDateCode());
                 arg.setOrdinalPosition(ref.getOrdinalPosition());
                 LogicTableArg arg2 = ((LogicTableF2)ltEntry).getArg2();
-                flipDataTypeIfFieldAlphanumeric(arg, arg2);
                 arg2.setFieldContentId(lhs.getDateCode());
+                arg2.setFieldFormat(lhs.getDataType());
             }
             arg.setLogfileId(getLtEmitter().getFileId());        
         }
@@ -204,15 +204,6 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
     @Override
     public DateCode getDateCode() {
         return (overriddenDateCode != null) ? overriddenDateCode : ref.getDateTimeFormat();
-    }
-
-    private void flipDataTypeIfFieldAlphanumeric(LogicTableArg arg, LogicTableArg arg2) {
-        if(arg2.getFieldFormat() != DataType.ALPHANUMERIC && arg.getFieldFormat() == DataType.ALPHANUMERIC) {
-            arg.setFieldFormat(DataType.ZONED);
-        }
-        if(arg2.getFieldFormat() == DataType.ALPHANUMERIC && arg.getFieldFormat() != DataType.ALPHANUMERIC) {
-            arg2.setFieldFormat(DataType.ZONED);
-        }
     }
 
     @Override

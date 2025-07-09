@@ -1,8 +1,8 @@
-//${test.name}R JOB (ACCT),'REGRESSION JOB',
+//${test.name}R JOB (${env["GERS_JOB_ACCT_INFO"]}),'REGRESSION JOB',
 //            NOTIFY=&SYSUID.,
-//            CLASS=A,
-//            MSGLEVEL=(1,1),
-//            MSGCLASS=H,
+//            CLASS=${env["GERS_JOB_CLASS"]},
+//            MSGLEVEL=${env["GERS_MSG_LEVEL"]},
+//            MSGCLASS=${env["GERS_MSG_CLASS"]},
 //            REGION=0M
 //*
 //JOBLIB   DD DISP=SHR,DSN=${env["OVERRIDE"]}

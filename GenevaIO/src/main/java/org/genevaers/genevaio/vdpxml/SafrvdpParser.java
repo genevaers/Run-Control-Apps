@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * Copyright Contributors to the GenevaERS Project.
 								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
@@ -29,7 +32,7 @@ public class SafrvdpParser extends BaseParser {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name) {
 			case "CREATEDTIMESTAMP":
 				created = text;

@@ -110,8 +110,7 @@ public class RecordCountAST  extends FormattedASTNode implements Assignable, Cal
 
     @Override
     public int getAssignableLength() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFormattedLength'");
+        return 10;
     }
 
     @Override

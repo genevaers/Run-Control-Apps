@@ -34,6 +34,7 @@ public class ColumnData {
     int alignmentValue;
     String numericMask; // Needed?
     int startPosition;
+    int extractAreaPosition;
     int ordinal;
     String name;
     String columnCalculation;
@@ -166,4 +167,11 @@ public class ColumnData {
         this.columnCalculation = columnCalculation;
     }
 
+    public int getExtractAreaPosition() {
+        return extractAreaPosition;
+    }
+
+    public void setExtractAreaPosition(int extractAreaPosition) {
+        this.extractAreaPosition = extractAreaPosition;
+    }
 }

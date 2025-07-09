@@ -88,6 +88,13 @@ class RunStringProcessingTest extends RunCompilerBase {
         assertEquals(LtCompareType.BEGINS, cfec.getCompareType());
     }
 
+    @Test void testBeginsWithError() {
+        LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, 
+        "IF {Alphanumeric} BEGINS_WITH {Description}  THEN COLUMN = 9 ELSE COLUMN = 3 ENDIF");
+        ErrorAST errs = (ErrorAST) ExtractPhaseCompiler.getXltRoot().getFirstNodeOfType(ASTFactory.Type.ERRORS);
+        assertTrue(errs.getError().contains("Only string constants"));
+    }
+
     @Test void testSFEC() {
         LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, 
         "IF {Alphanumeric} CONTAINS \"START\"  THEN COLUMN = 9 ELSE COLUMN = 3 ENDIF");
@@ -108,6 +115,12 @@ class RunStringProcessingTest extends RunCompilerBase {
         assertEquals(LtCompareType.ENDS, cfec.getCompareType());
     }
 
+    @Test void testEndsWithError() {
+        LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, 
+        "IF {Alphanumeric} ENDS_WITH {Description}  THEN COLUMN = 9 ELSE COLUMN = 3 ENDIF");
+        ErrorAST errs = (ErrorAST) ExtractPhaseCompiler.getXltRoot().getFirstNodeOfType(ASTFactory.Type.ERRORS);
+        assertTrue(errs.getError().contains("Only string constants"));
+    }
     @Test void testBothNumericFields() {
         LogicTable xlt = runFromXMLOverrideLogic(12044, TestHelper.ONE_COL_LOOKUP, 
         "IF {Binary1} CONTAINS {Binary2} THEN COLUMN = 9 ELSE COLUMN = 3 ENDIF");

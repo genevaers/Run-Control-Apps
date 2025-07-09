@@ -5,6 +5,7 @@ specFileSets:
       - "PeTests/Assignment/BIGASS.yaml"
       - "PeTests/Comparison/Integer/CMIALL.yaml"
       - "PeTests/Comparison/SearchFor/CMSFOR.yaml"
+      - "PeTests/Comparison/SearchFor/CONTAINS.yaml"
       - "PeTests/Arithmetic/BIGART.yaml" 
       - "PeTests/Pipe/PIPCA.yaml"
       - "PeTests/Pipe/PIPMU.yaml"

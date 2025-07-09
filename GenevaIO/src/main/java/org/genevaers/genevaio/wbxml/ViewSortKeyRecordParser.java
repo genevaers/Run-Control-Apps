@@ -94,11 +94,11 @@ public class ViewSortKeyRecordParser extends RecordParser {
 			switch (part) {
 				case "VIEWSORTKEYID":
 					vsk = new ViewSortKey();
-					vsk.setComponentId(Integer.parseInt(text));
 					vsk.setViewSortKeyId(Integer.parseInt(text));
 					setDefault(vsk);
 					break;
 				case "VIEWCOLUMNID":
+					vsk.setComponentId(Integer.parseInt(text));
 					vsk.setColumnId(Integer.parseInt(text));
 					break;
 				case "VIEWID":

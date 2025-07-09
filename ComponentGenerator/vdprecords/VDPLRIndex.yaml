@@ -12,9 +12,11 @@ fields:
   component_field: none
 - name: prefix.recordId
   type: mappingOnly
+  existing_java_type: record_id
   component_field: componentId
 - name: prefix.sequenceNbr
   type: mappingOnly
+  existing_java_type: sequence_nbr
   component_field: keyNumber
 - name: lr_index_name
   type: string

@@ -24,6 +24,7 @@ import org.genevaers.compilers.extract.astnodes.Assignable;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FormattedASTNode;
 import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.enums.DataType;
 
 public class FieldZonedMaxLength extends Rule{ 
 
@@ -32,7 +33,7 @@ public class FieldZonedMaxLength extends Rule{
     @Override
     public RuleResult apply(final ExtractBaseAST op1, final ExtractBaseAST op2) {
         FormattedASTNode f = ((FormattedASTNode)op2);
-        if(((Assignable)f).getAssignableLength() < MAX_ZONED_LENGTH ) {
+        if(f.getDataType() != DataType.ZONED || ((Assignable)f).getAssignableLength() < MAX_ZONED_LENGTH ) {
             return RuleResult.RULE_PASSED;
         } else {
             Repository.addErrorMessage(ExtractBaseAST.makeCompilerMessage(String.format(ERR_MESSAGE, f.getMessageName(), MAX_ZONED_LENGTH)));

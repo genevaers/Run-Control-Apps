@@ -464,8 +464,8 @@ import com.google.common.flogger.FluentLogger;
     params.setPort("5432");
     params.setSchema("gendev");
     params.setServer("localhost");
-    params.setUsername("postgres");
-    params.setPassword("postgres");
+    params.setUsername(System.getenv("PG_USERID"));
+    params.setPassword(System.getenv("PG_PASSWORD"));
     return params;
   }
 

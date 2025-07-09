@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.flogger.FluentLogger;
 import com.ibm.jzos.ZFile;
 import com.ibm.jzos.ZUtil;
@@ -38,6 +40,7 @@ import com.ibm.zos.sdsf.core.ISFRequestSettings;
 import com.ibm.zos.sdsf.core.ISFScrollConstants;
 import com.ibm.zos.sdsf.core.ISFStatus;
 import com.ibm.zos.sdsf.core.ISFStatusRunner;
+
 
 //Use the ISFActive Runner to look for the Active jobs 
 //Once the list is empty then they will have been completed
@@ -437,9 +440,13 @@ public class HeldJobs {
             if (jobList != null) {
                 for (ISFHeldOutput j : jobList) {
                     String rc = j.getValue("retcode");
+                    resultRC = rc;
                     if (rc.startsWith("ABEND")) {
-                        maxrcNum = Integer.parseInt(rc.substring(6));
-                        resultRC = rc;
+                        if (StringUtils.isNumeric(rc.substring(6))) {
+                            maxrcNum = Integer.parseInt(rc.substring(6));
+                        } else {
+                            maxrcNum = 88;
+                        }
                         failedJobs.add(j);
                     } else if (rc.startsWith("CC ")) {
                         int rcNum = Integer.parseInt(rc.substring(3));

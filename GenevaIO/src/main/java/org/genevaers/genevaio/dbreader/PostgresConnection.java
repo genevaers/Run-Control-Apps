@@ -19,12 +19,12 @@ package org.genevaers.genevaio.dbreader;
 
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.postgresql.ds.PGSimpleDataSource;
 import com.google.common.flogger.FluentLogger;
 
 public class PostgresConnection extends DatabaseConnection {
@@ -39,13 +39,15 @@ public class PostgresConnection extends DatabaseConnection {
 
     @Override
     public void connect() throws SQLException {
-        String url = "jdbc:postgresql://" 
-        + params.getServer() +":" + params.getPort() + "/" + params.getDatabase()
-        + "?user=" + params.getUsername() 
-        + "&password=" +params.getPassword() 
-        + "&ssl=false"
-        + "&currentSchema=" + params.getSchema();
-        con  = DriverManager.getConnection(url);
+        PGSimpleDataSource ds = new PGSimpleDataSource();
+        ds.setServerName("localhost");
+        ds.setDatabaseName(params.getDatabase());
+        ds.setUser(params.getUsername());
+        ds.setPassword(params.getPassword());
+        ds.setCurrentSchema(params.getSchema());
+        logger.atInfo().log("Built the Postgres Datasource");
+        con  = ds.getConnection();
+        logger.atInfo().log("Connected");
     }
     
     @Override

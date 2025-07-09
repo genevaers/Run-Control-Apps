@@ -44,4 +44,9 @@ public class RightASTNode extends StringFunctionASTNode implements Assignable{
         throw new UnsupportedOperationException("Unimplemented method 'getAssignableLength'");
     }
 
+
+    @Override
+    public int getChildStartPosition() {
+        return super.getChildStartPosition() + getChildLength() - getLength();
+    }
 }

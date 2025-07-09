@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class FMLogger {
+	static transient Logger logger = Logger.getLogger("org.genevaers.testframework.FMLogger");
 	static private FileHandler fileTxt;
 	static private SimpleFormatter formatterTxt;
 	static private ConsoleHandler conHandler;
@@ -38,7 +39,7 @@ public class FMLogger {
 	static public void setup() {
 		try {
 			// Create Logger
-			Logger logger = Logger.getLogger("");
+			
 //			logger.setLevel(Level.INFO);
 			logger.setLevel(Level.FINE);
 			Handler[] handlers = logger.getHandlers();
@@ -55,7 +56,7 @@ public class FMLogger {
 				logger.addHandler(conHandler);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.severe("Failed in FMLogger setup:"+e.getMessage());
 		}
 	}
 } 

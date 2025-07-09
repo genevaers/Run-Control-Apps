@@ -61,21 +61,20 @@ public class TestRepository  {
         //Make sure we can't intantiate this - there will be only one
     }
 
-    public static void buildTheRepo(File specFileList) {
+    public static void buildTheRepo(File specFileList, String overrideTemplateSet) {
         yr = new YAMLReader();
         try {
             //specFiles = yr.readSpecFileList(specFileList);
             specFileSets = yr.readSpecFileSets(specFileList);
-            processSpecFileSets();
+            processSpecFileSets(overrideTemplateSet);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Error in building the Repo: \n%s", e.getMessage());
         }
     }
 
-    private static void processSpecFileSets() {
+    private static void processSpecFileSets(String overrideTemplateSet) {
         for(SpecFiles specFiles : specFileSets.getSpecFileSets()) {
-            TemplateSet ts = readTemplateSet(specFiles.getTemplateSetName());
+            TemplateSet ts = readTemplateSet(overrideTemplateSet != null ? overrideTemplateSet : specFiles.getTemplateSetName());
             specFiles.addTemplateSet(ts);
             specFiles.buildTemplateTypeLists();
             readTheTestSpecs(specFiles);
@@ -97,8 +96,7 @@ public class TestRepository  {
             spec = yr.readSpec("spec/" + s);
             readPassViewsIfNeeded(spec);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Exception in reading Test specs \n%s", e.getMessage());
         }
         return spec;
     }
@@ -120,8 +118,7 @@ public class TestRepository  {
         try {
             return yr.readPassViews(passViewsPath.toFile());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Exception in reading Pass views \n%s", e.getMessage());
             return null;
         } 
     }
@@ -168,8 +165,7 @@ public class TestRepository  {
         try {
             templateSet = yr.yaml2TemplateSet(new File("templateSets/" + tempSet));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.atSevere().log("Exception in reading template sets \n%s", e.getMessage());
         }
         return templateSet;
     }

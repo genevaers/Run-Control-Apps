@@ -33,8 +33,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.flogger.FluentLogger;
 
 public class CoverageFile {
+
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private JsonFactory jFactory;
 	private ObjectMapper mapper;
@@ -65,7 +68,7 @@ public class CoverageFile {
 					readOkay = true;
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.atSevere().withCause(e);
 			}
 		}
 		return readOkay;
@@ -181,7 +184,7 @@ public class CoverageFile {
 				}
 				accumulating = true;
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.atSevere().log("Exception occurred in Json parser \n%s", e.getMessage());
 			}
 		} else {
 			// we just need to save the current JSON tree
@@ -207,7 +210,7 @@ public class CoverageFile {
 				}
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				logger.atSevere().log("Exception occurred in Json generator \n%s", e.getMessage());
 			}
 	}
 }

@@ -58,6 +58,8 @@ public class LookupSourceKeyRecordParser extends RecordParser {
 			switch (part) {
 				case "LOOKUPSTEPID":
 					lookupStepId = Integer.parseInt(text);
+					lrfieldid = 0;
+					lrlfAssocid = 0;
 					break;
 				// TODO backfill this?
 				// lookupKey.setStepNumber(stepNumber);
@@ -94,6 +96,7 @@ public class LookupSourceKeyRecordParser extends RecordParser {
 					lookupKey.setJustification(JustifyId.NONE);
 					lookupKey.setFieldId(lrfieldid);
 					lookupKey.setKeyNumber((short)seqNum);
+					lookupKey.setOrdinalPosition((short)seqNum);
 					if(lookupStepId != currentStepId) {
 						currentKeyList = new ArrayList<LookupPathKey>();
 						currentStepId = lookupStepId;
@@ -139,6 +142,7 @@ public class LookupSourceKeyRecordParser extends RecordParser {
 					break;
 				case "VALUE":
 					lookupKey.setValue(text);
+					lookupKey.setValueLength(text.length());
 				default:
 					break;
 			}

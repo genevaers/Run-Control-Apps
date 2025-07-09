@@ -122,11 +122,11 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             arg1.setLogfileId(lookup.getTargetLFID());
             arg1.setLrId(lookup.getTargetLRID());
             arg1.setFieldId(ref.getComponentId());
-            // arg1.setFieldFormat(getDataType());
-            // arg1.setFieldContentId(getDateCode());
+            arg1.setFieldFormat(((FormattedASTNode)rhs).getDataType());
+            arg1.setFieldContentId(((FormattedASTNode)rhs).getDateCode());
             LogicTableArg arg2 = dtl.getArg2();
-            flipDataTypeIfFieldAlphanumeric(arg1, arg2);
-//            arg2.setFieldContentId(lhs.getDateCode());
+            arg2.setFieldContentId(lhs.getDateCode());
+            arg2.setFieldFormat(lhs.getDataType());
             stripDatesIfSame(dtl);
             ltEmitter.addToLogicTable((LTRecord)dtl);
         }else if(currentViewColumn.getExtractArea() == ExtractArea.AREACALC) {
@@ -157,7 +157,14 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
             arg1.setLrId(lookup.getTargetLRID());
             arg1.setFieldId(ref.getComponentId());
             LogicTableArg skarg2 = skl.getArg2();
-            flipDataTypeIfFieldAlphanumeric(arg1, skarg2);
+            //C++ fixup - should be done as part of the assignment rules...
+            if(lhs.getDataType() == DataType.ALPHANUMERIC) {
+                if(arg1.getFieldFormat() == DataType.ZONED && !arg1.isSignedInd()) {
+                    lhs.overrideDataType(DataType.ZONED);
+                }
+            }
+            skarg2.setFieldContentId(lhs.getDateCode());
+            skarg2.setFieldFormat(lhs.getDataType());
             stripDatesIfSame(skl);
             ltEmitter.addToLogicTable((LTRecord)skl);
         }
@@ -302,15 +309,6 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
     @Override
     public DateCode getDateCode() {
         return (overriddenDateCode != null) ? overriddenDateCode : ref.getDateTimeFormat();
-    }
-
-    private void flipDataTypeIfFieldAlphanumeric(LogicTableArg arg, LogicTableArg arg2) {
-        if(arg2.getFieldFormat() != DataType.ALPHANUMERIC && arg.getFieldFormat() == DataType.ALPHANUMERIC) {
-            arg.setFieldFormat(DataType.ZONED);
-        }
-        if(arg2.getFieldFormat() == DataType.ALPHANUMERIC && arg.getFieldFormat() != DataType.ALPHANUMERIC) {
-            arg2.setFieldFormat(DataType.ZONED);
-        }
     }
 
     @Override

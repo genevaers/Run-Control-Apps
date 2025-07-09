@@ -85,4 +85,9 @@ public class InternalField extends Field {
         strB.append(DBLINDENT + name + ".addRecordNodes(" + name + "n, compare);\n");
         return strB.toString();
     }
+
+    @Override
+    public String getType() {
+        return existingJavaType;
+    }
 }

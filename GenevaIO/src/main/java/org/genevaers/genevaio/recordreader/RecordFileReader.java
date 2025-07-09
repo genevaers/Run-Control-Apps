@@ -20,11 +20,8 @@ package org.genevaers.genevaio.recordreader;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-
 import org.apache.commons.lang3.StringUtils;
+import org.genevaers.utilities.GersCodePage;
 
 public abstract class RecordFileReader {
 	private static boolean spacesConverted = false;
@@ -41,11 +38,7 @@ public abstract class RecordFileReader {
 
 	public static void setSpacesEBCDIC() {
 		if(spacesConverted == false) {
-			Charset utf8charset = Charset.forName("UTF-8");
-			Charset ebccharset = Charset.forName("IBM-1047");
-			ByteBuffer inputBuffer = ByteBuffer.wrap(spaces.getBytes());
-			CharBuffer data = utf8charset.decode(inputBuffer);
-			spaces = new String(ebccharset.encode(data).array());	
+			spaces = new String(GersCodePage.asciiToEbcdic(spaces));
 			spacesConverted = true;
 		}
 	}

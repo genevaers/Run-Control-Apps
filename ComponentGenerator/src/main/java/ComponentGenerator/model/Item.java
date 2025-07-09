@@ -18,6 +18,9 @@ package ComponentGenerator.model;
  */
 
 
+/**
+ * POJO for the Item. Used in the Jackson processing.
+ */
 public class Item {
 
     private String name;

@@ -1,9 +1,7 @@
 package org.genevaers.repository.calculationstack;
 
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.List;
+
 
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008
@@ -24,6 +22,7 @@ import java.util.List;
 
 
 import org.genevaers.repository.calculationstack.CalcStack.CalcStackOpcode;
+import org.genevaers.utilities.GersCodePage;
 
 public class CalcStackEntry {
 
@@ -80,20 +79,11 @@ public class CalcStackEntry {
         String os = System.getProperty("os.name");
 		if(os.startsWith("z")) {
             //On z/OS these strings will need to be EBCDIC
-            buffer.put(CalcStackEntry.asciiToEbcdic(str), 0, str.length());
-            buffer.put(CalcStackEntry.asciiToEbcdic(CalcStack.spaces), 0, len - str.length());
+            buffer.put(GersCodePage.asciiToEbcdic(str), 0, str.length());
+            buffer.put(GersCodePage.asciiToEbcdic(CalcStack.spaces), 0, len - str.length());
         } else {
             buffer.put(str.getBytes(), 0, str.length());
             buffer.put(CalcStack.spaces.getBytes(), 0, len - str.length());
         }
     }
-
-    public static byte[] asciiToEbcdic(String str) {
-        Charset utf8charset = Charset.forName("ISO8859-1");
-        Charset ebccharset = Charset.forName("IBM-1047");
-        ByteBuffer inputBuffer = ByteBuffer.wrap(str.getBytes());
-        CharBuffer data = utf8charset.decode(inputBuffer);
-        return ebccharset.encode(data).array();
-      }
-
 }

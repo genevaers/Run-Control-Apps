@@ -1,5 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -32,9 +35,16 @@ public class LRFieldRecordParser extends BaseParser {
 	private LRField lrField;
 	private int currentLrId;
 
+	public LRFieldRecordParser() {
+		sectionName = "Fields";
+	}
+
 	@Override
-	public void addElement(String name, String text) {
+	public void addElement(String name, String text, Map<String, String> attributes) {
 		switch (name.toUpperCase()) {
+			case "FIELD":
+			componentID = Integer.parseInt(attributes.get("ID"));
+			break;
 			case "NAME":
 				lrField = new LRField();
 				lrField.setComponentId(componentID);

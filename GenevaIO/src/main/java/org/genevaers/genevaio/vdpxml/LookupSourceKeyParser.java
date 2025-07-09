@@ -1,6 +1,8 @@
 package org.genevaers.genevaio.vdpxml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.genevaers.repository.Repository;
 
@@ -32,7 +34,7 @@ import org.xml.sax.Attributes;
 
 public class LookupSourceKeyParser extends BaseParser {
 	private LookupPathKey lookupKey;
-	private int lrlfAssocid;
+	private int lrid;
 	private int currentLookupId = 0;
 	private LookupPath currenLookupPath;
 
@@ -45,37 +47,59 @@ public class LookupSourceKeyParser extends BaseParser {
 	private int lookupStepId;
 	private ArrayList<LookupPathKey> currentKeyList;
 	private int lrfieldid;
-
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (qName.toUpperCase()) {
-			case "FIELDREF":
-				lookupKey.setFieldId(Integer.parseInt(attributes.getValue("ID")));
-				break;
-			default:
-				break;
-		}
-	}		
+	private LookupPathStep lookupStep;
+	private boolean symbol;
+		private boolean constant;
 	
-	@Override
-	public void addElement(String name, String text) {
-		switch (name.toUpperCase()) {
+		public LookupSourceKeyParser() {
+			sectionName = "Source";
+		}
+	
+		@Override
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
+			switch (qName.toUpperCase()) {
+				default:
+					break;
+			}
+		}
+	
+		@Override
+		public void addElement(String name, String text, Map<String, String> attributes) {
+			switch (name.toUpperCase()) {
+				case "LOGICALRECORDREF":
+					lrid = Integer.parseInt(attributes.get("ID"));
+					break;
+				case "KEYFIELD":
+					int seq = Integer.parseInt(attributes.get("seq"));
+					int lkid = Integer.parseInt(attributes.get("ID"));
+					lookupKey = makeLookupKeyPath(lkid, seq);
+					lookupKey.setSourceLrId(lrid);
+					lookupStep.addKey(lookupKey);
+					symbol = false;
+					constant = false;
+				break;
+			case "FIELDREF":
+				lookupKey.setFieldId(Integer.parseInt(attributes.get("ID")));
+				break;
 			case "DATATYPE":
 				lookupKey.setDatatype(DataType.fromdbcode(text.trim()));
 				break;
-			case "SIGNED":
+			case "DATEFORMAT":
+				lookupKey.setDateTimeFormat(DateCode.fromdbcode(text.trim()));
+				break;
+			case "SIGNEDDATA":
 				lookupKey.setSigned(text.equals("1") ? true : false);
 				break;
 			case "LENGTH":
 				short s = (short) Integer.parseInt(text);
-				lookupKey.setFieldLength(s);
+				if(symbol) {
+					lookupKey.setValueLength(s);
+				}
+ 				lookupKey.setFieldLength(s);
 				break;
 			case "DECIMALCNT":
 				s = (short) Integer.parseInt(text);
 				lookupKey.setDecimalCount(s);
-				break;
-			case "FLDCONTENTCD":
-				lookupKey.setDateTimeFormat(DateCode.fromdbcode(text));
 				break;
 			case "ROUNDING":
 				s = (short) Integer.parseInt(text);
@@ -88,12 +112,14 @@ public class LookupSourceKeyParser extends BaseParser {
 				lookupKey.setMask(text);
 				break;
 			case "SYMBOLICNAME":
+				symbol = true;
 				lookupKey.setSymbolicName(text);
 				break;
 			case "SYMBOLICDEFAULT":
 			case "VALUE":
 			case "CONSTANT":
 				lookupKey.setValue(text);
+				lookupKey.setValueLength(text.length());
 			default:
 				break;
 		}
@@ -103,19 +129,38 @@ public class LookupSourceKeyParser extends BaseParser {
 		seqNum = seq;
 	}
 
-    public void setLookupID(int lkid) {
+	public void setLookupID(int lkid) {
 		currenLookupPath = Repository.getLookups().get(lkid);
 		lookupKey = new LookupPathKey();
 		lookupKey.setComponentId(lkid);
 		lookupKey.setDateTimeFormat(DateCode.NONE);
 		lookupKey.setJustification(JustifyId.NONE);
-		lookupKey.setKeyNumber((short)seqNum);
+		lookupKey.setKeyNumber((short) seqNum);
 		currentKeyList = new ArrayList<LookupPathKey>();
 		currentStepId = componentID;
-//		lookupStepKeys.put(componentID, currentKeyList);
+		// lookupStepKeys.put(componentID, currentKeyList);
 		currentKeyList.add(lookupKey);
+	}
+
+	public LookupPathKey makeLookupKeyPath(int lkid, int seq) {
+		LookupPathKey lkey = new LookupPathKey();
+		lkey.setComponentId(lkid);
+		lkey.setDateTimeFormat(DateCode.NONE);
+		lkey.setJustification(JustifyId.LEFT);
+		lkey.setKeyNumber((short) seq);
+		lkey.setStepNumber(lookupStep.getStepNum());
+		return lkey;
 	}
 
 	public void setFieldId(int int1) {
 	}
+
+	public void setLookupStep(LookupPathStep lookupStep) {
+		this.lookupStep = lookupStep;
+	}
+
+	public LookupPathKey getLookupKey() {
+		return lookupKey;
+	}
+
 }
