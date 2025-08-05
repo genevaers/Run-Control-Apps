@@ -96,6 +96,12 @@ public class LogicTableTextWriter extends TextRecordWriter {
 
 
 	private void writeContent(MetadataNode recordsRoot, Writer fw) throws IOException {
+		if(recordsRoot.getName().equals("Compare")) {
+			fw.write("Comparison Summary\n==================\n\n");
+			fw.write("Source1: " + recordsRoot.getSource1() + "\n");
+			fw.write("Source2: " + recordsRoot.getSource2() + "\n");
+			fw.write("Differences: Source1 -> Source2 \n\n");
+		}
 		fw.write(String.format("\nRecord Level Reports\n"));
 		fw.write(String.format("====================\n"));
         Iterator<FieldNodeBase> fi = recordsRoot.getChildren().iterator();

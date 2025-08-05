@@ -16,7 +16,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<!-- our apps -->
-		<revision>1.1.0_RC17</revision>
+		<revision>1.1.0_RC18</revision>
 	</properties>
 
 	<licenses>
@@ -135,7 +135,7 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.19.0</version>
+				<version>2.20.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-net</groupId>
