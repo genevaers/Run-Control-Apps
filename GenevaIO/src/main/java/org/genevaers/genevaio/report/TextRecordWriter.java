@@ -99,7 +99,8 @@ public abstract class TextRecordWriter {
 			case CHANGED:
 				break;
 			case IGNORED:
-				retval = "Ignored";
+				//retval = "Ignored";
+				retval = "***    ";
 				break;
 			case RECIGNORE:
 				return "RCGOnly";
