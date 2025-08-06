@@ -30,4 +30,5 @@ public class LrDetails {
 	int lookupExitId;
 	String exitParms;
 	ComparisonState state;
+	int length;
 }
