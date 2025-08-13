@@ -48,6 +48,8 @@ public class ExtractorWriter {
 
 	private static  Configuration cfg;
 
+    private static Collection<JoinGenerator> joins;
+
 	public static void write(List<ExtractorEntry> exrecs, List<String> inputdds, int outLen, int lrLen){
 		configureFreeMarker();
         Template template;
@@ -60,6 +62,7 @@ public class ExtractorWriter {
             nodeMap.put("inputdds", inputdds);
             nodeMap.put("outLen", outLen);
             nodeMap.put("lrLen", lrLen);
+            nodeMap.put("joins", joins);
             generateTemplatedOutput(template, nodeMap, "XLT.java");
             logger.atInfo().log("Extract Java Generated");
         } catch (IOException e) {
@@ -85,12 +88,13 @@ public class ExtractorWriter {
 	}
 
 
-    public static void addJoinInitialisation(Collection<JoinGenerator> joins) {
+    public static void addJoinInitialisation(Collection<JoinGenerator> js) {
         //What do we do with the join data?
         //Function to read the data from the DDname of the PF - this cuts out the ref optimisation?
         //Use the join id to make a REFRnnn and use that as the ddname
         //So PE uses a REFR class? -> we make a REFRnnn class
         //  it knows how to build the map for the lookup - again templated
+        joins = js;
     }
 
 

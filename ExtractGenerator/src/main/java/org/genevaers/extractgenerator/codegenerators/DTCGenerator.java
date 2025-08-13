@@ -7,7 +7,7 @@ import org.genevaers.genevaio.ltfile.LogicTableNV;
 
 import com.google.common.flogger.FluentLogger;
 
-public class DTCGenerator implements ExtractRecordGenerator{
+public class DTCGenerator extends ExtractRecordGenerator{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     @Override
@@ -15,8 +15,15 @@ public class DTCGenerator implements ExtractRecordGenerator{
         LogicTableF1 dtc = (LogicTableF1)lt;
         LogicTableArg arg = dtc.getArg();
         logger.atInfo().log("DTC value %s", arg.getValue().getPrintString());
+        int targfieldLength = arg.getFieldLength();
+        String targString = "0";
+        if(arg.getValue().getPrintString().equals("")) {
+            targString = String.format("%-" + targfieldLength + "s", " ");
+        } else {
+            targString = arg.getValue().getPrintString();
+        }
         return new ExtractorEntry(
-            String.format("        target.put(\"%s\".getBytes());", arg.getValue().getPrintString()));
+            String.format("        target.put(\"%s\".getBytes());", targString));
     }
 
 }

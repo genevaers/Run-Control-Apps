@@ -12,10 +12,9 @@ public class LUSMGenerator {
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableRE lusm = (LogicTableRE)lt;
         logger.atInfo().log("LUSM" );
-        return new ExtractorEntry(String.format("//LUSM - update lookup buffer //LUSM - update lookup buffer\r\n" + //
+        return new ExtractorEntry(String.format("//LUSM - update lookup buffer\n" + //
                         "            joinBuffer = jn.updateBuffer();  // not found case?\r\n" + //
-                        "        }\r\n" + //
-                        ""));
+                        "        }"));
     }
 
 }

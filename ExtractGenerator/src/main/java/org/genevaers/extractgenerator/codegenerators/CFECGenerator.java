@@ -6,7 +6,7 @@ import org.genevaers.genevaio.ltfile.LogicTableF1;
 
 import com.google.common.flogger.FluentLogger;
 
-public class CFECGenerator implements ExtractRecordGenerator{
+public class CFECGenerator extends ExtractRecordGenerator{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     int trueGoto;
     int falseGoto;
@@ -22,6 +22,7 @@ public class CFECGenerator implements ExtractRecordGenerator{
         logger.atInfo().log("CFEC from pos %d len %d %s %s", arg.getStartPosition()-1,  arg.getFieldLength(), cfec.getCompareType(), arg.getValue().getPrintString());
         trueGoto = cfec.getGotoRow1();
         falseGoto = cfec.getGotoRow2();
+        this.lt = lt;
         return new ExtractorEntry(
         String.format("        if(new String(src, %d , %d).equals(\"%s\")) {", arg.getStartPosition()-1,  arg.getFieldLength(), arg.getValue().getPrintString()));
     }

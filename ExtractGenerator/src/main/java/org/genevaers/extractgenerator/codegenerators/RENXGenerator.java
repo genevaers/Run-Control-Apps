@@ -10,7 +10,7 @@ import org.genevaers.repository.components.LogicalFile;
 
 import com.google.common.flogger.FluentLogger;
 
-public class RENXGenerator implements ExtractRecordGenerator{
+public class RENXGenerator extends ExtractRecordGenerator{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private List<String> inputs;
 

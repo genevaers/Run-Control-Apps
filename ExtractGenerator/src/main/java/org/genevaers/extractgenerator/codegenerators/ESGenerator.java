@@ -6,7 +6,7 @@ import org.genevaers.genevaio.ltfile.LogicTableWR;
 
 import com.google.common.flogger.FluentLogger;
 
-public class ESGenerator implements ExtractRecordGenerator{
+public class ESGenerator extends ExtractRecordGenerator{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     @Override

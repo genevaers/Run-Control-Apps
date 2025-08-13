@@ -5,7 +5,7 @@ import org.genevaers.genevaio.ltfile.LogicTableWR;
 
 import com.google.common.flogger.FluentLogger;
 
-public class WRDTGenerator implements ExtractRecordGenerator{
+public class WRDTGenerator extends ExtractRecordGenerator{
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private int outLen;
 

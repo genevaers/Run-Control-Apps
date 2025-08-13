@@ -2,8 +2,13 @@ package org.genevaers.extractgenerator.codegenerators;
 
 import org.genevaers.genevaio.ltfile.LTRecord;
 
-public interface ExtractRecordGenerator {
+public abstract class ExtractRecordGenerator {
+    protected LTRecord lt;
 
-    public ExtractorEntry processRecord(LTRecord lt);
+    public abstract ExtractorEntry processRecord(LTRecord lt);
+
+    public LTRecord getLt() {
+        return lt;
+    }
 
 }

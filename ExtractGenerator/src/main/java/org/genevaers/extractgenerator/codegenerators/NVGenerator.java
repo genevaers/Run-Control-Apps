@@ -7,7 +7,7 @@ import org.genevaers.repository.Repository;
 
 import com.google.common.flogger.FluentLogger;
 
-public class NVGenerator implements ExtractRecordGenerator {
+public class NVGenerator extends ExtractRecordGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     int outputLength;
     int lrLength;

@@ -26,11 +26,29 @@ public class Join {
     private boolean updateRequired;
 
     private ByteArrayKey key; 
+    private int targLf;
+    private int targLr;
+    private String lflrid;
+    private int keyLength;
+    private int recLength;
+    private int fileid;
     
+    public Join(String lflr, int lf, int lr, int rlen, int klen, int fid) {
+        lflrid = lflr;
+        targLf = lf;
+        targLr = lr;
+        recLength = rlen;
+        keyLength = klen;
+        fileid = fid;
+    }
+
     public void addReferenceRecord(FileRecord refRecord) {
         //get the key
         FileRecord joinRecord = new FileRecord();
-
+        //here we need to know how long the key is.
+        //That is what is written to the REH file. Which we do not have...
+        //We could get from the VDP? Or Repository?
+        //Or at the time we build the XLT.java we can add the join details to be read here
         ByteArrayKey ipkey = new ByteArrayKey(refRecord.bytes.array(), 0, 1);
         joinRecord.bytes.put(refRecord.bytes.array(), 0, 25);
         data.put(ipkey, joinRecord);
@@ -90,5 +108,29 @@ public class Join {
 
     public boolean updateRequired() {
         return updateRequired;
+    }
+
+    public int getFileid() {
+        return fileid;
+    }
+
+    public int getKeyLength() {
+        return keyLength;
+    }
+
+    public int getRecLength() {
+        return recLength;
+    }
+
+    public int getTargLf() {
+        return targLf;
+    }
+
+    public int getTargLr() {
+        return targLr;
+    }
+
+    public String getLflrid() {
+        return lflrid;
     }
 }

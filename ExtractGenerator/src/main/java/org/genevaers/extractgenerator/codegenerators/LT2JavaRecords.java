@@ -18,10 +18,12 @@ public class LT2JavaRecords {
     private static List<String> inputDDnames = new ArrayList<>();
     private static int outputLength;
     private static int lrLength;
-    private static Stack<Integer> gotos = new Stack<>();
+    private static Stack<ExtractRecordGenerator> gotos = new Stack<>();
     private static int endScopeRow;
 
     private static Map<String, JoinGenerator> joins = new HashMap<>();
+
+    private static int lookupFieldLength;
 
     public static ExtractorEntry processRecord(LTRecord lt) {
         String fc = lt.getFunctionCode();
@@ -48,11 +50,13 @@ public class LT2JavaRecords {
             case "DTL":
                 DTLGenerator dtl = new DTLGenerator();
                 exrecs.add(dtl.processRecord(lt));
+                //do we need to stack them
+                lookupFieldLength = dtl.getFieldLength();
                 break;
             case "CFEC":
                 CFECGenerator cfec = new CFECGenerator();
                 exrecs.add(cfec.processRecord(lt));
-                gotos.push(cfec.getFalseRow());
+                gotos.push(cfec);
                 break;
             case "JOIN":
                 JoinGenerator join = new JoinGenerator();
@@ -60,8 +64,15 @@ public class LT2JavaRecords {
                 // Input DDName - record len, key Len, so we can populate the Map of data
                 //We also need to generate the if logic that is a JOIN - three way
                 //Flag on if reference data already read for this event record
+                //
+                // REH has LF/LR ID
+                // Record Length and key length
+                // Data file number
+                // should key the joins map on lf/lr 
                 exrecs.add(join.processRecord(lt));
                 joins.computeIfAbsent(join.getNewid(), id -> addJoin(join));
+                endScopeRow = join.getFalseRow();
+                gotos.push(join);
                 break;
             case "LKE":
                 LKEGenerator lke = new LKEGenerator();
@@ -73,9 +84,11 @@ public class LT2JavaRecords {
                 break;
             case "GOTO":
                 GOTOGenerator gotofc = new GOTOGenerator();
-                if(gotos.size() > 0 && gotos.peek() == lt.getRowNbr()+1) {
-                    gotofc.generateElse();
-                    gotos.pop();
+                if(gotos.size() > 0) {
+                    if(gotos.peek().getLt().getGotoRow2() == lt.getRowNbr()+1) {
+                        ExtractRecordGenerator gotFrom = gotos.pop();
+                        gotofc.setFrom(gotFrom);
+                    }
                 }
                 exrecs.add(gotofc.processRecord(lt));
                 endScopeRow = gotofc.getEndScopeRow();
@@ -98,7 +111,7 @@ public class LT2JavaRecords {
             break;
         }
         if(lt.getRowNbr() > 0 && lt.getRowNbr() == endScopeRow) {
-            exrecs.add(new ExtractorEntry("}"));  //will need a stack here? And manage indent
+            exrecs.add(new ExtractorEntry("        }"));  //will need a stack here? And manage indent
         }
         return null;
     }

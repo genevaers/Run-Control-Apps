@@ -113,28 +113,34 @@ public class PERun {
         //Should this be done dynamically
         //or when the Extract is generated... we should know what we need then
         //At the moment this is not reading the VDP
-        Join join = new Join();
+        JoinsRepo.getJoins().stream().forEach(j -> populateJoin(j));;
+    }
+
+    private void populateJoin(Join j) {
         rr = RecordFileReaderWriter.getReader();
-        rr.readRecordsFrom(new File("REFR001"));
-        rr.setRecLen(27);
+        try {
+            rr.readRecordsFrom(new File(String.format("REFR%03d", j.getFileid())));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        rr.setRecLen(j.getKeyLength() + j.getRecLength() + 2);//for CR/LF
         FileRecord rec = rr.readRecord();
         while (rr.isAtFileEnd() == false) {
             numrecords++;
-            join.addReferenceRecord(rec);
-            join.setJoinId(1);
+            j.addReferenceRecord(rec);
             rec.bytes.clear();
             rec = rr.readRecord();
         }
         rr.close();       
         logger.atInfo().log("Read %d reference records", numrecords);
-        join.logContent();
-        JoinsRepo.addJoin(join);
+        j.logContent();
     }
 
     private void readWrite() {
         try {
-            setupReferences();
             extractor = getExtractor();
+            setupReferences();
             setupIO();
             openInput(Paths.get(inputDDnames.get(0)));
             openOutput(outputDDnames.get(0));
