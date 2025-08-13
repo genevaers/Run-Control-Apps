@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.genevaers.engine.lookups.Join;
+import org.genevaers.engine.lookups.JoinsRepo;
 import org.genevaers.genevaio.ltfile.LTRecord;
+import org.genevaers.genevaio.recordreader.FileRecord;
 import org.genevaers.genevaio.recordreader.RecordFileWriter;
 import org.genevaers.utilities.GersCodePage;
 
@@ -26,9 +29,12 @@ import org.genevaers.utilities.GersCodePage;
 <#list inputdds as ip>
         inputDDnames.add("${ip}");
 </#list>
+<#list joins as j>
+        JoinsRepo.addJoin(new Join("${j.newid}", ${j.targLf?c}, ${j.targLr?c}, ${j.recLength}, ${j.keyLength}, ${j.fileid}));
+</#list>
     }
 
-    public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter) {
+    public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
 
 <#list exrecs as rec>
 ${rec}
