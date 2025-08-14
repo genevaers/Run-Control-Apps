@@ -50,7 +50,7 @@ public class Join {
         //We could get from the VDP? Or Repository?
         //Or at the time we build the XLT.java we can add the join details to be read here
         ByteArrayKey ipkey = new ByteArrayKey(refRecord.bytes.array(), 0, 1);
-        joinRecord.bytes.put(refRecord.bytes.array(), 0, 25);
+        joinRecord.bytes.put(refRecord.bytes.array(), keyLength, recLength+keyLength);
         data.put(ipkey, joinRecord);
     }
 
@@ -58,10 +58,10 @@ public class Join {
         Iterator<Entry<ByteArrayKey, FileRecord>> jei = data.entrySet().iterator();
         while (jei.hasNext()) {
             Entry<ByteArrayKey, FileRecord> je = jei.next();
-            byte[] joinrecBuffer = new byte[24];
+            byte[] joinrecBuffer = new byte[recLength];
             FileRecord val = je.getValue();
             val.bytes.position(1);
-            for(int i=0; i<24; i++) {
+            for(int i=0; i<recLength; i++) {
                 joinrecBuffer[i] = val.bytes.get();
             }
             logger.atInfo().log("Key %s -> %s",je.getKey() , new String(joinrecBuffer));
@@ -88,7 +88,7 @@ public class Join {
     public FileRecord updateBuffer() {
         currentBuffer = data.get(key);
         if(currentBuffer != null) {
-            currentBuffer.bytes.position(0);
+            currentBuffer.bytes.position(keyLength);
         }
         return currentBuffer;
     }
