@@ -20,7 +20,7 @@ public class DTCGenerator extends ExtractRecordGenerator{
         if(arg.getValue().getPrintString().equals("")) {
             targString = String.format("%-" + targfieldLength + "s", " ");
         } else {
-            targString = arg.getValue().getPrintString();
+            targString = String.format("%-" + targfieldLength + "s", arg.getValue().getPrintString());
         }
         return new ExtractorEntry(
             String.format("        target.put(\"%s\".getBytes());", targString));
