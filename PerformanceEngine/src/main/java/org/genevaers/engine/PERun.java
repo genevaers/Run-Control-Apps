@@ -179,22 +179,23 @@ public class PERun {
     }
 
     private void readInput() throws Exception {
+        int recnum = 0;
         rr = RecordFileReaderWriter.getReader();
         rr.readRecordsFrom(inputFile);
         rr.setRecLen(extractor.getLrLen());
         FileRecord rec = rr.readRecord();
         while (rr.isAtFileEnd() == false) {
-            numrecords++;
-            processRecord(rec);
+            recnum++;
+            processRecord(rec, recnum);
             rec.bytes.clear();
             rec = rr.readRecord();
         }
         // addVDPRecordToRepo(rec);
-        logger.atInfo().log("Read %d records", numrecords);
+        logger.atInfo().log("Read %d records", recnum);
         rr.close();
     }
 
-    private void processRecord(FileRecord rec) throws Exception {
+    private void processRecord(FileRecord rec, int recnum) throws Exception {
         logger.atInfo().log("Do something with the record");
         //The extractor is going to need to know about the joins
         //A join should really be based on ByteBuffers, maybe the key is a byte array?
@@ -202,7 +203,7 @@ public class PERun {
         //Then a join statement means get the join...
         //If lookup not already performed buuild the key and get the buffer
         //A DTL etc then uses the buffer rather than the source record
-        extractor.processRecord(rec.bytes.array(), outputRecord.bytes, outWriter, numrecords);
+        extractor.processRecord(rec.bytes.array(), outputRecord.bytes, outWriter, recnum);
      }
 
     private Extract getExtractor() {

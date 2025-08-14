@@ -35,6 +35,8 @@ import org.genevaers.utilities.GersCodePage;
     }
 
     public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
+        FileRecord joinBuffer;
+        Join jn;
 
 <#list exrecs as rec>
 ${rec}

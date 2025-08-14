@@ -34,9 +34,9 @@ public class JoinGenerator extends ExtractRecordGenerator{
         falseGoto = join.getGotoRow2();
         this.lt = lt;
         return new ExtractorEntry(String.format("//Join %d -> %s targ LF %d LR %d\n" +
-"                Join jn = JoinsRepo.getJoin(\"%s\");\n" +
+"         jn = JoinsRepo.getJoin(\"%s\");\n" +
 "        //Record count used for do again \n" +
-"        FileRecord joinBuffer = jn.getBufferForRecord(numrecords);\n" +
+"        joinBuffer = jn.getBufferForRecord(numrecords);\n" +
 "        if(joinBuffer == null && jn.updateRequired()) {", joinid, newid, targLf, targLr, getNewid()));
     }
 
