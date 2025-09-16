@@ -18,13 +18,12 @@
 mvn clean
 mvn install $1
 
-export rev=`grep "<revision>" pom.xml | awk -F'<revision>||</revision>' '{print $2}'`;
-echo RCA release number $rev;
-
-cp RCApps/target/*-jar-with-dependencies.jar $GERS_RCA_JAR_DIR/rcapps-$rev.jar;                                       
-                                                                         
-cd $GERS_RCA_JAR_DIR;                                                    
-                                                                         
-touch rcapps-latest.jar;                                                 
-rm rcapps-latest.jar;                                                    
-ln -s rcapps-$rev.jar rcapps-latest.jar;
+if [[ ! -z "$GERS_RCA_JAR_DIR" ]]; then
+    export rev=`grep "<revision>" pom.xml | awk -F '<revision>||</revision>' '{print $2}'`;
+    echo RCA release number $rev;
+    cp RCApps/target/*-jar-with-dependencies.jar $GERS_RCA_JAR_DIR/rcapps-$rev.jar;                                                                                                    
+    cd $GERS_RCA_JAR_DIR;                                                                                                                        
+    touch rcapps-latest.jar;                                                 
+    rm rcapps-latest.jar;                                                    
+    ln -s rcapps-$rev.jar rcapps-latest.jar;
+fi
