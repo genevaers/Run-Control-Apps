@@ -165,12 +165,12 @@ public class VDPTextWriter extends TextRecordWriter {
 		fw.write("\nLogical Record Summaries\n");
 		fw.write("========================\n");
 		addStateColumIfCompareMode(fw);
-		fw.write(String.format("%7s %-48s %-9s %7s %7s %-48s\n", "ID", "Name", "NumFields", "KeyLen", "ExitId", "Parms"));
+		fw.write(String.format("%7s %-48s %-6s %-9s %7s %7s %-48s\n", "ID", "Name", "Length", "NumFields", "KeyLen", "ExitId", "Parms"));
 		fw.write(StringUtils.repeat('-', 95)+"\n");
 		while (lrds.hasNext()) {
 			LrDetails lrd = lrds.next();
 			addStateValueIfCompareMode(fw, lrd.state);
-			fw.write(String.format("%7d %-48s %9s %7d %7d %-48s\n", lrd.id, lrd.name, lrd.numberOfFields, lrd.keyLen, lrd.lookupExitId, lrd.exitParms));
+			fw.write(String.format("%7d %-48s %6s %9s %7d %7d %-48s\n", lrd.id, lrd.name, lrd.length, lrd.numberOfFields, lrd.keyLen, lrd.lookupExitId, lrd.exitParms));
 		}
 	}
 
@@ -330,6 +330,7 @@ public class VDPTextWriter extends TextRecordWriter {
 				lrds.name = ((StringFieldNode)(lr.getChildrenByName("lrName"))).getValue();
 				lrDetailsById.put(lrds.id, lrds);
 				lrds.numberOfFields = Repository.getLogicalRecords().get(id).getValuesOfFieldsByID().size();
+				lrds.length = Repository.getLRLength(id);
 				lrds.keyLen = Repository.getLrKeyLen(id);
 				lrds.lookupExitId = ((NumericFieldNode)(lr.getChildrenByName("exitPgmId"))).getValue(); 
 				lrds.exitParms = ((StringFieldNode)(lr.getChildrenByName("exitStartup"))).getValue();

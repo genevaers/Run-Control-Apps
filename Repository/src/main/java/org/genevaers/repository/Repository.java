@@ -538,6 +538,16 @@ public class Repository {
 		return keylen;
 	}
 
+	public static int getLRLength(int id) {
+		LogicalRecord lr = lrs.get(id);
+		int maxEndPos = lr.getValuesOfFieldsByID()
+				.stream()
+				.mapToInt(f -> f.getStartPosition() + f.getLength())
+				.max()
+				.orElse(1);
+		return maxEndPos - 1;
+	}
+
 	public static void addErrorMessage(CompilerMessage err) {
 		logger.atSevere().log(err.getDetail());
 		compilerErrors.add(err);
