@@ -16,7 +16,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<!-- our apps -->
-		<revision>1.1.0_RC19</revision>
+		<revision>1.1.0_RC20</revision>
 	</properties>
 
 	<licenses>
