@@ -552,7 +552,8 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             lkRef.addChildIfNotNull(visitEffDate(ctx.effDate()));
             lkRef.setEffDateValue((EffDateValue) visitEffDate(ctx.effDate()));
         }
-        lkRef.makeUnique();
+        if(lkRef.getLookup() != null)
+            lkRef.makeUnique();
         return lkRef;
      }
 
@@ -602,7 +603,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
     private void checkSymbolListValid(LookupPathAST lkref) {
         for (String s : lkref.getSymbols().getSymbols()) {
             //Is the symbol defined in the lookup?
-            if(lkref.getLookup().isSymbolNotDefined(s)) {
+            if(lkref.getLookup()!=null && lkref.getLookup().isSymbolNotDefined(s)) {
                 lkref.addError("Symbol " + s + " not defined in lookup " + lkref.getLookup().getName());
             }
         }

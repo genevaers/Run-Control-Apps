@@ -235,6 +235,9 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
     }
 
     public ViewColumn getColumn() {
+        if(children.size() < 2) {
+            return null;
+        }
         ExtractBaseAST colnode = (ExtractBaseAST)children.get(1);
         if(colnode.getType() == Type.ERRORS) {
             return null;
