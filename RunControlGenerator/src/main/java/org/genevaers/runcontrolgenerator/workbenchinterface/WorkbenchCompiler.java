@@ -424,7 +424,7 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 	public static void setCurrentColumnNumber(int currentColumnNumber) {
 		WorkbenchCompiler.currentColumnNumber = currentColumnNumber;
 		FormatBaseAST.setCurrentColumnNumber(currentColumnNumber);
-		currentViewColumnSource = currentViewSource.findFromColumnSourcesByNumber(currentColumnNumber);
+		currentViewColumnSource = currentViewSource != null ? currentViewSource.findFromColumnSourcesByNumber(currentColumnNumber) : null;
 	}
 
 	public static void clearNewErrorsDetected() {
