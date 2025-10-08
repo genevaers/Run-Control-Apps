@@ -63,7 +63,11 @@ public class ExtractDependencyCache {
 
 	public Integer addLookupIfAbsent(String name, LookupPath lk) {
 		LookupRef localLkref = lookupsByName.computeIfAbsent(name, s -> getLookupRefByName(s,lk.getID()));
-		return localLkref != null ? localLkref.getId() : null;
+		Integer lkid = localLkref != null ? localLkref.getId() : null;
+		if(lkid != null) {
+			dependencies.add(new ViewLogicDependency(currenLogicType, null, r, null, null, null, currentParentId));
+		}
+		return lkid;
 	}
 
 	private LookupRef getLookupRefByName(String name, int id) {
