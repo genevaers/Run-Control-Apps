@@ -4,3 +4,4 @@ specFileSets:
     specs:
       - "PeTests/LongFields/longFieldTests.yaml"
       - "PeTests/LongFields/longFieldTestsFormat.yaml"
+      - "PeTests/LongFields/longFieldTestsFormatErrs.yaml"
