@@ -1,0 +1,34 @@
+digraph NoneDB {
+    rankdir=TB
+//Nodes
+graph [label="File Based Workflow\n\n\n", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22 ranksep="2 equally" compound=true ];
+labeljust=center;
+
+subgraph cluster_we { label="Geneva Editor" node [shape=plaintext]
+    editor[label="VSCode based editor" shape=rect style=filled color=PaleGreen]
+}
+
+subgraph cluster_comp { label="Git Repository"  node [shape=plaintext] 
+    REPO[label="YAML/JSON files" shape=rect style=filled color="lightblue1" ]
+}
+
+subgraph cluster_data { label="Run Control Apps" node [shape=plaintext]
+    rca[label="Run" shape=rect style=filled color=PaleGreen]
+}
+
+subgraph cluster_reports { label="RCA Reports" node [shape=plaintext]
+    rcar[label="VDP XLT JLT " shape=rect style=filled color=PaleGreen]
+}
+
+subgraph cluster_rcfiles { label="RC Files" node [shape=plaintext]
+    vdp[label="VDP" shape=rect style=filled color=pink]
+    xlt[label="XLT" shape=rect style=filled color=pink]
+    jlt[label="JLT" shape=rect style=filled color=pink]
+}
+
+editor -> REPO [lhead=cluster_comp ltail=cluster_we dir="both"]
+editor -> rca [lhead=cluster_data ltail=cluster_we]
+rca -> REPO [lhead=cluster_comp ltail=cluster_data dir=back]
+rca -> xlt [lhead=cluster_rcfiles ltail=cluster_data ]
+rca -> rcar [lhead=cluster_reports ltail=cluster_data]
+}
