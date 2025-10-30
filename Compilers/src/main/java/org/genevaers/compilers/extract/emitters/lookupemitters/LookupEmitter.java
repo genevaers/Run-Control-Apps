@@ -326,7 +326,7 @@ public class LookupEmitter extends CodeEmitter {
     }
 
     private boolean isLookupOptimizable(LookupPath lookup) {
-        if(lookup.getReadExitId() > 0) {
+        if(lookup != null && lookup.getReadExitId() > 0) {
             return Repository.getUserExits().get(lookup.getReadExitId()).isOptimizable();
         } else {
             return true;
