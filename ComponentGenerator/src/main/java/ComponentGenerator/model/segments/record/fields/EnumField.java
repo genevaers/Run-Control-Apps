@@ -92,7 +92,7 @@ public class EnumField extends Field {
 
     @Override
     public String getFieldNodeEntry(boolean prefix, boolean arrayValue) {
-        return  DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + NameUtils.getCamelCaseName(name, false) +".toString()), compare);";  
+        return  DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\"," + NameUtils.getCamelCaseName(name, false) +".toString()), compare);";  
     }
 
     @Override
