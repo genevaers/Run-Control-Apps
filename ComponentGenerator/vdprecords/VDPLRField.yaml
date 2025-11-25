@@ -12,6 +12,7 @@ fields:
   type: mappingOnly
   existing_java_type: record_id
   component_field: componentId
+  display_name: "Field ID"
 - name: field_name
   type: string
   maxlength: 48
@@ -19,29 +20,33 @@ fields:
 - name: lr_id
   type: integer
   component_field: lrID
+  display_name: "LR ID"
 - name: format_id
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DataType
   component_field: datatype
+  display_name: "Data Type"
 - name: signed_ind
   type: boolean
   component_field: signed
 - name: padding1
   type: boolean
   padding : true
-  component_field: none
 - name: start_position
   type: short
   component_field: startPosition
+  display_name: "Fixed Position"
 - name: field_length
   type: short
   component_field: length
 - name: ordinal_position
   type: short
   component_field: ordinalPosition
+  display_name: "Ordinal Position"
 - name: decimal_count
   type: short
   component_field: numDecimalPlaces
+  display_name: "Decimal Places"
 - name: rounding
   type: short
   component_field: rounding
@@ -49,34 +54,26 @@ fields:
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode
   component_field: dateTimeFormat
+  display_name: "Date/Time Format"
 - name: justify_id #Another case for an external enum
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.JustifyId
   component_field: justification
+  display_name: "Align Heading"
 - name: ordinal_offset
   type: short
   component_field: ordinalOffset
-- name: padding2
-  type: string
-  maxlength: 46
-  padding : true
-  component_field: none
+  display_name: "Ordinal Offset"
 - name: xml_tag
   type: string
   maxlength: 256
-  component_field: none
 - name: mask
   type: string
   maxlength: 48
   component_field: mask
+  display_name: "Numeric Mask"
 - name: db_col_name
   type: string
   maxlength: 48
-  component_field: none
+  display_name: "DB Column Name"
   # There is stuff that can be ignored
-- name: padding3
-  type: string
-  maxlength: 176
-  padding : true
-  component_field: none
-

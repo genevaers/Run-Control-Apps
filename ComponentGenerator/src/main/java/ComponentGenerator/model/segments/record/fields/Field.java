@@ -50,6 +50,16 @@ public abstract class Field implements FieldGenerator {
     private String dsectName;
     protected String componentField;
     private String def;
+    private String displayName;
+
+    public String getDisplayName() {
+        return displayName != null ? displayName : componentField != null 
+        ? StringUtils.capitalize(componentField) : NameUtils.getCamelCaseName(name, true);
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     public static final String INDENT = "    ";
     public static final String DBLINDENT = "        ";
@@ -168,24 +178,24 @@ public abstract class Field implements FieldGenerator {
 
     public String defaultNumericNodeEntry(boolean prefix, boolean arrayValue) {
         if (getRawComponentField() != null && getRawComponentField().equals("none") && prefix==false) {
-            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + NameUtils.getCamelCaseName(name, false) +"\"), compare);";  
+            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + getDisplayName() +"\"), compare);";  
         } else {
             if(arrayValue) {
-                return  DBLINDENT + "rn.add(new NumericFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\" + n," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
+                return  DBLINDENT + "rn.add(new NumericFieldNode(\"" + getDisplayName() + "\" + n," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
             } else {
-                return  DBLINDENT + "rn.add(new NumericFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
+                return  DBLINDENT + "rn.add(new NumericFieldNode(\"" + getDisplayName() + "\"," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
             }
         }
     }
 
     public String defaultStringNodeEntry(boolean prefix, boolean arrayValue) {
         if (getRawComponentField() != null && getRawComponentField().equals("none") && prefix==false) {
-            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + NameUtils.getCamelCaseName(name, false) +"\"), compare);";  
+            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + getDisplayName() +"\"), compare);";  
         } else {
             if(arrayValue) {
-                return  DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\" + n," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
+                return  DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\" + n," + NameUtils.getCamelCaseName(name, false) +"), compare);";  
             } else {
-               return  DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + NameUtils.getCamelCaseName(name, false) +"), compare);";                  
+               return  DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\"," + NameUtils.getCamelCaseName(name, false) +"), compare);";                  
             }
         }
     }
