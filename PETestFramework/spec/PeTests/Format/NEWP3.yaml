@@ -14,6 +14,7 @@ tests:
   rundate: "20090914"
   fiscaldateoverride: "1:20080303"
   timeout: "120"
+  passviews: "pass03Views.yaml"
   xmlfiles:
   - name: "PASS03_for_OpenSource[1000010].xml"
   reffiles:
