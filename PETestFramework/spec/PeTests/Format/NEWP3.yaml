@@ -5,6 +5,7 @@ description: "New Pass3 suite"
 category: "PeTests/Format"
 cq: ""
 note: ""
+haspassviews: true
 tests:
 - name: "NEWP3"
   header: "Pass 3"
