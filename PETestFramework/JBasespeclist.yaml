@@ -27,3 +27,5 @@ specFileSets:
       - "PeTests/FormatReports/SortKeyTitle.yaml"
       - "PeTests/FormatReports/SortKeyTitleExtra.yaml"
       - "PeTests/FormatReports/SortKeyTitleMore.yaml"
+      - "PeTests/Date/DateFormatTests.yaml"
+      - "PeTests/Date/TimeFormatTests.yaml"      
