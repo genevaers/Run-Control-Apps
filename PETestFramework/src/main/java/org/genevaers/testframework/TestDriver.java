@@ -773,6 +773,9 @@ public class TestDriver {
 					} else {
 						System.out.println(Menu.GREEN + "PASS for " + outFilePath.toString() + Menu.RESET);
 					}
+                	if(test.getPassviews() != null) {
+						test.setViewResult(Integer.parseInt(of.getDdname().substring(1)), !diffFound);
+					}
 			  } catch (IOException e) {
 					logger.atSevere().log("Exception occurred in output files match \n%s", e.getMessage());
 				}
