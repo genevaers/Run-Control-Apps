@@ -3,8 +3,7 @@
 #Uppercase please
 name: "TIMEF"
 title: "Date and time Formats test specification"
-description: "Test all date and time formats with all data types \
-  \ stuff"
+description: "Test all date and time formats with all data types"
 #The category maps to the directory path below the Spec directory
 #Which is where the spec file should be located
 category: "PeTests/Date"
