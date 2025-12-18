@@ -2001,7 +2001,7 @@ tests:
     secondary: "100"
     recfm: "FB"
     lrecl: "80"
-    workfile: "02"
+    workfile: "2"
   - ddname: "F0001501"
     space: "TRK"
     primary: "100"
