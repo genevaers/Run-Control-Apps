@@ -3,8 +3,7 @@
 #Uppercase please
 name: "TIMEF"
 title: "Date and time Formats test specification"
-description: "Test all date and time formats with all data types \
-  \ stuff"
+description: "Test all date and time formats with all data types"
 #The category maps to the directory path below the Spec directory
 #Which is where the spec file should be located
 category: "PeTests/Date"
@@ -48,11 +47,25 @@ tests:
     primary: "1"
     secondary: "10"
     recfm: "VB"
-    lrecl: "300"
+    lrecl: "180"
+  - ddname: "EXTR002" 
+    space: "TRK"
+    primary: "1"
+    secondary: "10"
+    recfm: "VB"
+    lrecl: "100"
   formatfiles:
   - ddname: "FMTOUT01" 
     space: "TRK"
     primary: "1"
     secondary: "10"
     recfm: "VB"
-    lrecl: "300"
+    lrecl: "164"
+    workfile: "1"    
+  - ddname: "FMTOUT02" 
+    space: "TRK"
+    primary: "1"
+    secondary: "10"
+    recfm: "VB"
+    lrecl: "80"
+    workfile: "2"    
