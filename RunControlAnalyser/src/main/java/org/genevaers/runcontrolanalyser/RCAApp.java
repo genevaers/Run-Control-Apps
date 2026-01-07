@@ -49,6 +49,8 @@ public class RCAApp {
         }
         if (ranOkay == Status.OK) {
             logger.atInfo().log("Run control analyser completed");
+        } else if (ranOkay == Status.DIFF){
+            logger.atInfo().log("Run control analyser completed with differences found");
         } else {
             logger.atSevere().log("Run control analyser failed. See log for details.");
         }

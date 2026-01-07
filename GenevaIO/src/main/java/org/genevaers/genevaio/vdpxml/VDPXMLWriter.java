@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ControlRecord;
@@ -136,11 +137,24 @@ public class VDPXMLWriter {
         openElement("Output", fw);
         fw.write("\n");
         writeElement("Media", vw.getViewDefinition().getOutputMedia().dbcode(), fw);
+        writeElement("ZeroSuppresion", vw.getViewDefinition().isZeroValueRecordSuppression()?"1":"0", fw);
         writeOutputFileDetails(vw, fw);
         writeExitRefs(vw, fw);
         writePageLayout(vw, fw);
+        writeFormatRecordFilters(vw,fw);
         closeElement("Output", fw);
         fw.write("\n");
+    }
+
+    private void writeFormatRecordFilters(ViewNode vw, Writer fw) throws IOException {
+        String fmtFiltLogic = vw.getFormatFilterLogic();
+        if(StringUtils.isNotEmpty(fmtFiltLogic)){
+            openElement("Filters", fw);
+            fw.write("\n");
+            writeChunkedText("Filter", fmtFiltLogic, fw);
+            closeElement("Filters", fw);
+            fw.write("\n");
+        }
     }
 
     private void writePageLayout(ViewNode vw, Writer fw) throws IOException {
@@ -237,6 +251,9 @@ public class VDPXMLWriter {
     private void writeExitRefs(ViewNode vw, Writer fw) throws IOException {
         if (vw.getViewDefinition().getFormatExitId() > 0) {
             writeExitRef(vw.getViewDefinition().getFormatExitId(), vw.getViewDefinition().getFormatExitParams(), fw);
+        }
+        if(vw.getViewDefinition().getWriteExitId() > 0) {
+            writeExitRef(vw.getViewDefinition().getWriteExitId(), vw.getViewDefinition().getWriteExitParams(), fw);
         }
     }
 

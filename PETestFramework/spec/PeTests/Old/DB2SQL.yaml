@@ -1,0 +1,46 @@
+---
+name: "DB2SQL"
+title: "Test DB2 SQL source"
+description: "Test DB2 SQL as source/event data"
+category: "PeTests/Old"
+cq: ""
+note: ""
+haspassviews: true
+tests:
+- name: "DB2SQL"
+  header: "DB2SQL"
+  description: "Test DB2 SQL source, from pass 3"
+  source: "WBXML"
+  expandcookies: "Y"
+  rundate: "20090914"
+  fiscaldateoverride: "1:20080303"
+  comparephase: "Y"
+  timeout: "120"
+  xmlfiles:
+  - name: "PASS03_PM418_DB2SQL_Tests[1000011].xml"
+  eventfiles:
+  - ddname: "REGRSALE"
+    dsn: "GEBT.REGRI.SALES.CO.FILEREG2"
+  - ddname: "SALEBIGM"
+    dsn: "GEBT.REGRI.SALES.CO.BIGNUM1"
+  extractfiles:
+  - ddname: "EXTR001"
+    space: "TRK"
+    primary: "1"
+    secondary: "1"
+    recfm: "VB"
+    lrecl: "300"
+    workfile: "1"
+  formatfiles:
+  - ddname: "F0001964"
+    dsn: "GEBT.REGRO.PASS03.F01.MR88.F0001964"
+    basedsn: "GEBT.PM418.PASS03.F01.MR88.F0001964"
+    space: "TRK"
+    primary: "100"
+    secondary: "100"
+    recfm: "FB"
+    lrecl: "1"
+    workfile: "1"
+  expectedresult:
+    message: "pass compare phase"
+    rc: "0"

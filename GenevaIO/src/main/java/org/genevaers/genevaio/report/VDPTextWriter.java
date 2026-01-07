@@ -170,7 +170,7 @@ public class VDPTextWriter extends TextRecordWriter {
 		while (lrds.hasNext()) {
 			LrDetails lrd = lrds.next();
 			addStateValueIfCompareMode(fw, lrd.state);
-			fw.write(String.format("%7d %-48s %6d %9s %7d %7d %-48s\n", lrd.id, lrd.name, lrd.length, lrd.numberOfFields, lrd.keyLen, lrd.lookupExitId, lrd.exitParms));
+			fw.write(String.format("%7d %-48s %6s %9s %7d %7d %-48s\n", lrd.id, lrd.name, lrd.length, lrd.numberOfFields, lrd.keyLen, lrd.lookupExitId, lrd.exitParms));
 		}
 	}
 
@@ -250,7 +250,8 @@ public class VDPTextWriter extends TextRecordWriter {
 		if(compareMode) {
 			fw.write("Comparison Summary\n==================\n\n");
 			fw.write("Source1: " + recordsRoot.getSource1() + "\n");
-			fw.write(String.format("Source2: %s from %s\n\n", recordsRoot.getSource2(), cppCompare ? "C++ MR91" : "Java RCG"));
+			fw.write("Source2: " + recordsRoot.getSource2() + "\n");
+			fw.write("Differences: Source1 -> Source2 \n\n");
 		} else {
 			fw.write("Summary\n=======\n\n");
 		}

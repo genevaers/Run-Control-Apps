@@ -120,6 +120,9 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
     }
 
     private void generateLogicTableEntry(ExtractBaseAST rhs, ColumnAST col) {
+        if(!(rhs instanceof Assignable)) {
+            return;
+        }
         LTRecord lto = (LTRecord) ((Assignable) rhs).getAssignmentEntry(col, (ExtractBaseAST) rhs);
         if (lto != null) {
             lto.setSourceSeqNbr((short) (ltEmitter.getLogicTable().getNumberOfRecords()));
@@ -235,6 +238,9 @@ public class ColumnAssignmentASTNode extends ExtractBaseAST implements Emittable
     }
 
     public ViewColumn getColumn() {
+        if(children.size() < 2) {
+            return null;
+        }
         ExtractBaseAST colnode = (ExtractBaseAST)children.get(1);
         if(colnode.getType() == Type.ERRORS) {
             return null;

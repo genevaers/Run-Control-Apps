@@ -35,10 +35,13 @@ import org.genevaers.repository.components.enums.OutputMedia;
 public class ViewOutputParser extends BaseParser {
 
 	private ViewNode viewNode;
-	private Integer pid;
-	private Integer prefid;
+	private int pid;
+	private int prefid;
 	private ViewDefinition vd;
 	private String pfname;
+	private String exitType;
+	private int exitId;
+	private String wparms;
 
 	public ViewOutputParser() {
 		sectionName = "Output";
@@ -53,11 +56,9 @@ public class ViewOutputParser extends BaseParser {
 				break;
 			case "PARTITION":
 				pid = Integer.parseInt(attributes.get("ID"));
-				generateExtractOutputLogic(pid);
 				break;
 			case "PARTITIONREF":
 				prefid = Integer.parseInt(attributes.get("ID"));
-				generateExtractOutputLogic(prefid);
 				break;
 			case "NAME":
 				pfname = text;
@@ -68,13 +69,21 @@ public class ViewOutputParser extends BaseParser {
 				viewNode.getOutputFile().setOutputDDName(text);
 				break;
 			case "EXITREF":
-				int exitID = Integer.parseInt(attributes.get("ID"));
-				viewNode.getViewDefinition().setFormatExitId(exitID);
+				exitId = Integer.parseInt(attributes.get("ID"));
+				exitType = attributes.get("Type");
+				if("WRITE".equalsIgnoreCase(exitType)){
+					viewNode.getViewDefinition().setWriteExitId(exitId);
+				} else if("FORMT".equalsIgnoreCase(exitType)){
+					viewNode.getViewDefinition().setFormatExitId(exitId);
+				}
 				break;
-				case "PARAMETER":
-				viewNode.getViewDefinition().setFormatExitParams(text);;
+			case "PARAMETER":
+				if("WRITE".equalsIgnoreCase(exitType)){
+					viewNode.getViewDefinition().setWriteExitParams(text);
+				} else if("FORMT".equalsIgnoreCase(exitType)){
+					viewNode.getViewDefinition().setFormatExitParams(text);
+				}
 				break;
-
 			case "HEADERS":
 				logger.atFine().log("Parsing Headers for %s", viewNode.getViewDefinition().getName());
 				ViewHeaderFooterParser hfp = new ViewHeaderFooterParser();
@@ -95,7 +104,7 @@ public class ViewOutputParser extends BaseParser {
 			case "MAXCHARSPERLINE":
 				vd.setOutputLineSizeMax((short) Integer.parseInt(text.trim()));
 				break;
-			case "ZEROSUPPRESSIND":
+			case "ZEROSUPPRESION":
 				vd.setZeroValueRecordSuppression(text.equals("0") ? false : true);
 				break;
 			case "EXTRACTMAXRECCNT":
@@ -125,7 +134,7 @@ public class ViewOutputParser extends BaseParser {
 			case "DELIMHEADERROWIND":
 				vd.setGenerateDelimitedHeader(text.equals("0") ? false : true);
 				break;
-			case "FORMATFILTLOGIC":
+			case "FILTER":
 				viewNode.setFormatFilterLogic(removeBRLineEndings(text));
 				break;
 			default:
@@ -181,9 +190,12 @@ public class ViewOutputParser extends BaseParser {
 
 			}
 			Iterator<ViewSource> vsi = viewNode.getViewSourceIterator();
+			// int exitID = viewNode.getViewDefinition().getWriteExitId();
 			while (vsi.hasNext()) {
 				ViewSource vs = vsi.next();
 				vs.setExtractOutputLogic(writeLogic);
+				vs.setWriteExitId(exitId);
+				vs.setWriteExitParams(wparms);
 			}
 		}
 	}
@@ -193,9 +205,9 @@ public class ViewOutputParser extends BaseParser {
 		int exitID = vn.getViewDefinition().getWriteExitId();
 		if (exitID != 0) {
 			UserExit ex = Repository.getUserExits().get(exitID);
-			String wparms = vn.getViewDefinition().getWriteExitParams();
+			wparms = vn.getViewDefinition().getWriteExitParams();
 			if (wparms.length() > 0) {
-				exitStr += String.format(",USEREXIT=({%s, \"%s\"})", ex.getName(), wparms);
+				exitStr += String.format(",USEREXIT=({%s},\"%s\")", ex.getName(), wparms);
 			} else {
 				exitStr += String.format(",USEREXIT={%s}", ex.getName());
 			}
@@ -203,11 +215,37 @@ public class ViewOutputParser extends BaseParser {
 		return exitStr;
 	}
 
+	private void setOutputFile(int id) {
+		PhysicalFile outpf = Repository.getPhysicalFiles().get(id);
+		if(outpf != null) {
+			outpf.setRequired(true);
+			viewNode.getViewDefinition().setDefaultOutputFileId(outpf.getComponentId());
+			viewNode.setOutputFileFrom(outpf);
+		}
+	}
+
 	private String getFileParm(ViewNode vn, int partId) {
 		String fileStr;
 		PhysicalFile pf = Repository.getPhysicalFiles().get(partId);
 		fileStr = "DEST=FILE={" + pf.getLogicalFilename() + "." + pf.getName() + "}" + getWriteParm(vn);
 		return fileStr;
+	}
+
+	@Override
+	public void endElement(){
+		Iterator<ViewSource> vsi = viewNode.getViewSourceIterator();
+		while (vsi.hasNext()) {
+				ViewSource vs = vsi.next();
+				if(vs.getExtractOutputLogic().isEmpty()){
+					if (pid != 0) {
+						generateExtractOutputLogic(pid);
+					} else if (prefid != 0) {
+						generateExtractOutputLogic(prefid);
+					} else {
+						generateExtractOutputLogic(0);
+					}
+				}
+		}
 	}
 
 }

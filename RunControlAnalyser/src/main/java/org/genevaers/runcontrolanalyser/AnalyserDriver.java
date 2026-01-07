@@ -235,8 +235,8 @@ public class AnalyserDriver {
 	private static void generateJLTDiffReport(Path root, Path rc1, Path rc2) {
 		MetadataNode recordsRoot = new MetadataNode();
 		recordsRoot.setName("Compare");
-		recordsRoot.setSource1(root.relativize(rc1.resolve(GersConfigration.JLT_DDNAME)).toString());
-		recordsRoot.setSource2(root.relativize(rc2.resolve(GersConfigration.JLTOLD_DDNAME)).toString());
+		recordsRoot.setSource1(GersConfigration.JLT_DDNAME.toString());
+		recordsRoot.setSource2(GersConfigration.JLTOLD_DDNAME.toString());
 		fa.readLT(root, recordsRoot, false, GersConfigration.JLT_DDNAME);
 		logger.atInfo().log("JLT Tree built from %s", rc1.toString());
 		//Records2Dot.write(recordsRoot, root.resolve("JLT1records.gv"));
@@ -244,6 +244,7 @@ public class AnalyserDriver {
 		logger.atInfo().log("JLT Tree added to from %s", rc2.toString());
 		//Records2Dot.write(recordsRoot, root.resolve("JLTrecords.gv"));
 		switch (GersConfigration.getReportFormat()) {
+			case "TXT":
 			case "TEXT":
 				LogicTableTextWriter lttw = new LogicTableTextWriter();
 				lttw.writeFromRecordNodes(recordsRoot, GersConfigration.getJLTReportName(), generation);
@@ -254,14 +255,17 @@ public class AnalyserDriver {
 				ltrw.setIgnores();
 				ltrw.writeFromRecordNodes(recordsRoot, GersConfigration.getJLTReportName());
 				break;
+			default:
+				logger.atSevere().log("Invalid or no JLT report format specified.");
+				break;
 		}
 	}
 
 	private static void generateXLTDiffReport(Path root, Path rc1, Path rc2) {
 		MetadataNode recordsRoot = new MetadataNode();
 		recordsRoot.setName("Compare");
-		recordsRoot.setSource1(root.relativize(rc1.resolve(GersConfigration.XLT_DDNAME)).toString());
-		recordsRoot.setSource2(root.relativize(rc2.resolve(GersConfigration.XLTOLD_DDNAME)).toString());
+		recordsRoot.setSource1(GersConfigration.XLT_DDNAME.toString());
+		recordsRoot.setSource2(GersConfigration.XLTOLD_DDNAME.toString());
 		fa.readLT(root, recordsRoot, false, GersConfigration.XLT_DDNAME);
 		logger.atInfo().log("XLT Tree built from %s", rc1.toString());
 		Records2Dot.write(recordsRoot, root.resolve("xlt1records.gv"));
@@ -269,6 +273,7 @@ public class AnalyserDriver {
 		logger.atInfo().log("XLT Tree added to from %s", rc2.toString());
 		// Records2Dot.write(recordsRoot, root.resolve("xltrecords.gv"));
 		switch (GersConfigration.getReportFormat()) {
+			case "TXT":
 			case "TEXT":
 				LogicTableTextWriter lttw = new LogicTableTextWriter();
 				lttw.writeFromRecordNodes(recordsRoot, GersConfigration.getXLTReportName(), generation);
@@ -285,8 +290,8 @@ public class AnalyserDriver {
 	private static void generateVDPDiffReport(Path root, Path rc1, Path rc2) throws Exception {
 		MetadataNode recordsRoot = new MetadataNode();
 		recordsRoot.setName("Compare");
-		recordsRoot.setSource1(root.relativize(rc1.resolve(GersConfigration.VDP_DDNAME)).toString());
-		recordsRoot.setSource2(root.relativize(rc2.resolve(GersConfigration.VDPOLD_DDNAME)).toString());
+		recordsRoot.setSource1(GersConfigration.VDP_DDNAME.toString());
+		recordsRoot.setSource2(GersConfigration.VDPOLD_DDNAME.toString());
 		Path vdp1p = root.resolve(GersConfigration.VDP_DDNAME);
 		fa.readVDP(vdp1p, GersConfigration.VDP_DDNAME, recordsRoot, false);
 		logger.atInfo().log("VDP Tree built from %s", rc1.toString());
@@ -299,6 +304,7 @@ public class AnalyserDriver {
 		logger.atInfo().log("VDP Tree added to from %s", rc2.toString());
 		//Records2Dot.write(recordsRoot, root.resolve("records.gv"));
 		switch(GersConfigration.getReportFormat()) {
+			case "TXT":
 			case "TEXT":
 			VDPTextWriter vdptw = new VDPTextWriter();
 			vdptw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName(), generation);

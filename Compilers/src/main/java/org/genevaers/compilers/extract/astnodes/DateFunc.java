@@ -1,9 +1,18 @@
 package org.genevaers.compilers.extract.astnodes;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.genevaers.genevaio.ltfactory.LtFactoryHolder;
+import org.genevaers.genevaio.ltfactory.LtFuncCodeFactory;
+import org.genevaers.genevaio.ltfile.Cookie;
 import org.genevaers.genevaio.ltfile.LTFileObject;
+import org.genevaers.genevaio.ltfile.LTRecord;
+import org.genevaers.genevaio.ltfile.LogicTableArg;
+import org.genevaers.genevaio.ltfile.LogicTableF1;
+import org.genevaers.repository.Repository;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.DataType;
 import org.genevaers.repository.components.enums.DateCode;
+import org.genevaers.repository.components.enums.ExtractArea;
 import org.genevaers.repository.data.NormalisedDate;
 
 /*
@@ -24,7 +33,7 @@ import org.genevaers.repository.data.NormalisedDate;
  */
 
 
-public class DateFunc extends FormattedASTNode implements GenevaERSValue{
+public class DateFunc extends FormattedASTNode implements GenevaERSValue,Assignable{
 
     private String value;
     private String dateCodeStr;
@@ -80,8 +89,35 @@ public class DateFunc extends FormattedASTNode implements GenevaERSValue{
 
     @Override
     public int getMaxNumberOfDigits() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaxNumberOfDigits'");
+        return dateCodeStr.length();
     }
+
+     @Override
+    public LTFileObject getAssignmentEntry(ColumnAST col, ExtractBaseAST rhs) {
+        LtFuncCodeFactory fcf = LtFactoryHolder.getLtFunctionCodeFactory();
+        LTRecord fc;
+        if(currentViewColumn.getExtractArea() == ExtractArea.AREACALC) {
+            fc = (LTRecord) fcf.getCTC(String.valueOf(value), currentViewColumn);
+        } else if(currentViewColumn.getExtractArea() == ExtractArea.AREADATA) {
+            fc = (LTRecord) fcf.getDTC(String.valueOf(value), currentViewColumn);
+        } else {
+            ViewSortKey sk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+             fc = (LTRecord) fcf.getSKC(String.valueOf(value), currentViewColumn, sk);
+        }
+        expandArgCookieValue((LogicTableF1)fc);
+        fc.setSourceSeqNbr((short) (ltEmitter.getLogicTable().getNumberOfRecords() + 1));
+        ltEmitter.addToLogicTable((LTRecord)fc);
+        return null;
+    }
+
+     private void expandArgCookieValue(LogicTableF1 f) {
+        LogicTableArg arg = f.getArg();
+        arg.setValue(new Cookie(getCookieCode(), getValue()));
+    }
+
+     @Override
+     public int getAssignableLength() {
+        return getMaxNumberOfDigits();
+     }
 
 }

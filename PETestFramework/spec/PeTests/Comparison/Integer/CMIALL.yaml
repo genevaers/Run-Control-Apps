@@ -10,7 +10,6 @@ tests:
   header: "Big Bang"
   description: "All Cases"
   source: "WBXML"
-  timeout: "20"
   decimalplaces: "0"
   xmlfiles:
   - name: "CMISORTED.xml"

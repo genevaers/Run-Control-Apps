@@ -144,13 +144,12 @@ public class LogicalRecordHTMLWriter {
 	}
 
 	private DomContent getRecordLength(LogicalRecord lr) {
-		Iterator<LRField> fit = lr.getIteratorForFieldsByID();
-		int len = 0;
-		while(fit.hasNext()) {
-			LRField f = fit.next();
-			len += f.getLength();
-		}
-		return td(Integer.toString(len));
+		int maxEndPos = lr.getValuesOfFieldsByID()
+				.stream()
+				.mapToInt(f -> f.getStartPosition() + f.getLength())
+				.max()
+				.orElse(1);
+		return td(Integer.toString(maxEndPos - 1));
 	}
 
 	private DomContent getFieldList(LogicalRecord lr) {

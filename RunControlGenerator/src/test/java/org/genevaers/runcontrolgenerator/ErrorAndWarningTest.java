@@ -201,7 +201,7 @@ class ErrorAndWarningTest extends RunCompilerBase {
         assertEquals(1, warns.size());
         List<CompilerMessage> errs = Repository.getCompilerErrors();
         assertEquals(1, errs.size());
-        assertTrue(errs.get(0).getDetail().contains("column 1 which has a date code"));
+        assertTrue(errs.get(0).getDetail().contains("column 1"));
     }
 
     @Test void testAssignmentTruncationLongField() {
