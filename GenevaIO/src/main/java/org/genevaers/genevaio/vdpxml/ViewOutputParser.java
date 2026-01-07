@@ -85,7 +85,7 @@ public class ViewOutputParser extends BaseParser {
 				}
 				break;
 			case "HEADERS":
-				logger.atFine().log("Parsing Headers");
+				logger.atFine().log("Parsing Headers for %s", viewNode.getViewDefinition().getName());
 				ViewHeaderFooterParser hfp = new ViewHeaderFooterParser();
 				hfp.setViewNode(viewNode);
 				hfp.parse(reader);
@@ -174,7 +174,6 @@ public class ViewOutputParser extends BaseParser {
 					writeLogic = String.format("WRITE(SOURCE=VIEW,DEST=EXT=%03d",
 							viewNode.getViewDefinition().getExtractFileNumber());
 					writeLogic += getWriteParm(viewNode) + ")";
-					setOutputFile(id);
 					break;
 				case EXTRACT:
 					if (viewNode.getOutputFile().getComponentId() > 0) {
@@ -201,15 +200,6 @@ public class ViewOutputParser extends BaseParser {
 		}
 	}
 
-	private void setOutputFile(int id) {
-		PhysicalFile outpf = Repository.getPhysicalFiles().get(id);
-		if(outpf != null) {
-			outpf.setRequired(true);
-			viewNode.getViewDefinition().setDefaultOutputFileId(outpf.getComponentId());
-			viewNode.setOutputFileFrom(outpf);
-		}
-	}
-
 	private String getWriteParm(ViewNode vn) {
 		String exitStr = "";
 		int exitID = vn.getViewDefinition().getWriteExitId();
@@ -223,6 +213,15 @@ public class ViewOutputParser extends BaseParser {
 			}
 		}
 		return exitStr;
+	}
+
+	private void setOutputFile(int id) {
+		PhysicalFile outpf = Repository.getPhysicalFiles().get(id);
+		if(outpf != null) {
+			outpf.setRequired(true);
+			viewNode.getViewDefinition().setDefaultOutputFileId(outpf.getComponentId());
+			viewNode.setOutputFileFrom(outpf);
+		}
 	}
 
 	private String getFileParm(ViewNode vn, int partId) {

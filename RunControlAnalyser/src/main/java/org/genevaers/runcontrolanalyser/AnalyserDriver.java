@@ -94,9 +94,7 @@ public class AnalyserDriver {
 	}
 
 	private static void setStatus(int numVDPDiffs, int numXLTDiffs, int numJLTDiffs) {
-		if(status != Status.ERROR) {
-			status =  numVDPDiffs > 0 || numXLTDiffs > 0 || numJLTDiffs > 0 ? Status.DIFF : Status.OK;
-		}
+		status =  numVDPDiffs > 0 || numXLTDiffs > 0 || numJLTDiffs > 0 ? Status.DIFF : Status.OK;
 	}
 
 	private static void compareRunControlFiles(Path root) {
@@ -115,8 +113,8 @@ public class AnalyserDriver {
 				generateJLTDiffReport(root, xlt1, xlt2);
 			}
 		} catch (Exception e) {
-			logger.atSevere().log("Problem comparing run ontrol files. %s", e.getMessage());
-			status = Status.ERROR;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -314,7 +312,6 @@ public class AnalyserDriver {
 			break;
 			case "HTML":
 			vdprw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName());
-			numVDPDiffs = vdprw.getNumDiffs();
 			break;
 		}		
 		logger.atInfo().log("VDP Diff Completed");

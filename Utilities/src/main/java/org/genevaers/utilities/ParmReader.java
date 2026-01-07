@@ -86,4 +86,12 @@ public class ParmReader {
 		return new GersFile().exists(GersConfigration.getParmFileName());
 	}
 
+    public boolean EngineParmExists() {
+        return new GersFile().exists(GersConfigration.getEngineParmFileName());
+    }
+
+    public boolean ExtractorParmExists() {
+        return new GersFile().exists(GersConfigration.getExtractorParmFileName());
+    }
+
 }

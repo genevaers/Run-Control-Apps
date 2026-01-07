@@ -197,7 +197,8 @@ public class SpecGenerator {
                 saveSpec();
             }
         } catch (JsonProcessingException e) {
-            logger.atSevere().log("Exception occurred in create new spec  \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -208,7 +209,8 @@ public class SpecGenerator {
         try {
              mapper.writeValue(new File(DEVGERS_TEST_SPEC_LIST), specFiles);
         } catch (IOException e) {
-            logger.atSevere().log("Exception occurred in save dev spec list \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -217,7 +219,8 @@ public class SpecGenerator {
         try {
             specFiles = yr.readSpecFileList(new File(DEVGERS_TEST_SPEC_LIST));
         } catch (IOException e) {
-            logger.atSevere().log("Exception occurred in get dev spec list \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }

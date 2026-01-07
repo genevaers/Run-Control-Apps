@@ -68,7 +68,8 @@ public class TestRepository  {
             specFileSets = yr.readSpecFileSets(specFileList);
             processSpecFileSets(overrideTemplateSet);
         } catch (IOException e) {
-            logger.atSevere().log("Error in building the Repo: \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -96,7 +97,8 @@ public class TestRepository  {
             spec = yr.readSpec("spec/" + s);
             readPassViewsIfNeeded(spec);
         } catch (IOException e) {
-            logger.atSevere().log("Exception in reading Test specs \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return spec;
     }
@@ -118,7 +120,8 @@ public class TestRepository  {
         try {
             return yr.readPassViews(passViewsPath.toFile());
         } catch (IOException e) {
-            logger.atSevere().log("Exception in reading Pass views \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
             return null;
         } 
     }
@@ -165,7 +168,8 @@ public class TestRepository  {
         try {
             templateSet = yr.yaml2TemplateSet(new File("templateSets/" + tempSet));
         } catch (IOException e) {
-            logger.atSevere().log("Exception in reading template sets \n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return templateSet;
     }

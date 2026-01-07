@@ -37,9 +37,6 @@ public class RCGApp {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private static Status result = Status.ERROR;
     private static String cwd = "";
-    private static int numVDPRecordsWritten;
-    private static int numJLTRecordsWritten;
-    private static int numXLTRecordsWritten;
 
     public static void main(String[] args) {
 		System.out.printf("GenevaERS RunControlGenerator version %s\n", "tbd");
@@ -63,9 +60,6 @@ public class RCGApp {
         if(GersConfigration.isRCGValid()) {
             result = rcg.runFromConfig();
             if (result == Status.OK) {
-                numVDPRecordsWritten = rcg.getNumVDPRecordsWritten();
-                numJLTRecordsWritten = rcg.getNumJLTRecordsWritten();
-                numXLTRecordsWritten = rcg.getNumXLTRecordsWritten();
                 logger.atInfo().log("Run control generation completed");
             } else {
                 logger.atSevere().log("Run control generation failed. See log for details.");
@@ -95,18 +89,6 @@ public class RCGApp {
 
     public static void setCurrentWorkingDirectory(String dir) {
         cwd = dir;
-    }
-
-    public static int getNumVDPRecordsWritten(){
-        return numVDPRecordsWritten;
-    }
-
-    public static int getNumXLTRecordsWritten(){
-        return numXLTRecordsWritten;
-    }
-
-    public static int getNumJLTRecordsWritten(){
-        return numJLTRecordsWritten;
     }
 
 }

@@ -46,7 +46,7 @@ public class GersTest {
     private MergeReport mergerpt;
     private String db2bind = "N";
     private String comparephase = "N";
-    private String timeout = "60";
+    private String timeout = "20";
     private String exitload;
     private String expandcookies;
     private String fiscaldateoverride;

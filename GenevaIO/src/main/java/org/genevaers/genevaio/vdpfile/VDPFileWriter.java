@@ -700,6 +700,12 @@ public class VDPFileWriter {
 				PhysicalFile pf = pfe.getValue();
 				pf.setLogicalFileId(lf.getID());
 				pf.setLogicalFilename(lf.getName());
+				if(pf.getOutputDDName() == null) {
+					pf.setOutputDDName("");
+				}
+				if(pf.getInputDDName() == null) {
+					pf.setInputDDName("");
+				}
 				VDPPhysicalFile vdppf = new VDPPhysicalFile();
 				if(lf.isRequired() && pf.isRequired()) {
 			        logger.atFine().log("Write PF:%d", pf.getComponentId());

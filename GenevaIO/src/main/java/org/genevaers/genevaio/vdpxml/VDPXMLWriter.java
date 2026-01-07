@@ -260,7 +260,7 @@ public class VDPXMLWriter {
     private void writeOutputFileDetails(ViewNode vw, Writer fw) throws IOException {
         ViewDefinition vd = vw.getViewDefinition();
         if (vd.getDefaultOutputFileId() > 0) {
-            writeClosedAttributedElement("PartitionRef", "ID", Integer.toString(vd.getDefaultOutputFileId()), fw);
+
         } else {
             writeAttributedElement("Partition", "ID", "1", fw);
             writeElement("Name", vw.getOutputFile().getName(), fw);

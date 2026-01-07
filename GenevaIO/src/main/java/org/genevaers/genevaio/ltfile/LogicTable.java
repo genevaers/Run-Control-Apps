@@ -20,6 +20,7 @@ package org.genevaers.genevaio.ltfile;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.genevaers.repository.components.enums.LtRecordType;
 
@@ -32,12 +33,12 @@ public class LogicTable {
 	}
 
 	public int getNumberOfRecords(LtRecordType type) {
-		return (int) records.stream().filter(l -> l.getRecordType().equals(type)). count();
+		return (int) records.stream().filter(l -> l.getRecordType().equals(type)).count();
 	}
 
 	public void add(LTRecord ltRecord) {
 		lastEntry = ltRecord;
-		//TODO keep type counters as records added
+		// TODO keep type counters as records added
 		records.add(ltRecord);
 	}
 
@@ -45,12 +46,16 @@ public class LogicTable {
 		return records.iterator();
 	}
 
-    public LTRecord getFromPosition(int i) {
-        return records.get(i);
-    }
+	public LTRecord getFromPosition(int i) {
+		return records.get(i);
+	}
 
-   public LTRecord getLastEntry() {
-        return lastEntry;
-    }
+	public LTRecord getLastEntry() {
+		return lastEntry;
+	}
+
+	public Stream<LTRecord> getStream() {
+		return records.stream();
+	}
 
 }

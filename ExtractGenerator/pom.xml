@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright Contributors to the GenevaERS Project.
+								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
+								2008
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.genevaers</groupId>
+		<artifactId>apps</artifactId>
+		<relativePath>../</relativePath>
+		<version>${revision}</version>
+	</parent>
+	<groupId>org.genevaers</groupId>
+	<artifactId>extractgenerator</artifactId>
+
+	<name>GenevaERS Extractor</name>
+	<url>https://genevaers.org/</url>
+
+	<properties>
+		<maven.compiler.release>8</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.genevaers</groupId>
+			<artifactId>genevaio</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.genevaers</groupId>
+			<artifactId>utilities</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.flogger</groupId>
+			<artifactId>flogger</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.flogger</groupId>
+			<artifactId>flogger-system-backend</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.7.1</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.genevaers.extractgenerator.Runner</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>application.properties</include>
+					<include>FreeMarkerTemplates/ExtractJava.ftl</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>z/os</id>
+			<activation>
+				<os>
+					<family>z/os</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.ibm</groupId>
+					<artifactId>jzos</artifactId>
+					<version>2.4.8</version>
+				</dependency>
+				<dependency>
+					<groupId>org.genevaers</groupId>
+					<artifactId>zosutilities</artifactId>
+					<version>${revision}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.genevaers</groupId>
+					<artifactId>zosio</artifactId>
+					<version>${revision}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.genevaers</groupId>
+					<artifactId>winio</artifactId>
+					<version>${revision}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+</project>

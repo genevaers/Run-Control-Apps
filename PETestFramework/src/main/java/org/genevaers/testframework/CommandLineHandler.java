@@ -115,7 +115,7 @@ public class CommandLineHandler {
 			properties.load(resourceStream);
             version = properties.getProperty("build.version") + " (" + properties.getProperty("build.timestamp") + ")";
 		} catch (IOException e) {
-			logger.atSevere().log("Exception in reading version \n%s",e.getMessage());
+			e.printStackTrace();
 		}
 		return version;
 	}

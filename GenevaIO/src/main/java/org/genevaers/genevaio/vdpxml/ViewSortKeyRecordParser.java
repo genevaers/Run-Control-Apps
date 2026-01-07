@@ -87,6 +87,7 @@ public class ViewSortKeyRecordParser extends BaseParser {
 
 	@Override
 	public void addElement(String name, String text, Map<String, String> attributes) {
+				logger.atFine().log("name %s text %s", name, text);
 		short s;
 		switch (name.toUpperCase()) {
 			case "SORTCOLUMN":
@@ -99,7 +100,7 @@ public class ViewSortKeyRecordParser extends BaseParser {
 				vsk.setComponentId(componentID);
 				vsk.setViewSortKeyId(componentID);
 				vsk.setSequenceNumber((short) seqNum);
-				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.SAMEPAGE); //default
+				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.SAMEPAGE); //XSD has default as samepage
 				viewNode.addViewSortKeyBySeq(vsk);;
 				break;
 			case "SORTKEYLABEL":
@@ -116,10 +117,12 @@ public class ViewSortKeyRecordParser extends BaseParser {
 				}
 				break;
 			case "HEADER":
-				if("NEWP".equalsIgnoreCase(text)){
-					text = "PNEW";
+				if(text.equals("NEWP")) {
+				logger.atFine().log("Fixed new page");
+					vsk.setSortBreakHeaderOption(SortBreakHeaderOption.NEWPAGE);
+				} else {
+					vsk.setSortBreakHeaderOption(SortBreakHeaderOption.fromdbcode(text));
 				}
-				vsk.setSortBreakHeaderOption(SortBreakHeaderOption.fromdbcode(text));
 				break;
 			case "FOOTER":
 				if (text.equals("1"))

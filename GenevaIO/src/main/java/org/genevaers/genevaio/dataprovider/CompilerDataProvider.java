@@ -44,6 +44,9 @@ public interface CompilerDataProvider {
 	public void setEnvironmentID(int environmentId);
 	public int getEnvironmentID();
 
+	public void setEnvironmentName(String name);
+	public String getEnvironmentName();
+
 	public void setLogicalRecordID(int lrid);
 	public LogicalRecord getLogicalRecord(int id);
 	public void loadLR(int environmentID, int sourceLR);

@@ -62,10 +62,18 @@ public class BinRecordReader extends RecordFileReader {
 		try {
 			long offset = rFile.getFilePointer();
 			if (offset < filelen) {
-				record.length = rFile.readShort();
+				if(recLen > 0) {
+					record.length = (short) recLen;
+				} else {
+					record.length = rFile.readShort();
+				}
 				if (record.length > 0 && record.bytes.hasArray()) {
 					if (record.length < record.bytes.limit()) {
-						rFile.readFully(record.bytes.array(), 0, record.length - 2);
+						if(recLen > 0) {
+							rFile.readFully(record.bytes.array(), 0, recLen);
+						} else {
+							rFile.readFully(record.bytes.array(), 0, record.length - 2);
+						}
 						bytesRead++;
 					} else {
 						logger.atFine().log("%d Running past the end of the file - treating as EOF", offset);

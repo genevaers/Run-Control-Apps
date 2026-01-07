@@ -24,13 +24,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.flogger.FluentLogger;
-
  /**
   * This is the main class for the ComponentGenerator. Just a wrapper for main, the details of the generation are controlled by the <a href="file:../../../../ComponentGenerator//src/main/resources/modelConfig.yaml">model config</a> file.
   */
   public class CommandLineHandler {
-	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	static ModelGenerator modelGenerateor = new ModelGenerator();
 	private static final String MODEL_CONFIGFILE = "../ComponentGenerator/src/main/resources/modelConfig.yaml";
@@ -40,7 +37,7 @@ import com.google.common.flogger.FluentLogger;
 		try {
 			modelGenerateor.generateFrom(MODEL_CONFIGFILE);
 		} catch (IOException e) {
-			logger.atSevere().log("Exception in CommandLineHandler: %s",e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

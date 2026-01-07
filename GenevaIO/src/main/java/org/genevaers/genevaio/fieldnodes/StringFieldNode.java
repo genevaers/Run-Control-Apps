@@ -44,7 +44,7 @@ public class StringFieldNode extends FieldNodeBase {
     }
 
     public String getDiffValue() {
-        return diffValue != null ? diffValue : "";
+        return diffValue;
     }
 
     public void setDiffValue(String diffValue) {

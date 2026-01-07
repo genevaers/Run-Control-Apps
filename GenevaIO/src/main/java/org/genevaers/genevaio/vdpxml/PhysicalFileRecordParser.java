@@ -81,7 +81,7 @@ public class PhysicalFileRecordParser extends BaseParser {
 				pf.setRecfm(FileRecfm.VB);
 				pf.setName(text);
 				pf.setFileType(FileType.DISK); //default
-				pf.setAccessMethod(AccessMethod.SEQUENTIAL); //default
+				pf.setAccessMethod(AccessMethod.SEQUENTIAL);
 				//RepoHelper.fillPF(pf);
 				Repository.getPhysicalFiles().add(pf, componentID, text);
 				break;

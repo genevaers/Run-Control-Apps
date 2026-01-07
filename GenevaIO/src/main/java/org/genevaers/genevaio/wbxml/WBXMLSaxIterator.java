@@ -96,7 +96,8 @@ public class WBXMLSaxIterator {
         try {
            reader = xmlInputFactory.createXMLStreamReader(xmlReader);
         } catch (XMLStreamException e) {
-            logger.atSevere().log("WBXMLSaxIterator readWBXML failed\n%s", e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

@@ -51,6 +51,7 @@ public class ViewHeaderFooterParser extends BaseParser {
 
 	@Override
 	public void addElement(String name, String text, Map<String, String> attributes) {
+				logger.atFine().log("name %s text %s", name, text);
 		switch (name.toUpperCase()) {
 			case "HEADER":
 				id = Integer.parseInt(attributes.get("ID"));
@@ -61,12 +62,15 @@ public class ViewHeaderFooterParser extends BaseParser {
 				break;
 			case "FUNCTION":
 				functonCode = text.trim();
-				if("DATE".equalsIgnoreCase(functonCode)){
-					functonCode = "PDATE";
-				}else if ("TIME".equalsIgnoreCase(functonCode)) {
-					functonCode = "PTIME";
+				if(functonCode.equals("DATE")) {
+					logger.atFine().log("Fix DATE", name, text);
+					rh.setFunction(Repository.getReportFunctionValue(ReportFunction.PDATE));
+				} else 	if(functonCode.equals("TIME")) {
+					logger.atFine().log("Fix TIME", name, text);
+					rh.setFunction(Repository.getReportFunctionValue(ReportFunction.PTIME));
+				} else {
+					rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(functonCode)));
 				}
-				rh.setFunction(Repository.getReportFunctionValue(ReportFunction.fromdbcode(functonCode)));
 				break;
 			case "ALIGNMENT":
 				justify = text.trim();

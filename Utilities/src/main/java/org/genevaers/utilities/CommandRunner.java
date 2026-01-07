@@ -78,18 +78,6 @@ public class CommandRunner {
 		return proc.waitFor();
 	}
 
-	public void run(Process proc) throws IOException, InterruptedException {
-
-		ProcessHandler inputStream =
-			new ProcessHandler(proc.getInputStream(),"INPUT");
-		ProcessHandler errorStream =
-			new ProcessHandler(proc.getErrorStream(),"ERROR");
-
-		/* start the stream threads */
-		inputStream.start();
-		errorStream.start();
-	}
-
 	public void clear() {
 		cmdOutput.setLength(0);
 	}

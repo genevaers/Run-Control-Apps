@@ -1,5 +1,7 @@
 package org.genevaers.rcapps;
 
+import java.io.FileOutputStream;
+
 /*
  * Copyright Contributors to the GenevaERS Project.
 								SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation
@@ -22,7 +24,12 @@ package org.genevaers.rcapps;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolanalyser.RCAApp;
@@ -39,6 +46,10 @@ public class RCDriver {
     private static Path rcPath;
 
     private static String rcaTextType;
+
+    private static String envName;
+
+    private static List<String> yamlViews;
 
     public static void initialise() {
         GersConfigration.initialise();
@@ -97,7 +108,15 @@ public class RCDriver {
 
     public static void runRCA(String relPath) {
         writeRCAParms();
+        if(inputType.equals("YAML")) {
+            writeViewNames();
+        }
         logger.atInfo().log("Run RCA from %s", relPath );
+        if(rcPath.resolve(GersConfigration.VIEW_NAMES).toFile().exists()) {
+            logger.atInfo().log("Found %s", rcPath.resolve(GersConfigration.VIEW_NAMES).toString() );
+        } else {
+            logger.atInfo().log("Did not find %s", rcPath.resolve(GersConfigration.VIEW_NAMES).toString() );
+        }
         Runner.runFrom(relPath);
     }
 
@@ -129,6 +148,7 @@ public class RCDriver {
             fw.write("# Auto generated Run Control Parms\n");
             fw.write(GersConfigration.GENERATE +"=Y\n");
             fw.write(GersConfigration.INPUT_TYPE +"=" + inputType + "\n");
+            fw.write(GersConfigration.ENVIRONMENT_ID +"=" + envName + "\n");
             fw.write(GersConfigration.XLT_REPORT + "=Y\n");
             fw.write(GersConfigration.JLT_REPORT + "=Y\n");
             fw.write(GersConfigration.VDP_REPORT + "=Y\n");
@@ -136,7 +156,6 @@ public class RCDriver {
             fw.write(GersConfigration.COVERAGE + "=Y\n");
             fw.write(GersConfigration.RCA_REPORT + "=Y\n");
             fw.write(GersConfigration.LOG_LEVEL + "=STANDARD\n");
-            fw.close();
         } catch (IOException e) {
             logger.atSevere().log("Unable to write RCA Parms %s", e.getMessage() );
         }
@@ -149,5 +168,27 @@ public class RCDriver {
     public static String getRCAreportFileName() {
         return GersConfigration.RCA_HTMLREPORTFILENAME;
     }
+
+    public static void setEnvironmentName(String n) {
+        envName = n;
+    }
+
+    public static void setViewNames(List<String> views) {
+        yamlViews = views;
+     }
+
+     public static void writeViewNames() {
+         logger.atInfo().log("Write YAMLVIEWS to %s", rcPath.toString());
+         try (FileWriter fw = new FileWriter(rcPath.resolve(GersConfigration.VIEW_NAMES).toFile())) {
+             Iterator<String> vi = yamlViews.iterator();
+             while (vi.hasNext()) {
+                 String v = vi.next();
+                 fw.write(v + "\n");
+             }
+         } catch (IOException e) {
+             logger.atSevere().log("Unable to write RCA Parms %s", e.getMessage());
+         }
+         logger.atInfo().log("YAMLVIEWS written to %s", rcPath.toString());
+     }
 
 }

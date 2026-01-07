@@ -121,6 +121,8 @@ under the License.
 				<includes>
 					<include>application.properties</include>
 					<include>RCApps.ftl</include>
+					<include>Engine.ftl</include>
+					<include>Extractor.ftl</include>
 				</includes>
 			</resource>
 		</resources>

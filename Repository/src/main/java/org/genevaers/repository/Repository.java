@@ -452,10 +452,10 @@ public class Repository {
 
 	public static void fixupPFDDNames() {
 		for(PhysicalFile pf : pfs.getValues()) {
-			if(pf.getOutputDDName().length() == 0) {
+			if(pf.getOutputDDName() == null || pf.getOutputDDName().length() == 0) {
 				pf.setOutputDDName(String.format("O%07d", pf.getComponentId()));
 			}
-			if(pf.getInputDDName().length() == 0) {
+			if(pf.getInputDDName() == null || pf.getInputDDName().length() == 0) {
 				pf.setInputDDName(String.format("I%07d", pf.getComponentId()));
 			}
 		}
@@ -657,5 +657,20 @@ public class Repository {
 			currentlp.setStatus(val);
 		}
 	}
+
+    public static int getLRLength(int id) {
+		LogicalRecord lr = lrs.get(id);
+		Iterator<LRField> fit = lr.getIteratorForFieldsByID();
+		int endpos = 0;
+		int theEndPos = 0;
+		while(fit.hasNext()) {
+			LRField f = fit.next();
+			endpos = f.getStartPosition() + f.getLength();
+			if(endpos > theEndPos) {
+				theEndPos = endpos;
+			}
+		}
+		return theEndPos - 1;
+    }
 
 }

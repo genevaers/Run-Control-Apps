@@ -36,6 +36,7 @@ public abstract class RecordFileWriter {
 	public abstract void close();
 	protected FileRecord record = new FileRecord();
 	private int numRecordsWritten;
+	protected int recLen;
 
 	public static String getSpaces() {
 		return spaces;
@@ -88,5 +89,13 @@ public abstract class RecordFileWriter {
 
 	public FileRecord getRecordToFill() {
 		return record;
+	}
+
+	public void setReclen(int reclen) {
+		this.recLen = reclen;
+	}
+
+	public int getReclen() {
+		return recLen;
 	}
 }

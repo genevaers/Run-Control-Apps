@@ -65,9 +65,6 @@ public class Runner {
             logger.atInfo().log(header.toString());
             if(GersConfigration.generatorRunRequested()) {
                 RCGApp.run();
-                ReportWriter.setNumVDPRecordsWritten(RCGApp.getNumVDPRecordsWritten());
-                ReportWriter.setNumJLTRecordsWritten(RCGApp.getNumJLTRecordsWritten());
-                ReportWriter.setNumXLTRecordsWritten(RCGApp.getNumXLTRecordsWritten());
                 status = RCGApp.getResult();
             }
             if(status != Status.ERROR && GersConfigration.analyserRunRequested())  {
@@ -109,7 +106,7 @@ public class Runner {
 			properties.load(resourceStream);
 			ver = properties.getProperty("build.version");
 		} catch (IOException e) {
-			logger.atSevere().log("Exception in get version \n%s", e.getMessage());
+			e.printStackTrace();
 		}
 		return ver;
 	}

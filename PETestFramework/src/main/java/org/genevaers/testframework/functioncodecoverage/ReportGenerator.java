@@ -43,13 +43,10 @@ import java.util.List;
 
 import org.genevaers.testframework.functioncodecoverage.FunctionCodeHit.HITS_STATE;
 
-import com.google.common.flogger.FluentLogger;
-
 import j2html.tags.ContainerTag;
 import j2html.tags.specialized.TrTag;
 
 public class ReportGenerator {
-	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
 	private static final String HITS_STYLE = "text-align: right; border-style: solid; border-width: 1px;padding: 3;";
 
@@ -91,7 +88,8 @@ public class ReportGenerator {
 							)).renderFormatted());
 			testHtml.close();
 		} catch (IOException e) {
-			logger.atSevere().log("Exception occurred in Coverage Report Generator \n%s", e.getMessage());
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}

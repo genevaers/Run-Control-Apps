@@ -174,7 +174,8 @@ public class TestDataGenerator  {
                             outputPath.resolve(targetStr));
                 }
             } catch (IOException | TemplateException e) {
-                logger.atSevere().log("Error in generateOutputs: \n%s", e.getMessage()); 
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
     }

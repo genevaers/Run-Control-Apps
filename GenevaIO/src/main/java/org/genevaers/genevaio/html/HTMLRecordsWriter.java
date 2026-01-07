@@ -67,7 +67,6 @@ import j2html.tags.specialized.TrTag;
 public abstract class HTMLRecordsWriter {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 	
-	protected int numDiffs;
 	private  Writer fw;
 	private  final String POPUP = "w3-modal-content w3-animate-zoom";
 	 String toggleScript = "function toggleDiv(divname) {" +
@@ -183,9 +182,6 @@ public abstract class HTMLRecordsWriter {
 	}
 
 	protected  TdTag rowEntry(FieldNodeBase n) {
-		if(n.getParent().getState() == ComparisonState.DIFF) {
-			numDiffs++;
-		}
 		switch(n.getFieldNodeType()) {
 			case NUMBERFIELD:
 				return td(((NumericFieldNode)n).getValueString()).withCondClass(n.getState() == ComparisonState.ORIGINAL, "w3-pale-blue")
@@ -215,11 +211,4 @@ public abstract class HTMLRecordsWriter {
 		return th(n.getName());
 	}
 
-	public int getNumDiffs() {
-		return numDiffs;
-	}
-
-	public boolean diffsFound() {
-		return numDiffs > 0;
-	}
 }

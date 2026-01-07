@@ -16,7 +16,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<!-- our apps -->
-		<revision>1.1.0_RC20</revision>
+		<revision>2.0.0_ENG</revision>
 	</properties>
 
 	<licenses>
@@ -56,11 +56,23 @@
 		<module>RunControlAnalyser</module>
 		<module>WinIO</module>
 		<module>RCApps</module>
+		<module>PerformanceEngine</module>
+		<module>ExtractGenerator</module>
 	</modules>
 
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.genevaers</groupId>
+				<artifactId>engine</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.genevaers</groupId>
+				<artifactId>extractgenerator</artifactId>
+				<version>${revision}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.genevaers</groupId>
 				<artifactId>runcontrolgenerator</artifactId>
@@ -150,17 +162,17 @@
 			<dependency>
 				<groupId>com.google.flogger</groupId>
 				<artifactId>flogger</artifactId>
-				<version>0.9</version>
+				<version>0.8</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.flogger</groupId>
 				<artifactId>flogger-system-backend</artifactId>
-				<version>0.9</version>
+				<version>0.8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-runtime</artifactId>
-				<version>4.13.2</version>
+				<version>4.13.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.googlecode.java-diff-utils</groupId>
@@ -185,12 +197,12 @@
 			<dependency>
 				<groupId>org.freemarker</groupId>
 				<artifactId>freemarker</artifactId>
-				<version>2.3.34</version>
+				<version>2.3.32</version>
 			</dependency>
 			<dependency>
 				<groupId>org.fusesource.jansi</groupId>
 				<artifactId>jansi</artifactId>
-				<version>2.4.2</version>
+				<version>2.4.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -273,7 +285,8 @@
 						</executions>
 						<configuration>
 							<licenses>
-								<license implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
+								<license
+									implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20">
 									<notes>Also allow the license url to be https.</notes>
 									<patterns>
 										<pattern>https://www.apache.org/licenses/LICENSE-2.0</pattern>

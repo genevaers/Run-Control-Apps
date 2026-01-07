@@ -27,6 +27,7 @@ public abstract class RecordFileReader {
 	private static boolean spacesConverted = false;
 	protected static String spaces = StringUtils.repeat(" ", 1536); //!!! Don't change this length  !!!!!
 	protected boolean EOFreached = false;
+	protected int recLen;
 
 	public abstract void readRecordsFrom(File file) throws IOException;
 	public abstract FileRecord readRecord();
@@ -46,4 +47,13 @@ public abstract class RecordFileReader {
 	public boolean isAtFileEnd() {
 		return EOFreached;
 	}
+	
+	public void setRecLen(int recLen) {
+		this.recLen = recLen;
+	}
+
+	public int getRecLen() {
+		return recLen;
+	}
+
 }

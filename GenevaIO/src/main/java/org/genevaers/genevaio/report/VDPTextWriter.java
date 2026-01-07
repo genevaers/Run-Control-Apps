@@ -297,6 +297,7 @@ public class VDPTextWriter extends TextRecordWriter {
 				}
 				lrds.name = ((StringFieldNode)(lr.getChildrenByName("lrName"))).getValue();
 				lrDetailsById.put(lrds.id, lrds);
+				lrds.length = Repository.getLRLength(id);
 				lrds.numberOfFields = Repository.getLogicalRecords().get(id).getValuesOfFieldsByID().size();
 				lrds.keyLen = Repository.getLrKeyLen(id);
 				lrds.lookupExitId = ((NumericFieldNode)(lr.getChildrenByName("exitPgmId"))).getValue(); 

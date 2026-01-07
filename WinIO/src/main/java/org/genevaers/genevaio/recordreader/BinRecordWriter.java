@@ -45,15 +45,24 @@ public class BinRecordWriter extends RecordFileWriter {
 
 	@Override
 	public void write(ByteBuffer bytes) {
-		if(bytes.getShort(0) ==  bytes.position()) {
-			try {
-				wFile.write(bytes.array(), 0, bytes.position());
-				bytesWritten += bytes.position();
-			} catch (IOException e){
-				logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
-			}
+		if(recLen > 0) {
+				try {
+					wFile.write(bytes.array(), 0, recLen);
+					bytesWritten += bytes.position();
+				} catch (IOException e){
+					logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
+				}
 		} else {
-			logger.atSevere().log("Write length mistmatch record length is %d  buffer position is ", bytes.getShort(0), bytes.position());
+			if(bytes.getShort(0) ==  bytes.position()) {
+				try {
+					wFile.write(bytes.array(), 0, bytes.position());
+					bytesWritten += bytes.position();
+				} catch (IOException e){
+					logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
+				}
+			} else {
+				logger.atSevere().log("Write length mistmatch record length is %d  buffer position is ", bytes.getShort(0), bytes.position());
+			}
 		}
     }
 

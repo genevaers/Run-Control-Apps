@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "comparebb",
+            "request": "launch",
+            "mainClass": "org.genevaers.engine.comparebb",
+            "projectName": "engine"
+        },
+        {
+            "type": "java",
+            "name": "Runner",
+            "request": "launch",
+            "mainClass": "org.genevaers.extractgenerator.Runner",
+            "projectName": "extractgenerator"
+        },
+        {
+            "type": "java",
+            "name": "Engine",
+            "request": "launch",
+            "mainClass": "org.genevaers.engine.Engine",
+            "projectName": "engine"
+        },
+        {
+            "type": "java",
             "name": "CommandLineHandler",
             "request": "launch",
             "mainClass": "org.genevaers.ftl2jcl.CommandLineHandler",
@@ -81,6 +102,30 @@
             "mainClass": "org.genevaers.rcapps.Runner",
             "projectName": "rcapps",
             "cwd": "${workspaceFolder}/../../../RunControlPlayPen"
+        },
+        {
+            "type": "java",
+            "name": "Launch Engine from playpen",
+            "request": "launch",
+            "mainClass": "org.genevaers.engine.Engine",
+            "projectName": "engine",
+            "cwd": "${workspaceFolder}/../../../EnginePlaypen"
+        },
+        {
+            "type": "java",
+            "name": "Launch Extractor from playpen",
+            "request": "launch",
+            "mainClass": "org.genevaers.extractgenerator.Runner",
+            "projectName": "extractgenerator",
+            "cwd": "${workspaceFolder}/../../../ExtractorPlaypen"
+        },
+        {
+            "type": "java",
+            "name": "Launch RCA from Extractor playpen",
+            "request": "launch",
+            "mainClass": "org.genevaers.rcapps.Runner",
+            "projectName": "rcapps",
+            "cwd": "${workspaceFolder}/../../../ExtractorPlaypen"
         },
         {
             "type": "java",

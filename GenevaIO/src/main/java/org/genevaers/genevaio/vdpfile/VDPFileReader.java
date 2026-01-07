@@ -92,6 +92,7 @@ public class VDPFileReader{
 		try {
 			readVDP();
 		} catch (Exception e) {
+			logger.atSevere().log("VDP File read failed:\n%s", e.getMessage());
 			logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
 		}
 	}
