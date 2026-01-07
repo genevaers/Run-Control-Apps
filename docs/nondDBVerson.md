@@ -17,7 +17,19 @@ In that past we have discussed replacing the existing VDP. XLT and JLT files wit
 Developing that may also be an option.
 
 ## Development Tasks
+Below are sections to capture some of the development tasks related to the new proposal.  
+
+### VS Code interface
+Investigate how to create a user friendly GUI.  
+Consider the way in which the settings are managed.  
+
+### Scaling
+How well with this scale? That is how well will it work for large views with many columns and many data sources.
 
 ### Code Generation
+The existing code generator will need to be modified to generate classes to manage the components.  
+This again will be to avoid lots of repetitive manual coding.
 
 ### Migrating Existing Metadata
+
+We will need a path that converts existing views into whatever we come up with.
