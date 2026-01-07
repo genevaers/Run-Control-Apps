@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "comparebb",
+            "request": "launch",
+            "mainClass": "org.genevaers.engine.comparebb",
+            "projectName": "engine"
+        },
+        {
+            "type": "java",
             "name": "Runner",
             "request": "launch",
             "mainClass": "org.genevaers.extractgenerator.Runner",
