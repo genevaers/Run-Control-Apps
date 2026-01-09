@@ -2,6 +2,8 @@ package org.genevaers.extractgenerator;
 
 
 
+import java.io.File;
+
 /*
  * Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
  * 
@@ -72,6 +74,11 @@ public class ExtractorWriter {
 
 
 	private static  void generateTemplatedOutput(Template template, Map<String, Object> nodeMap, String reportFileName) {
+        //Generate the output file into the generated source area of the Performance Engine
+        String genSrcDir = GersConfigration.getPerformanceEngineGenSourceDir();
+        File targdir = new File(genSrcDir);
+        targdir.mkdirs();
+        reportFileName = genSrcDir + System.getProperty("file.separator") + reportFileName;
         try(Writer fw = new GersFile().getWriter(reportFileName)) {
 	    	template.process(nodeMap, fw);
 		} catch (IOException | TemplateException e) {

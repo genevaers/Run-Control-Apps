@@ -658,19 +658,4 @@ public class Repository {
 		}
 	}
 
-    public static int getLRLength(int id) {
-		LogicalRecord lr = lrs.get(id);
-		Iterator<LRField> fit = lr.getIteratorForFieldsByID();
-		int endpos = 0;
-		int theEndPos = 0;
-		while(fit.hasNext()) {
-			LRField f = fit.next();
-			endpos = f.getStartPosition() + f.getLength();
-			if(endpos > theEndPos) {
-				theEndPos = endpos;
-			}
-		}
-		return theEndPos - 1;
-    }
-
 }

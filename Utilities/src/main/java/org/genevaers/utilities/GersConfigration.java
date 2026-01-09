@@ -121,6 +121,8 @@ public class GersConfigration {
     private static final String EXTRACTOR_LOG_FILENAME = "EXLOG";
     private static final String EXTRACTOR_REPORT_FILENAME = "EXRPT";
     
+    private static final String CODE_BASE = "CODE_BASE";
+
     protected static Map<String, ConfigEntry> parmToValue = new TreeMap<>();
 
     private static boolean zos;
@@ -176,6 +178,8 @@ public class GersConfigration {
         parmToValue.put(DB_SERVER, new ConfigEntry("", false));
         parmToValue.put(DB_PORT, new ConfigEntry("", false));
         parmToValue.put(DB_DATABASE, new ConfigEntry("", false));
+
+        parmToValue.put(CODE_BASE, new ConfigEntry("", false));
     }
 
     public static void addParmValue(String name, String value) {
@@ -526,5 +530,9 @@ public class GersConfigration {
 	public static String getExtractorReportFileName() {
         return getCWDPrefix() + EXTRACTOR_REPORT_FILENAME;
 	}
+
+    public static String getPerformanceEngineGenSourceDir() {
+        return parmToValue.get(CODE_BASE).getValue() + "/target/generated-sources/org/genevaers/engine/extractor";
+    }
 
 }

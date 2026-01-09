@@ -56,8 +56,6 @@
 		<module>RunControlAnalyser</module>
 		<module>WinIO</module>
 		<module>RCApps</module>
-		<module>PerformanceEngine</module>
-		<module>ExtractGenerator</module>
 	</modules>
 
 
@@ -323,6 +321,18 @@
 				<module>PETestFramework</module>
 				<module>ZosIO</module>
 				<module>ZosUtilities</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>extractor</id>
+			<modules>
+				<module>ExtractGenerator</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>pe</id>
+			<modules>
+				<module>PerformanceEngine</module>
 			</modules>
 		</profile>
 	</profiles>

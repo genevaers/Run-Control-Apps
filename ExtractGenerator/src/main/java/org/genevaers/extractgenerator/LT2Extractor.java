@@ -30,7 +30,7 @@ public class LT2Extractor {
 
     public void execute() {
         logger.atInfo().log("Read a logic table and generate Extractor code.");
-        GersConfigration.initialise();
+        //GersConfigration.initialise();
         Path root = Paths.get(GersConfigration.getCurrentWorkingDirectory());
         readVDP(root, GersConfigration.VDP_DDNAME, null);
         Path xlt = root.resolve(GersConfigration.XLT_DDNAME);
