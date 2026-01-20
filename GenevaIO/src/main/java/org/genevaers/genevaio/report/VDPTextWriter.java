@@ -356,18 +356,18 @@ public class VDPTextWriter extends TextRecordWriter {
 		LookupDetails lkds = null;
         while (fi.hasNext()) {
             FieldNodeBase lk = (FieldNodeBase) fi.next();
-			int id = ((NumericFieldNode)(lk.getChildrenByName("recordId"))).getValue();
+			int id = ((NumericFieldNode)(lk.getChildrenByName("RecordId"))).getValue();
 			if(id != currentID) {
 				lkds = new LookupDetails();
 				lkds.id = id;
-				lkds.name = ((StringFieldNode)(lk.getChildrenByName("joinName"))).getValue();
+				lkds.name = ((StringFieldNode)(lk.getChildrenByName("JoinName"))).getValue();
 				lookupDetailsById.put(lkds.id, lkds);
-				lkds.sourceLR = ((NumericFieldNode)(lk.getChildrenByName("sourceLrId"))).getValue();
+				lkds.sourceLR = ((NumericFieldNode)(lk.getChildrenByName("SourceLrId"))).getValue();
 				currentID = id;
 			}
-			lkds.numberOfSteps = ((NumericFieldNode)(lk.getChildrenByName("sequenceNbr"))).getValue();
-			lkds.targetLF = ((NumericFieldNode)(lk.getChildrenByName("inputFileId"))).getValue();
-			lkds.targetLR = ((NumericFieldNode)(lk.getChildrenByName("targetLrId"))).getValue();
+			lkds.numberOfSteps = ((NumericFieldNode)(lk.getChildrenByName("Sequence Number"))).getValue();
+			lkds.targetLF = ((NumericFieldNode)(lk.getChildrenByName("Input File ID"))).getValue();
+			lkds.targetLR = ((NumericFieldNode)(lk.getChildrenByName("TargetLrId"))).getValue();
 		}
 	}
 
