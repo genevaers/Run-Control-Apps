@@ -87,6 +87,7 @@ public class GersEnvironment {
 		getEnvVarOrDefault("GERS_DB2_EXIT_LIB", "DSN.V12R1M0.SDSNEXIT");
 		getEnvVarOrDefault("GERS_DB2_RUN_LIB", "DSN121.RUNLIB.LOAD");
 		getEnvVarOrDefault("GERS_DB2_UTILITY", "DSNTIA12");
+		getEnvVarOrDefault("GERS_DB2_PLAN_SUFFIX", "");
 		getEnvVarOrDefault("GERS_GIT_REPO_DIR", "");
 		getEnvVarOrDefault("GERS_RCA_JAR_DIR", "");
 		getEnvVarOrDefault("RUNOS", "ZOS");

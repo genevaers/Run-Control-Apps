@@ -1,29 +1,11 @@
-<?xml version='1.0'?>
-<!--
-Copyright Contributors to the GenevaERS Project. SPDX-License-Identifier: Apache-2.0 (c) Copyright IBM Corporation 2008.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
-
 <safrxml>
     <Generation>
         <Record>
             <XMLVERSION>3</XMLVERSION>
             <TYPE>ViewFolder</TYPE>
-            <PROGRAM>Workbench Version 4.17.020 Build 1045  </PROGRAM>
+            <PROGRAM>Workbench Version 4.21.1_RC12  (GillianHannington 2025-10-31 01:37)</PROGRAM>
             <FILENAME>PASS03_PM418_DB2SQL_Tests[1000011].xml</FILENAME>
-            <CREATEDTIMESTAMP>2023-05-05 13:00:09</CREATEDTIMESTAMP>
+            <CREATEDTIMESTAMP>2025-10-31 13:57:47</CREATEDTIMESTAMP>
             <CREATEDUSERID>ADMIN</CREATEDUSERID>
         </Record>
     </Generation>
@@ -521,8 +503,8 @@ under the License.
             <COMMENTS></COMMENTS>
             <CREATEDTIMESTAMP>2009-03-31 10:33:39</CREATEDTIMESTAMP>
             <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2009-05-20 07:02:17</LASTMODTIMESTAMP>
-            <LASTMODUSERID>SHERRYG </LASTMODUSERID>
+            <LASTMODTIMESTAMP>2025-10-31 01:57:22</LASTMODTIMESTAMP>
+            <LASTMODUSERID>ADMIN   </LASTMODUSERID>
             <LASTACTTIMESTAMP></LASTACTTIMESTAMP>
             <LASTACTUSERID></LASTACTUSERID>
         </Record>
@@ -808,26 +790,6 @@ under the License.
             <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
             <LASTMODUSERID></LASTMODUSERID>
         </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LRLFASSOCID>489</LRLFASSOCID>
-            <LOGFILEID>292</LOGFILEID>
-            <LOGRECID>380</LOGRECID>
-            <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
-            <CREATEDUSERID></CREATEDUSERID>
-            <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
-            <LASTMODUSERID></LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LRLFASSOCID>497</LRLFASSOCID>
-            <LOGFILEID>293</LOGFILEID>
-            <LOGRECID>380</LOGRECID>
-            <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
-            <CREATEDUSERID></CREATEDUSERID>
-            <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
-            <LASTMODUSERID></LASTMODUSERID>
-        </Record>
     </LR-LF-Association>
     <LogicalFile>
         <Record>
@@ -840,26 +802,6 @@ under the License.
             <LASTMODTIMESTAMP>2009-03-31 08:27:41</LASTMODTIMESTAMP>
             <LASTMODUSERID>SHERRYG </LASTMODUSERID>
         </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LOGFILEID>292</LOGFILEID>
-            <NAME>GV9H_REGR2_DB2_VIA_VSAM</NAME>
-            <COMMENTS></COMMENTS>
-            <CREATEDTIMESTAMP>2009-04-20 04:20:48</CREATEDTIMESTAMP>
-            <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2009-05-20 07:00:35</LASTMODTIMESTAMP>
-            <LASTMODUSERID>SHERRYG </LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LOGFILEID>293</LOGFILEID>
-            <NAME>GV9H_REGR32</NAME>
-            <COMMENTS></COMMENTS>
-            <CREATEDTIMESTAMP>2009-05-20 06:56:28</CREATEDTIMESTAMP>
-            <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2009-07-16 05:53:55</LASTMODTIMESTAMP>
-            <LASTMODUSERID>SHERRYG </LASTMODUSERID>
-        </Record>
     </LogicalFile>
     <LF-PF-Association>
         <Record>
@@ -868,39 +810,6 @@ under the License.
             <PHYFILEID>904</PHYFILEID>
             <PARTSEQNBR>1</PARTSEQNBR>
             <LOGFILEID>289</LOGFILEID>
-            <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
-            <CREATEDUSERID></CREATEDUSERID>
-            <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
-            <LASTMODUSERID></LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LFPFASSOCID>839</LFPFASSOCID>
-            <PHYFILEID>907</PHYFILEID>
-            <PARTSEQNBR>1</PARTSEQNBR>
-            <LOGFILEID>292</LOGFILEID>
-            <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
-            <CREATEDUSERID></CREATEDUSERID>
-            <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
-            <LASTMODUSERID></LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LFPFASSOCID>842</LFPFASSOCID>
-            <PHYFILEID>909</PHYFILEID>
-            <PARTSEQNBR>1</PARTSEQNBR>
-            <LOGFILEID>293</LOGFILEID>
-            <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
-            <CREATEDUSERID></CREATEDUSERID>
-            <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
-            <LASTMODUSERID></LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <LFPFASSOCID>852</LFPFASSOCID>
-            <PHYFILEID>919</PHYFILEID>
-            <PARTSEQNBR>2</PARTSEQNBR>
-            <LOGFILEID>293</LOGFILEID>
             <CREATEDTIMESTAMP></CREATEDTIMESTAMP>
             <CREATEDUSERID></CREATEDUSERID>
             <LASTMODTIMESTAMP></LASTMODTIMESTAMP>
@@ -940,87 +849,6 @@ COALESCE(STATISTIC_AMOUNT,0)<BR/>
             <CREATEDTIMESTAMP>2009-03-31 08:21:42</CREATEDTIMESTAMP>
             <CREATEDUSERID>SHERRYG </CREATEDUSERID>
             <LASTMODTIMESTAMP>2019-10-01 19:29:15</LASTMODTIMESTAMP>
-            <LASTMODUSERID>ADMIN   </LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <PHYFILEID>907</PHYFILEID>
-            <NAME>GV9H_REGR2_DB2_VIA_VSAM</NAME>
-            <FILETYPECD>DISK </FILETYPECD>
-            <DISKFILETYPECD>DATAB</DISKFILETYPECD>
-            <ACCESSMETHODCD>DB2VS</ACCESSMETHODCD>
-            <READEXITID>0</READEXITID>
-            <READEXITSTARTUP></READEXITSTARTUP>
-            <DDNAMEINPUT>EVENTGV9</DDNAMEINPUT>
-            <DSN>DM11.DSNDBD.SADBSD01.REGR2</DSN>
-            <MINRECLEN>0</MINRECLEN>
-            <MAXRECLEN>0</MAXRECLEN>
-            <DDNAMEOUTPUT>        </DDNAMEOUTPUT>
-            <RECFM></RECFM>
-            <LRECL>0</LRECL>
-            <DBMSSUBSYS>DM12</DBMSSUBSYS>
-            <DBMSSQL><![CDATA[SELECT * FROM SDATRT01.REGR2]]></DBMSSQL>
-            <DBMSTABLE>REGR2</DBMSTABLE>
-            <DBMSROWFMTCD>SQL  </DBMSROWFMTCD>
-            <DBMSINCLNULLSIND>0</DBMSINCLNULLSIND>
-            <COMMENTS></COMMENTS>
-            <CREATEDTIMESTAMP>2009-04-20 04:09:59</CREATEDTIMESTAMP>
-            <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2019-10-01 19:29:25</LASTMODTIMESTAMP>
-            <LASTMODUSERID>ADMIN   </LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <PHYFILEID>909</PHYFILEID>
-            <NAME>GV9H_REGR32</NAME>
-            <FILETYPECD>DISK </FILETYPECD>
-            <DISKFILETYPECD>DATAB</DISKFILETYPECD>
-            <ACCESSMETHODCD>DB2VS</ACCESSMETHODCD>
-            <READEXITID>0</READEXITID>
-            <READEXITSTARTUP></READEXITSTARTUP>
-            <DDNAMEINPUT>REGR32  </DDNAMEINPUT>
-            <DSN>DM11.DSNDBD.SADBSD01.REGR32</DSN>
-            <MINRECLEN>0</MINRECLEN>
-            <MAXRECLEN>0</MAXRECLEN>
-            <DDNAMEOUTPUT>        </DDNAMEOUTPUT>
-            <RECFM></RECFM>
-            <LRECL>0</LRECL>
-            <DBMSSUBSYS>DM12</DBMSSUBSYS>
-            <DBMSSQL><![CDATA[SELECT * FROM SDATRT01.REGR32]]></DBMSSQL>
-            <DBMSTABLE>REGR32</DBMSTABLE>
-            <DBMSROWFMTCD>SQL  </DBMSROWFMTCD>
-            <DBMSINCLNULLSIND>0</DBMSINCLNULLSIND>
-            <COMMENTS></COMMENTS>
-            <CREATEDTIMESTAMP>2009-05-20 06:49:32</CREATEDTIMESTAMP>
-            <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2019-10-01 19:31:00</LASTMODTIMESTAMP>
-            <LASTMODUSERID>ADMIN   </LASTMODUSERID>
-        </Record>
-        <Record>
-            <ENVIRONID>30</ENVIRONID>
-            <PHYFILEID>919</PHYFILEID>
-            <NAME>GV9H_REGR32_INTERNAL_FMT_WITH_NULLS</NAME>
-            <FILETYPECD>DISK </FILETYPECD>
-            <DISKFILETYPECD>DATAB</DISKFILETYPECD>
-            <ACCESSMETHODCD>DB2VS</ACCESSMETHODCD>
-            <READEXITID>0</READEXITID>
-            <READEXITSTARTUP></READEXITSTARTUP>
-            <DDNAMEINPUT>REGR32IF</DDNAMEINPUT>
-            <DSN>DM11.DSNDBD.SADBSD01.REGR32</DSN>
-            <MINRECLEN>0</MINRECLEN>
-            <MAXRECLEN>0</MAXRECLEN>
-            <DDNAMEOUTPUT>        </DDNAMEOUTPUT>
-            <RECFM></RECFM>
-            <LRECL>0</LRECL>
-            <DBMSSUBSYS>DM12</DBMSSUBSYS>
-            <DBMSSQL><![CDATA[SELECT * FROM SDATRT01.REGR32]]></DBMSSQL>
-            <DBMSTABLE>REGR32</DBMSTABLE>
-            <DBMSROWFMTCD>DB2  </DBMSROWFMTCD>
-            <DBMSINCLNULLSIND>0</DBMSINCLNULLSIND>
-            <COMMENTS></COMMENTS>
-            <CREATEDTIMESTAMP>2009-06-10 06:06:39</CREATEDTIMESTAMP>
-            <CREATEDUSERID>SHERRYG </CREATEDUSERID>
-            <LASTMODTIMESTAMP>2019-10-01 19:31:11</LASTMODTIMESTAMP>
             <LASTMODUSERID>ADMIN   </LASTMODUSERID>
         </Record>
     </PhysicalFile>

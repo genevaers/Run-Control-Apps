@@ -312,28 +312,28 @@ public class VDPTextWriter extends TextRecordWriter {
 		LrDetails lrds = null;
         while (fi.hasNext()) {
             FieldNodeBase lr = (FieldNodeBase) fi.next();
-			int id = ((NumericFieldNode)(lr.getChildrenByName("recordId"))).getValue();
+			int id = ((NumericFieldNode)(lr.getChildrenByName("RecordId"))).getValue();
 			if(id != currentID) {
 				lrds = new LrDetails();
 				lrds.id = id;
 				lrds.state = lr.getState();
 				if(cppCompare && (lrds.state == ComparisonState.DIFF || lrds.state == ComparisonState.ORIGINAL) && lrds.id > 900000) {
-					lr.getChildrenByName("lrName").setState(ComparisonState.RECIGNORE);
+					lr.getChildrenByName("Name").setState(ComparisonState.RECIGNORE);
 					lrds.state = ComparisonState.RECIGNORE;
 					ignoredLrs.add(id);
 				}
 				if(lrds.state == ComparisonState.ORIGINAL && cppCompare) {
-					lr.getChildrenByName("lrName").setState(ComparisonState.RECIGNORE);
+					lr.getChildrenByName("Name").setState(ComparisonState.RECIGNORE);
 					lrds.state = ComparisonState.RECIGNORE;
 					ignoredLrs.add(id);
 				}
-				lrds.name = ((StringFieldNode)(lr.getChildrenByName("lrName"))).getValue();
+				lrds.name = ((StringFieldNode)(lr.getChildrenByName("Name"))).getValue();
 				lrDetailsById.put(lrds.id, lrds);
 				lrds.numberOfFields = Repository.getLogicalRecords().get(id).getValuesOfFieldsByID().size();
 				lrds.length = Repository.getLRLength(id);
 				lrds.keyLen = Repository.getLrKeyLen(id);
-				lrds.lookupExitId = ((NumericFieldNode)(lr.getChildrenByName("exitPgmId"))).getValue(); 
-				lrds.exitParms = ((StringFieldNode)(lr.getChildrenByName("exitStartup"))).getValue();
+				lrds.lookupExitId = ((NumericFieldNode)(lr.getChildrenByName("Lookup Exit ID"))).getValue(); 
+				lrds.exitParms = ((StringFieldNode)(lr.getChildrenByName("Lookup Exit Parameters"))).getValue();
 			}
 		}
 	}
@@ -356,18 +356,18 @@ public class VDPTextWriter extends TextRecordWriter {
 		LookupDetails lkds = null;
         while (fi.hasNext()) {
             FieldNodeBase lk = (FieldNodeBase) fi.next();
-			int id = ((NumericFieldNode)(lk.getChildrenByName("recordId"))).getValue();
+			int id = ((NumericFieldNode)(lk.getChildrenByName("RecordId"))).getValue();
 			if(id != currentID) {
 				lkds = new LookupDetails();
 				lkds.id = id;
-				lkds.name = ((StringFieldNode)(lk.getChildrenByName("joinName"))).getValue();
+				lkds.name = ((StringFieldNode)(lk.getChildrenByName("JoinName"))).getValue();
 				lookupDetailsById.put(lkds.id, lkds);
-				lkds.sourceLR = ((NumericFieldNode)(lk.getChildrenByName("sourceLrId"))).getValue();
+				lkds.sourceLR = ((NumericFieldNode)(lk.getChildrenByName("SourceLrId"))).getValue();
 				currentID = id;
 			}
-			lkds.numberOfSteps = ((NumericFieldNode)(lk.getChildrenByName("sequenceNbr"))).getValue();
-			lkds.targetLF = ((NumericFieldNode)(lk.getChildrenByName("inputFileId"))).getValue();
-			lkds.targetLR = ((NumericFieldNode)(lk.getChildrenByName("targetLrId"))).getValue();
+			lkds.numberOfSteps = ((NumericFieldNode)(lk.getChildrenByName("Sequence Number"))).getValue();
+			lkds.targetLF = ((NumericFieldNode)(lk.getChildrenByName("Input File ID"))).getValue();
+			lkds.targetLR = ((NumericFieldNode)(lk.getChildrenByName("TargetLrId"))).getValue();
 		}
 	}
 
@@ -379,9 +379,9 @@ public class VDPTextWriter extends TextRecordWriter {
             FieldNodeBase n = (FieldNodeBase) fi.next();
 			if(n.getName().equals("View_Definition")) {
 				FieldNodeBase rec = n.getChildren().get(0);
-				vds.name = ((StringFieldNode)(rec.getChildrenByName("viewName"))).getValue();
-				vds.id = ((NumericFieldNode)(rec.getChildrenByName("recordId"))).getValue();
-				vds.viewType = ((StringFieldNode)(rec.getChildrenByName("viewType"))).getValue();
+				vds.name = ((StringFieldNode)(rec.getChildrenByName("Name"))).getValue();
+				vds.id = ((NumericFieldNode)(rec.getChildrenByName("RecordId"))).getValue();
+				vds.viewType = ((StringFieldNode)(rec.getChildrenByName("ViewType"))).getValue();
 			} else if(n.getName().equals("Columns")) {
 				vds.numberOfColumns = n.getChildren().size();
 			} else if(n.getName().equals("Sources")) {
@@ -428,14 +428,15 @@ public class VDPTextWriter extends TextRecordWriter {
 	}
 
 	private void writeComponent(FieldNodeBase c, Writer fw) throws IOException {
-		int recordType = ((NumericFieldNode)c.getChildren().get(0).getChildrenByName("recordType")).getValue();
-		int recordId = ((NumericFieldNode)c.getChildren().get(0).getChildrenByName("recordId")).getValue();
+		int recordType = ((NumericFieldNode)c.getChildren().get(0).getChildrenByName("Record Type")).getValue();
+		int recordId = ((NumericFieldNode)c.getChildren().get(0).getChildrenByName("RecordId")).getValue();
 		fw.write(String.format("\n~%s (%d)\n",c.getName(), recordType));
 		if(recordType == 300 && ignoredLrs.contains(recordId)) {
 			propagate(c, ComparisonState.IGNORED);
 		}
 		writeComponentEntries(c, fw);
 	}
+	
 
 	private void writeComponentEntries(FieldNodeBase c, Writer fw) throws IOException {
 
@@ -453,19 +454,19 @@ public class VDPTextWriter extends TextRecordWriter {
 		Iterator<FieldNodeBase> fi = c.getChildren().iterator();
 		while (fi.hasNext()) {
 			FieldNodeBase n = (FieldNodeBase) fi.next();
-			fw.write(String.format("\n    ~*%s (%s)\n",n.getName().replace('_', ' '), ((NumericFieldNode)n.getChildren().get(0).getChildrenByName("recordType")).getValue()));
+			fw.write(String.format("\n    ~*%s (%s)\n",n.getName().replace('_', ' '), ((NumericFieldNode)n.getChildren().get(0).getChildrenByName("Record Type")).getValue()));
 			writeComponentEntries(n, fw);
 		}
 	}
 
 	private void writeRecord(FieldNodeBase r, Writer fw) throws IOException {
-		int recordType = ((NumericFieldNode)r.getChildrenByName("recordType")).getValue();
-		int recordId = ((NumericFieldNode)r.getChildrenByName("recordId")).getValue();
+		int recordType = ((NumericFieldNode)r.getChildrenByName("Record Type")).getValue();
+		int recordId = ((NumericFieldNode)r.getChildrenByName("RecordId")).getValue();
 		if(recordType == 300 && ignoredLrs.contains(recordId)) {
 			r.setState(ComparisonState.RECIGNORE);
 		}
 		if(recordType == 400) {
-			int lrid = ((NumericFieldNode)r.getChildrenByName("lrId")).getValue();
+			int lrid = ((NumericFieldNode)r.getChildrenByName("ID")).getValue();
 		 	if(ignoredLrs.contains(lrid)) {
 				r.setState(ComparisonState.RECIGNORE);
 			}
