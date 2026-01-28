@@ -35,7 +35,7 @@ tests:
   #you can use an absoulte DSN as well
   eventfiles:
   - ddname: "SRCEGEN" #needs to match what is in the PF DDName
-    filename: "ALLTYPE"
+    filename: "DATEGEN"
   #List of reference files - just like event files
   # omit if no reference phase required
   #Extract output 
