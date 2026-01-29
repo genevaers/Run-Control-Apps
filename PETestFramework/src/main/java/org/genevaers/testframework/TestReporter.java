@@ -103,6 +103,7 @@ public class TestReporter {
 	}
 
 	public boolean allPassed() {
+		logger.atInfo().log("Reported all tests passed: %s", allTestsPassed);
 		return allTestsPassed;
 	}
 
