@@ -12,7 +12,6 @@ fields:
   type: mappingOnly
   existing_java_type: record_id
   component_field: componentId
-  display_name: "Field ID"
 - name: field_name
   type: string
   maxlength: 48
@@ -20,7 +19,6 @@ fields:
 - name: lr_id
   type: integer
   component_field: lrID
-  display_name: "LR ID"
 - name: format_id
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DataType
@@ -32,6 +30,7 @@ fields:
 - name: padding1
   type: boolean
   padding : true
+  component_field: none
 - name: start_position
   type: short
   component_field: startPosition
@@ -54,7 +53,6 @@ fields:
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode
   component_field: dateTimeFormat
-  display_name: "Date/Time Format"
 - name: justify_id #Another case for an external enum
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.JustifyId
@@ -64,9 +62,15 @@ fields:
   type: short
   component_field: ordinalOffset
   display_name: "Ordinal Offset"
+- name: padding2
+  type: string
+  maxlength: 46
+  padding : true
+  component_field: none
 - name: xml_tag
   type: string
   maxlength: 256
+  component_field: none
 - name: mask
   type: string
   maxlength: 48
@@ -77,3 +81,8 @@ fields:
   maxlength: 48
   display_name: "DB Column Name"
   # There is stuff that can be ignored
+- name: padding3
+  type: string
+  maxlength: 176
+  padding : true
+  component_field: none

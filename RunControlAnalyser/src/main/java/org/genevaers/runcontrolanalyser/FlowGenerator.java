@@ -47,6 +47,7 @@ import org.genevaers.repository.components.UserExit;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewColumnSource;
 import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.enums.ColumnSourceType;
 import org.genevaers.repository.components.enums.LtRecordType;
 
@@ -353,9 +354,14 @@ public class FlowGenerator {
 		if(l1) {
 			if(xtr.getRecordType() ==  LtRecordType.F1){
 				LogicTableF1 f1 = (LogicTableF1)xtr;
-				int  parentLRid = Repository.getFields().get(f1.getArg().getFieldId()).getLrID();
-				addParentREFRLR(parentLRid);
-				addRefFieldLink(f1.getArg().getFieldId(), f1.getColumnId(), xtr.getFunctionCode().startsWith("SK"));				
+				LRField refField = Repository.getFields().get(f1.getArg().getFieldId());
+				if(refField == null) {
+					logger.atWarning().log("Missing LRField id %d referenced in comparison", f1.getArg().getFieldId());
+				} else {
+					int  parentLRid = refField.getLrID();
+					addParentREFRLR(parentLRid);
+					addRefFieldLink(f1.getArg().getFieldId(), f1.getColumnId(), xtr.getFunctionCode().startsWith("SK"));
+				}
 			} else if(xtr.getRecordType() ==  LtRecordType.F2){
 				LogicTableF2 f2 = (LogicTableF2)xtr;
 				int  parentLRid = Repository.getFields().get(f2.getArg1().getFieldId()).getComponentId();
@@ -366,9 +372,14 @@ public class FlowGenerator {
 		if(l2) {
 			if(xtr.getRecordType() ==  LtRecordType.F1){
 				LogicTableF1 f1 = (LogicTableF1)xtr;
-				int  parentLRid = Repository.getFields().get(f1.getArg().getFieldId()).getLrID();
-				addParentREFRLR(parentLRid);
-				addRefFieldLink(f1.getArg().getFieldId(), f1.getColumnId(), xtr.getFunctionCode().startsWith("SK"));				
+				LRField refField = Repository.getFields().get(f1.getArg().getFieldId());
+				if(refField == null) {
+					logger.atWarning().log("Missing LRField id %d referenced in comparison", f1.getArg().getFieldId());
+				} else {
+					int  parentLRid = refField.getLrID();
+					addParentREFRLR(parentLRid);
+					addRefFieldLink(f1.getArg().getFieldId(), f1.getColumnId(), xtr.getFunctionCode().startsWith("SK"));
+				}
 			} else if(xtr.getRecordType() ==  LtRecordType.F2){
 				LogicTableF2 f2 = (LogicTableF2)xtr;
 				int  parentLRid = Repository.getFields().get(f2.getArg1().getFieldId()).getComponentId();
@@ -403,9 +414,14 @@ public class FlowGenerator {
 		}
 		else if(xtr.getFunctionCode().endsWith("L")) {
 			LogicTableF2 dtl = (LogicTableF2)xtr;
-			int  parentLRid = Repository.getFields().get(dtl.getArg1().getFieldId()).getLrID();
-			addParentREFRLR(parentLRid);
-			addRefFieldLink(dtl.getArg1().getFieldId(), dtl.getColumnId(), xtr.getFunctionCode().startsWith("SK"));				
+			LRField refField = Repository.getFields().get(dtl.getArg1().getFieldId());
+			if(refField == null) {
+				logger.atWarning().log("Missing LRField id %d referenced in assignment", dtl.getArg1().getFieldId());
+			} else {
+				int  parentLRid = refField.getLrID();
+				addParentREFRLR(parentLRid);
+				addRefFieldLink(dtl.getArg1().getFieldId(), dtl.getColumnId(), xtr.getFunctionCode().startsWith("SK"));
+			}			
 		}
 		else if(xtr.getFunctionCode().endsWith("C")) {
 			LogicTableF1 dtc = (LogicTableF1)xtr;

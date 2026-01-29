@@ -466,7 +466,7 @@ public class VDPTextWriter extends TextRecordWriter {
 			r.setState(ComparisonState.RECIGNORE);
 		}
 		if(recordType == 400) {
-			int lrid = ((NumericFieldNode)r.getChildrenByName("ID")).getValue();
+			int lrid = ((NumericFieldNode)r.getChildrenByName("LrID")).getValue();
 		 	if(ignoredLrs.contains(lrid)) {
 				r.setState(ComparisonState.RECIGNORE);
 			}
