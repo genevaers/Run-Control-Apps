@@ -194,11 +194,13 @@ public class TestReporter {
 		Iterator<Spec> si = TestRepository.getSpecIterator();
 
 		while(si.hasNext()) {
-			processSpec(si.next());
-		}
+			TestCategory cat = processSpec(si.next());
+			logger.atInfo().log("Category %s Tests: %d Passed: %d All Passed: %s", cat.getName(), cat.totalNumTests, cat.numPassed, cat.allPassed());
+		} 
+		logger.atInfo().log("All tests passed: %s", allTestsPassed);
 	}
 
-	private void processSpec(Spec spec) {
+	private TestCategory processSpec(Spec spec) {
 		// Just open the file once and get all we need
 		// Follow the SAFR way :-)
 
@@ -215,12 +217,10 @@ public class TestReporter {
 		specResult.setDescription(spec.getDescription());
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
-		logger.atInfo().log("Spec " + spec.getName() + " Tests " + results.size() + " Passed " + cat.allPassed()	);
+		logger.atInfo().log("Spec %s Tests %d Passed %d", spec.getName(), results.size(), results.stream().filter(r -> r.passed()).count());
 		cat.totalNumTests += results.size();
-		logger.atInfo().log("Category " + cat.getName() + "Total Tests: " + cat.totalNumTests + " Passed: " + cat.numPassed);
 		allTestsPassed &= cat.allPassed();
-		logger.atInfo().log("All tests passed: " + allTestsPassed);
-
+		return cat;
 	}
 
 	protected TestCategory findOrMakeCategory(String category) {
