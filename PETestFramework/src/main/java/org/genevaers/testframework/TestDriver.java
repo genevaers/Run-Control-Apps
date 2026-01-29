@@ -855,8 +855,17 @@ public class TestDriver {
 		CommandRunner cr = new CommandRunner();
 		try {
 			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
-			String rcaString = winrcapps + "/rcapps-latest.jar";
-			ProcessBuilder procBuilder = new ProcessBuilder("java","_jar", rcaString);
+			if (winrcapps == null || winrcapps.trim().isEmpty()) {
+				logger.atSevere().log("Environment variable GERS_RCA_JAR_DIR is not set or empty");
+				return;
+			}
+			Path jarPath = Paths.get(winrcapps).resolve("rcapps-latest.jar").normalize();
+			if (!Files.exists(jarPath) || !Files.isRegularFile(jarPath)) {
+				logger.atSevere().log("RCA jar not found at expected location: %s", jarPath.toString());
+				return;
+			}
+			
+			ProcessBuilder procBuilder = new ProcessBuilder("java", "-jar", jarPath.toString());
 			procBuilder.directory(loc.toFile());
 			Process proc = procBuilder.start();
 			cr.run(proc);
