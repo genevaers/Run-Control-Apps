@@ -209,17 +209,17 @@ public class TestReporter {
 		Path specOutputPath = outPath.resolve(spec.getCategory()).resolve(spec.getName()).normalize();
 
 		List<SpecTestResult> results = cat.getSpecTestResults(outPath, specOutputPath, spec);
-		cat.totalNumTests += results.size();
 		// checkForTestCoverageAndVDPFlowResults(results);
-
 		SpecGroup specGroup = cat.addSpecGroups(spec);
 		SpecResult specResult = specGroup.addTestResults(spec.getName(), results);
 		specResult.setDescription(spec.getDescription());
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
-		System.err.println("Category " + cat.getName() + " Spec " + spec.getName() + " Tests " + results.size() + " Passed " + cat.allPassed()	);
+		logger.atInfo().log("Spec " + spec.getName() + " Tests " + results.size() + " Passed " + cat.allPassed()	);
+		cat.totalNumTests += results.size();
+		logger.atInfo().log("Category " + cat.getName() + "Total Tests: " + cat.totalNumTests + " Passed: " + cat.numPassed);
 		allTestsPassed &= cat.allPassed();
-		System.err.println("All tests passed: " + allTestsPassed);
+		logger.atInfo().log("All tests passed: " + allTestsPassed);
 
 	}
 

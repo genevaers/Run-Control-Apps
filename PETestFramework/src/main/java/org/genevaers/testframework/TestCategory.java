@@ -57,7 +57,6 @@ public class TestCategory {
 	}
 
 	public boolean allPassed() {
-		System.out.println("Total Tests: " + totalNumTests + " Passed: " + numPassed);
 		if (totalNumTests == null || numPassed == null) {
 			return false;
 		}
