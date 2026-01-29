@@ -58,7 +58,10 @@ public class TestCategory {
 
 	public boolean allPassed() {
 		System.out.println("Total Tests: " + totalNumTests + " Passed: " + numPassed);
-		return totalNumTests == numPassed;
+		if (totalNumTests == null || numPassed == null) {
+			return false;
+		}
+		return totalNumTests.equals(numPassed);
 	}
 
 	public List<SpecGroup> getSpecGroups() {
