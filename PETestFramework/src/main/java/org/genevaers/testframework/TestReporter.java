@@ -217,8 +217,9 @@ public class TestReporter {
 		specResult.setDescription(spec.getDescription());
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
-
+		System.err.println("Category " + cat.getName() + " Spec " + spec.getName() + " Tests " + results.size() + " Passed " + cat.allPassed()	);
 		allTestsPassed &= cat.allPassed();
+		System.err.println("All tests passed: " + allTestsPassed);
 
 	}
 
