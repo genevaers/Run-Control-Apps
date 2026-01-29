@@ -774,6 +774,7 @@ public class TestDriver {
 						System.out.println(Menu.GREEN + "PASS for " + outFilePath.toString() + Menu.RESET);
 					}
                 	if(test.getPassviews() != null) {
+						System.out.println("Set view result for test " + test.getFullName() + " to " + (!diffFound ? "PASS" : "FAIL"));
 						test.setViewResult(Integer.parseInt(of.getDdname().substring(1)), !diffFound);
 					}
 			  } catch (IOException e) {
