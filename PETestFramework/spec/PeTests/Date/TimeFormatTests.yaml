@@ -68,4 +68,4 @@ tests:
     secondary: "10"
     recfm: "VB"
     lrecl: "80"
-    workfile: "2"    
+    workfile: "2"
