@@ -34,9 +34,9 @@ import org.w3c.dom.NodeList;
 public class TestCategory {
 	private static final String RUN_CLASS_BASE = "org.genevaers.test";
 	public String name = "";
-	public Integer numPassed = 0;
-	public Integer numUnknown = 0;
-	public Integer totalNumTests = 0;
+	public int  numPassed = 0;
+	public int numUnknown = 0;
+	public int  totalNumTests = 0;
 	public List<SpecGroup> specGroups = new ArrayList<SpecGroup>();
 	static Logger logger = Logger.getLogger("org.genevaers.testframework.TestCategory");
 
@@ -44,15 +44,15 @@ public class TestCategory {
 		return name;
 	}
 
-	public Integer getNumPassed() {
+	public int getNumPassed() {
 		return numPassed;
 	}
 
-	public Integer getNumUnknown() {
+	public int getNumUnknown() {
 		return numUnknown;
 	}
 
-	public Integer getTotalNumTests() {
+	public int getTotalNumTests() {
 		return totalNumTests;
 	}
 
@@ -158,6 +158,7 @@ public class TestCategory {
 		if(test.hasResults()) {
 			addExpandedResults(testResults, test);
 		} else {
+			System.out.println("No results for test: " + test.getName());
 			addUnknownResults(testResults, test);
 		}
 	}
