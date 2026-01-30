@@ -53,7 +53,7 @@ public class BinRecordWriter extends RecordFileWriter {
 				logger.atSevere().withCause(e).withStackTrace(StackSize.FULL);
 			}
 		} else {
-			logger.atSevere().log("Write length mistmatch record length is %d  buffer position is ", bytes.getShort(0), bytes.position());
+			logger.atSevere().log("Write length mismatch record length is %d  buffer position is %d", bytes.getShort(0), bytes.position());
 		}
     }
 

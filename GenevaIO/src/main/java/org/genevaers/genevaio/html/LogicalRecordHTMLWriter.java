@@ -138,7 +138,12 @@ public class LogicalRecordHTMLWriter {
 		int len = 0;
 		while(keyIt.hasNext()) {
 			LRIndex k = keyIt.next();
-			len += lr.findFromFieldsByID(k.getFieldID()).getLength();
+			LRField f = lr.findFromFieldsByID(k.getFieldID());
+			if (f == null) {
+				logger.atWarning().log("LogicalRecord %d missing field %d referenced by index; skipping length", lr.getComponentId(), k.getFieldID());
+				continue;
+			}
+			len += f.getLength();
 		}
 		return td(Integer.toString(len));
 	}
