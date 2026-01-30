@@ -211,6 +211,8 @@ public class TestReporter {
 		Path specOutputPath = outPath.resolve(spec.getCategory()).resolve(spec.getName()).normalize();
 
 		List<SpecTestResult> results = cat.getSpecTestResults(outPath, specOutputPath, spec);
+		cat.totalNumTests += results.size();
+		
 		// checkForTestCoverageAndVDPFlowResults(results);
 		SpecGroup specGroup = cat.addSpecGroups(spec);
 		SpecResult specResult = specGroup.addTestResults(spec.getName(), results);
@@ -218,7 +220,6 @@ public class TestReporter {
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
 		logger.atInfo().log("Spec %s Tests %d Passed %d", spec.getName(), results.size(), results.stream().filter(r -> r.passed()).count());
-		cat.totalNumTests += results.size();
 		allTestsPassed &= cat.allPassed();
 		return cat;
 	}

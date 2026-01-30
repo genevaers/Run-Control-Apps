@@ -34,9 +34,9 @@ import org.w3c.dom.NodeList;
 public class TestCategory {
 	private static final String RUN_CLASS_BASE = "org.genevaers.test";
 	public String name = "";
-	public Integer numPassed = 0;
-	public Integer numUnknown = 0;
-	public Integer totalNumTests = 0;
+	public int numPassed = 0;
+	public int numUnknown = 0;
+	public int totalNumTests = 0;
 	public List<SpecGroup> specGroups = new ArrayList<SpecGroup>();
 	static Logger logger = Logger.getLogger("org.genevaers.testframework.TestCategory");
 
@@ -44,23 +44,20 @@ public class TestCategory {
 		return name;
 	}
 
-	public Integer getNumPassed() {
+	public int getNumPassed() {
 		return numPassed;
 	}
 
-	public Integer getNumUnknown() {
+	public int getNumUnknown() {
 		return numUnknown;
 	}
 
-	public Integer getTotalNumTests() {
+	public int getTotalNumTests() {
 		return totalNumTests;
 	}
 
 	public boolean allPassed() {
-		if (totalNumTests == null || numPassed == null) {
-			return false;
-		}
-		return totalNumTests.equals(numPassed);
+		return totalNumTests == numPassed;
 	}
 
 	public List<SpecGroup> getSpecGroups() {
@@ -143,8 +140,7 @@ public class TestCategory {
 			GersTest test) {
 		String WBXMLFile = test.getXmlfiles().get(0).getName();
 
-		SpecTestResult stres = getTestResult(specOutputPath, specFileDirPath, spec.getName(), test.getName(),
-				WBXMLFile);
+		SpecTestResult stres = getTestResult(specOutputPath, specFileDirPath, spec.getName(), test.getName(), WBXMLFile);
 		if (stres.passed()) {
 			numPassed++;
 		}
@@ -206,8 +202,7 @@ public class TestCategory {
 		}
 	}
 
-	private SpecTestResult getTestResult(Path specOutputPath, Path specFileDirPath, String specName, String testName,
-			String wbXMLFile) {
+	private SpecTestResult getTestResult(Path specOutputPath, Path specFileDirPath, String specName, String testName, String wbXMLFile) {
 		SpecTestResult testResult = new SpecTestResult();
 		testResult.name = testName;
 		testResult.wbxmlFileName = wbXMLFile;
