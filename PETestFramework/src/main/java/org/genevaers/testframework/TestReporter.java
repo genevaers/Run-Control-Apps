@@ -103,7 +103,6 @@ public class TestReporter {
 	}
 
 	public boolean allPassed() {
-		logger.atInfo().log("Reported all tests passed: %s", allTestsPassed);
 		return allTestsPassed;
 	}
 
@@ -192,12 +191,9 @@ public class TestReporter {
 
 	protected void processSpecList() {
 		Iterator<Spec> si = TestRepository.getSpecIterator();
-
 		while(si.hasNext()) {
-			TestCategory cat = processSpec(si.next());
-			logger.atInfo().log("Category %s Tests: %d Passed: %d All Passed: %s", cat.getName(), cat.totalNumTests, cat.numPassed, cat.allPassed());
+			processSpec(si.next());
 		} 
-		logger.atInfo().log("All tests passed: %s", allTestsPassed);
 	}
 
 	private TestCategory processSpec(Spec spec) {
@@ -219,7 +215,6 @@ public class TestReporter {
 		specResult.setDescription(spec.getDescription());
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
-		logger.atInfo().log("Spec %s Tests %d Passed %d", spec.getName(), results.size(), results.stream().filter(r -> r.passed()).count());
 		allTestsPassed &= cat.allPassed();
 		return cat;
 	}
