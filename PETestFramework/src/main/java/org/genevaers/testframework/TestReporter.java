@@ -191,13 +191,12 @@ public class TestReporter {
 
 	protected void processSpecList() {
 		Iterator<Spec> si = TestRepository.getSpecIterator();
-
 		while(si.hasNext()) {
 			processSpec(si.next());
-		}
+		} 
 	}
 
-	private void processSpec(Spec spec) {
+	private TestCategory processSpec(Spec spec) {
 		// Just open the file once and get all we need
 		// Follow the SAFR way :-)
 
@@ -209,16 +208,15 @@ public class TestReporter {
 
 		List<SpecTestResult> results = cat.getSpecTestResults(outPath, specOutputPath, spec);
 		cat.totalNumTests += results.size();
+		
 		// checkForTestCoverageAndVDPFlowResults(results);
-
 		SpecGroup specGroup = cat.addSpecGroups(spec);
 		SpecResult specResult = specGroup.addTestResults(spec.getName(), results);
 		specResult.setDescription(spec.getDescription());
 		String specAbsPath = generateSpecHTML(specOutputPath, spec);
 		specResult.setHtmlPath(specAbsPath);
-
 		allTestsPassed &= cat.allPassed();
-
+		return cat;
 	}
 
 	protected TestCategory findOrMakeCategory(String category) {
