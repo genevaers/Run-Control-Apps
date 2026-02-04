@@ -18,16 +18,13 @@ package ComponentGenerator.model.segments.functioncodes;
  */
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FunctionCodeDefinition {
 
     String function_code;
     String ltRecordType;
     String category;
     String description;
-    List<FunctionCodeArg> args = new ArrayList<>();
+    String ltDescription;
 
     public String getFunctionCode() {
         return function_code;
@@ -61,12 +58,12 @@ public class FunctionCodeDefinition {
         this.description = description;
     }
 
-    public List<FunctionCodeArg> getArgs() {
-        return args;
+    public String getLtDescription() {
+        return ltDescription;
     }
 
-    public void setArgs(List<FunctionCodeArg> args) {
-        this.args = args;
+    public void setLtDescription(String ltDescription) {
+        this.ltDescription = ltDescription;
     }
 
 }
