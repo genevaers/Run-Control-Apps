@@ -24,7 +24,7 @@ Notes:
  Under **eventfiles** and **reffiles** the ddname must match the ddname defined for the PF in the Workbench. The filename refers to the file name saved in PETestFramework/event/data which is described below.  
  **expectedresult** can be omitted if the test is expected to complete successfully with RC 0. If the test is expected to fail then set with, for example RC: "8"
 
-Tests that are designed to test the Performance Engine functionality (GVBMR95, GVBMR88) should be put under a subdirectory in "PETestFramework/spec/PeTests". Put it in a meaningful category, as the categories are used in the final report.
+Tests that are designed to test the Performance Engine functionality (GVBMR95, GVBMR88) should be put under a subdirectory in "PETestFramework/spec/PeTests". Put it in a meaningfully named directory (specified as category in the spec file), as the categories are used in the final report.
 
 ## Save the input data - event data and reference data
 
