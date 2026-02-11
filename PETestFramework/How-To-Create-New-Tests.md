@@ -22,7 +22,7 @@ Notes:
  The **name** and the **test name** are used to create the data set names that will contain the JCL, the input, and the job output, hence they must be upper case and less than 8 characters.  
  The **description** will show up when you use the menu option to run the test framework, and will also appear on the reports; make it meaningful.  
  Under **eventfiles** and **reffiles** the ddname must match the ddname defined for the PF in the Workbench. The filename refers to the file name saved in PETestFramework/event/data which is described below.  
- **expectedresult** can be omitted if the test is expected to complete successfully with RC 0. If the test is expected to fail then set with, for example RC: "8"
+ **expectedresult** can be omitted if the test is expected to complete successfully with RC 0. If the test is expected to fail then set, for example RC: "8". See [Testing error conditions](#testing-error-conditions) below for more information.
 
 Tests that are designed to test the Performance Engine functionality (GVBMR95, GVBMR88) should be put under a subdirectory in "PETestFramework/spec/PeTests". Put it in a meaningfully named directory (specified as category in the spec file), as the categories are used in the final report.
 
@@ -45,7 +45,7 @@ where LRECL is the record length of the original source data set.
 e.g.   
 SUMMARY,100  
 
-## Add the 'spec' to a 'specfile' 
+## Add the 'spec' to a 'speclist' 
 
 Speclists live in directory PETestFramework/ 
 
@@ -53,7 +53,8 @@ The speclist uses a templateSetName defined in templateSets, and points to one o
 
 You can create your own speclist in the PETestFramework directory for testing e.g. <your name>speclist.yaml
 
-Currently the templateSetName should be set to "gvbrcatoPE.yaml" or "gvbrcatoPEError.yaml", the latter being used for error test cases. See JBaseandExitsspeclist.yaml for an example of how to use these two template sets.
+Currently the templateSetName should be set to "gvbrcatoPE.yaml" or "gvbrcatoPEError.yaml", the latter being used for error test cases.  
+See [Testing error conditions](#testing-error-conditions) below for more information.
 
 When you have defined your speclist, you can point to it using environment variable GERS_TEST_SPEC_LIST
 
@@ -79,3 +80,33 @@ e.g.
 cd PETestFramework
 rm -rf out
 ```
+
+### Testing Error conditions
+
+Most test cases will be for successful runs, but it is possible to test for various error conditions.
+
+Error test cases can be defined by setting the following:
+
+1. In the yaml for the test spec the key word **expectedresult** can be set to a non-zero value, for example:
+```
+  expectedresult:
+    message: "pass"
+    rc: "8"
+```
+some text
+```
+  expectedresult:
+    message: "ABENDU0998"
+    rc: "0"
+```
+
+2. In the speclist yaml, if the expectedresult for a test is non-zero, then put that error spec in a separate 'name' section within the speclist, and use the templateSetName "gvbrcatoPEError.yaml", for example:
+
+```
+  - name: "Error cases"
+    templateSetName: "gvbrcatoPEError.yaml"
+    specs:
+      - "PeTests/Format/OVERFLW.yaml"
+```
+
+See JBaseandExitsspeclist.yaml for an example of how to use two different template sets in the same speclist.
