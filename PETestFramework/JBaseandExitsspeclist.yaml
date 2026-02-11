@@ -34,8 +34,5 @@ specFileSets:
       - "PeTests/FormatReports/SortKeyTitleMore.yaml"      
       - "PeTests/Date/DateFormatTests.yaml"
       - "PeTests/Date/TimeFormatTests.yaml"      
-  - name: "Error cases"
-    templateSetName: "gvbrcatoPEError.yaml"
-    specs:
       - "PeTests/Format/OVERFLW.yaml"
 

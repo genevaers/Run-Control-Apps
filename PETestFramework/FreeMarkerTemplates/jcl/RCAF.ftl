@@ -77,13 +77,21 @@ ${env["GERS_TEST_HLQ"]}.${test.dataSet}</#macro>
 //MR88VDP  DD DSN=<@qualifiedTest/>.RCA.VDP,
 //            DISP=SHR
 //*
+<#if ext.workfile??>
+//SYSIN    DD DSN=<@qualifiedTest/>.OUTE.MR95.SORT${ext.workfile?left_pad(3,"0")},
+<#else>
 //SYSIN    DD DSN=<@qualifiedTest/>.OUTE.MR95.SORT${ext?counter?left_pad(3,"0")},
+</#if>
 //            DISP=SHR
 //*
 //SORTCNTL DD DSN=<@qualifiedTest/>.PARM(REGRF88C),
 //            DISP=SHR
 //*
+<#if ext.workfile??>
+//SORTIN   DD DSN=<@qualifiedTest/>.OUTE.MR95.EXTR${ext.workfile?left_pad(3,"0")},
+<#else>
 //SORTIN   DD DSN=<@qualifiedTest/>.OUTE.MR95.EXTR${ext?counter?left_pad(3,"0")},
+</#if>
 //            DISP=SHR
 //*
 //MR88MSTR DD DUMMY,BLKSIZE=2408
