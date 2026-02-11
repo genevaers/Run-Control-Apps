@@ -32,8 +32,4 @@ specFileSets:
       - "PeTests/Function/STRFN.yaml" 
       - "PeTests/FormatReports/ReportZeroSuppress.yaml"
       - "PeTests/FormatReports/ReportHeaderTest.yaml"
-  - name: "Error cases"
-    templateSetName: "gvbrcatoPEError.yaml"
-    specs:
       - "PeTests/Format/OVERFLW.yaml" 
-
