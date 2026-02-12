@@ -19,10 +19,10 @@ A YAML file defines the inputs and output, and is used to generate the JCL to ru
 Use [Example.yaml](./spec/Example.yaml) as a guide to define the test.
 
 Notes:
- The **name** and the **test name** are used to create the data set names that will contain the JCL, the input, and the job output, hence they must be upper case and less than 8 characters.  
+ The **name** and the **tests** block **name** entry are used to create the data set names that will contain the JCL, the input, and the job output, hence they must be upper case and less than 8 characters.  
  The **description** will show up when you use the menu option to run the test framework, and will also appear on the reports; make it meaningful.  
  Under **eventfiles** and **reffiles** the ddname must match the ddname defined for the PF in the Workbench. The filename refers to the file name saved in PETestFramework/event/data which is described below.  
- **expectedresult** can be omitted if the test is expected to complete successfully with RC 0. If the test is expected to fail then set, for example RC: "8". See [Testing error conditions](#testing-error-conditions) below for more information.
+ The **expectedresult** block can be omitted if the test is expected to complete successfully with RC 0. If the test is expected to fail then set, for example RC: "8". See [Testing error conditions](#testing-error-conditions) below for more information.
 
 Tests that are designed to test the Performance Engine functionality (GVBMR95, GVBMR88) should be put under a subdirectory in "PETestFramework/spec/PeTests". Put it in a meaningfully named directory (specified as category in the spec file), as the categories are used in the final report.
 
@@ -35,8 +35,8 @@ The data can be transferred from a data set to a local directory using, for exam
 Save in directory "PETestFramework/event/data"  
 
 If the file in event/data is named, for example, SUMMARY, then the generated
-source file data set will be \<GERS_TEST_HLQ\>.INPUT.SUMMARY
-For this example, in the spec file, set the eventfiles filename to SUMMARY.
+source file data set will be \<GERS_TEST_HLQ\>.INPUT.SUMMARY  
+For this example, in the spec file, set the **eventfiles** entry **filename** to SUMMARY.
   
 Edit the file PETestFramework/event/datasetParms.txt and add a line:  
 *filename*,LRECL  
@@ -51,10 +51,10 @@ Speclists live in directory PETestFramework/
 
 The speclist uses a templateSetName defined in templateSets, and points to one or more test cases. 
 
-You can create your own speclist in the PETestFramework directory for testing e.g. <your name>speclist.yaml
+You can create your own speclist in the PETestFramework directory for testing, for example *\<your name\>speclist.yaml*.  
+See speclist JBasespeclist.yaml for an example of the format.
 
-Currently the templateSetName should be set to "gvbrcatoPE.yaml" or "gvbrcatoPEError.yaml", the latter being used for error test cases.  
-See [Testing error conditions](#testing-error-conditions) below for more information.
+Currently the **templateSetName** should be set to "gvbrcatoPE.yaml". This defines the set of freemarker templates used to generate the JCL.  More template sets could be developed in the future.
 
 When you have defined your speclist, you can point to it using environment variable GERS_TEST_SPEC_LIST
 
@@ -65,9 +65,9 @@ export GERS_TEST_SPEC_LIST=JBasespeclist.yaml
 
 The base files are used to confirm that the test produced the expected output. The base files are saved in PETestFramework/base and are used to compare to the output - either an extract file or a format file.  
 
-When the spec files and spec list have been created, run the test to generate output data. See the [README](./README.md) for the PETestFramework for instructions on running the tests on z/OS UNIX. The test will report as a fail as there are no base files to compare to at this point.
+When the spec files and speclist have been created, run the test to generate output data. See the [README](./README.md) for the PETestFramework for instructions on running the tests on z/OS UNIX. The test will report as a fail as there are no base files to compare to at this point.
 
-The output written to the format data set will be automatically copied to PETestFramework/out  
+The output written to the format data set (or extract data set if it is extract only) will be automatically copied to PETestFramework/out  
 The directory structure below PETestFramework/out follows the same structure as the PETestFramework/spec directory. The directory structure of PETestFramework/base should follow this same structure too.
 
 When you are sure the output generated is correct, copy the output in PETestFramework/out to the matching directory location in PETestFramework/base
@@ -87,26 +87,38 @@ Most test cases will be for successful runs, but it is possible to test for vari
 
 Error test cases can be defined by setting the following:
 
-1. In the yaml for the test spec the key word **expectedresult** can be set to a non-zero value, for example:
+1. In the test spec the YAML block **expectedresult** can indicate a non-zero return value, for example:
 ```
   expectedresult:
     message: "pass"
     rc: "8"
 ```
-some text
+The **expectedresult** entry **message** can have the following values:  
+abend, badrc, pass, success, jclerror  **(more info on these required)**
+
+2. The **errorfiles** block is used to specify the output file and lines containing the error message. This will be written to the 'out' directory and compared with the 'base' files.
+
+The following example will read from **ddname** MR88LOG from the completed format phase output, and will copy the lines starting from the line containing "Report DD Name" to the end of the file. **filename** refers to the file created in the 'out' directory containing these lines. You should create a base file matching this name and output.
+```
+errorfiles:
+  - ddname: "MR88LOG"
+    filename: "MR88LOG"
+    startkey: "Report DD Name"
+    stopkey: "End of file"
+```
+You can omit the startkey and stopkey entries to read the whole file, but be aware that lines containing dates and times could be problematic when used to compare with base files.
+
+### Check abend cases
+
+You can set the keyword ABEND in the expectedresult block as follows:  
+
+message: "ABENDxxxxx"  
+
+where xxxxx is the abend code.
+For example,
 ```
   expectedresult:
     message: "ABENDU0998"
     rc: "0"
 ```
-
-2. In the speclist yaml, if the expectedresult for a test is non-zero, then put that error spec in a separate 'name' section within the speclist, and use the templateSetName "gvbrcatoPEError.yaml", for example:
-
-```
-  - name: "Error cases"
-    templateSetName: "gvbrcatoPEError.yaml"
-    specs:
-      - "PeTests/Format/OVERFLW.yaml"
-```
-
-See JBaseandExitsspeclist.yaml for an example of how to use two different template sets in the same speclist.
+This will check for the abend code in the job output, and will not compare any output with base files.
