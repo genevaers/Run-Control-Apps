@@ -101,7 +101,7 @@ public class VDPTextWriter extends TextRecordWriter {
 	private void checkIfOldIsCpp(MetadataNode recordsRoot) {
 		compareMode = recordsRoot.getName().equals("Compare");
 		if(compareMode) {
-			FieldNodeBase desc = recordsRoot.getChildrenByName("Generation").getChildrenByName("1_0_1").getChildrenByName("description");
+			FieldNodeBase desc = recordsRoot.getChildrenByName("Generation").getChildrenByName("1_0_1").getChildrenByName("Description");
 			cppCompare = ((StringFieldNode)desc).getDiffValue().contains("GVBMR91");
 		}
 	}
