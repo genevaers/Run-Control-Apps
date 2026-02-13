@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.genevaers.extractgenerator.codegenerators.ExtractRecordGenerator;
 import org.genevaers.extractgenerator.codegenerators.ExtractorEntry;
 import org.genevaers.extractgenerator.codegenerators.LT2JavaRecords;
 import org.genevaers.genevaio.fieldnodes.MetadataNode;
@@ -40,10 +42,17 @@ public class LT2Extractor {
     private void generateExtract(Path root, Path rc1) {
         MetadataNode recordsRoot = new MetadataNode();
         recordsRoot.setSource1(root.relativize(rc1.resolve(GersConfigration.XLT_DDNAME)).toString());
-        readLT(root, recordsRoot, GersConfigration.XLT_DDNAME).getStream().forEach(lte -> LT2JavaRecords.processRecord(lte));
+        LogicTable xlt = readLT(root, recordsRoot, GersConfigration.XLT_DDNAME);
+        ExtractRecordGenerator.setXLT(xlt);
+        //Not a straight iteration need a recursive processRecord to manage the gotos and nesting of conditions
+        while(ExtractRecordGenerator.notAtEndOfXLT()) {
+            LTRecord lte = ExtractRecordGenerator.addToExtractEntiries();
+            //generateExtractFromLT(lte);
+        }
+        //xlt.getStream().forEach(lte -> LT2JavaRecords.processRecord(lte));
         ExtractorWriter.addJoinInitialisation(LT2JavaRecords.getJoins());
         logger.atInfo().log("XLT read from %s", rc1.toString());
-        ExtractorWriter.write(LT2JavaRecords.getExrecs(), LT2JavaRecords.getInputDDnames(), LT2JavaRecords.getOutputLength(), LT2JavaRecords.getLrLength());
+        ExtractorWriter.write(ExtractRecordGenerator.getFilterRecs( ), ExtractRecordGenerator.getColumnRecs(), ExtractRecordGenerator.getInputDDnames(), ExtractRecordGenerator.getOutputLength(), ExtractRecordGenerator.getLrLength());
     }
 
     private void generateExtractFromLT(LTRecord lte) {

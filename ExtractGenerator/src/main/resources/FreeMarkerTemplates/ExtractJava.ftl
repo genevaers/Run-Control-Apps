@@ -38,7 +38,17 @@ import org.genevaers.utilities.GersCodePage;
         FileRecord joinBuffer;
         Join jn;
 
-<#list exrecs as rec>
+// Filter Logic
+<#list filterRecs as rec>
+${rec}
+</#list>
+    }
+
+// Column Logic
+    public void columnLogic(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
+        FileRecord joinBuffer;
+        Join jn;
+<#list columnRecs as rec>
 ${rec}
 </#list>
     }

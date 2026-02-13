@@ -14,7 +14,8 @@ public class DTCGenerator extends ExtractRecordGenerator{
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableF1 dtc = (LogicTableF1)lt;
         LogicTableArg arg = dtc.getArg();
-        logger.atInfo().log("DTC value %s", arg.getValue().getPrintString());
+        String dtcSource = String.format("(%d)DTC value %s", dtc.getRowNbr(),arg.getValue().getPrintString());
+        logger.atInfo().log(dtcSource);
         int targfieldLength = arg.getFieldLength();
         String targString = "0";
         if(arg.getValue().getPrintString().equals("")) {
@@ -23,7 +24,7 @@ public class DTCGenerator extends ExtractRecordGenerator{
             targString = String.format("%-" + targfieldLength + "s", arg.getValue().getPrintString());
         }
         return new ExtractorEntry(
-            String.format("        target.put(\"%s\".getBytes());", targString));
+            String.format("//%s\n        target.put(\"%s\".getBytes());", dtcSource,targString));
     }
 
 }

@@ -8,6 +8,6 @@ public class ExtractorEntry {
     }
 
     public String getEntryString() {
-        return entry;
+        return entry != null ? entry : "";
     }
 }

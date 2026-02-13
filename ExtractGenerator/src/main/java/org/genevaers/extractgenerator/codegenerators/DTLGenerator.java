@@ -12,18 +12,22 @@ public class DTLGenerator extends ExtractRecordGenerator {
 
     @Override
     public ExtractorEntry processRecord(LTRecord lt) {
-        LogicTableF2 dte = (LogicTableF2)lt;
+        LogicTableF2 dte = (LogicTableF2) lt;
         LogicTableArg arg1 = dte.getArg1();
         LogicTableArg arg2 = dte.getArg2();
-        //We need to ensure that the management of the join buffer is done in the same way as the preformance engine
-        //It is restarted from the data and so does not include the key fields
-        //That would be managed in the JOIN function code.
-        logger.atInfo().log("DTL from pos %d len %d to pos %d len %d", arg1.getStartPosition(),  arg1.getFieldLength(), arg2.getStartPosition(), arg2.getFieldLength());
+        // We need to ensure that the management of the join buffer is done in the same
+        // way as the preformance engine
+        // It is restarted from the data and so does not include the key fields
+        // That would be managed in the JOIN function code.
+        String dtlSource = String.format("(%d)DTL from pos %d len %d to pos %d len %d", lt.getRowNbr(),
+                arg1.getStartPosition(),
+                arg1.getFieldLength(), arg2.getStartPosition(), arg2.getFieldLength());
+        logger.atInfo().log(dtlSource);
         fieldLength = arg1.getFieldLength();
         return new ExtractorEntry(
-        String.format("//DTL\n        if(joinBuffer != null) {\n" + //
+                String.format("//%s\n        if(joinBuffer != null) {\n" + //
                         "            target.put(joinBuffer.bytes.array(), %d, %d);\n" + //
-                        "        }", arg1.getStartPosition()-1, fieldLength));
+                        "        }", dtlSource, arg1.getStartPosition() - 1, fieldLength));
     }
 
     public int getFieldLength() {

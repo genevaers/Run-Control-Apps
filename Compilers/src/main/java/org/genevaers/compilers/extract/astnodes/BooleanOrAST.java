@@ -19,10 +19,10 @@ import org.genevaers.compilers.base.EmittableASTNode;
  * under the License.
  */
 
-
-public class BooleanOrAST extends ExtractBaseAST implements EmittableASTNode{
+public class BooleanOrAST extends ExtractBaseAST implements EmittableASTNode {
 
     Integer orEnd = 0;
+
     public BooleanOrAST() {
         type = ASTFactory.Type.BOOLOR;
     }
@@ -38,12 +38,12 @@ public class BooleanOrAST extends ExtractBaseAST implements EmittableASTNode{
 
     @Override
     public void resolveGotos(Integer compT, Integer compF, Integer joinT, Integer joinF) {
-    // resolve children
-     ExtractBaseAST lhs = (ExtractBaseAST) children.get(0);
-     ExtractBaseAST rhs = (ExtractBaseAST) children.get(1);
-    if (lhs != null && rhs != null) {
+        // resolve children
+        ExtractBaseAST lhs = (ExtractBaseAST) children.get(0);
+        ExtractBaseAST rhs = (ExtractBaseAST) children.get(1);
+        if (lhs != null && rhs != null) {
             lhs.resolveGotos(compT, orEnd, joinT, orEnd);
             rhs.resolveGotos(compT, compF, joinT, joinF);
+        }
     }
-}
 }

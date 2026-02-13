@@ -6,33 +6,43 @@ import org.genevaers.genevaio.ltfile.LogicTableF1;
 
 import com.google.common.flogger.FluentLogger;
 
-public class CFECGenerator extends ExtractRecordGenerator{
+public class CFECGenerator extends ComparisonGenerator implements EndScopeGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    int trueGoto;
-    int falseGoto;
+    private LogicTableF1 cfec;
+
+    public CFECGenerator(FunctionSection section) {
+        super(section);
+    }
 
     @Override
-    public ExtractorEntry processRecord(LTRecord lt) {
-        //Need the manage the start and end hava a pending goto
-        //Collect somehow and when the targer row is reached we add the closing }
-        //How to we recognise an ELSE... because there is a goto there?
-        //Goto will be the row before..
-        LogicTableF1 cfec = (LogicTableF1)lt;
+    public EndScope getEndScope() {
+        int nextRow = lt.getRowNbr() + 1;
+        if(cfec.getGotoRow1() > nextRow && cfec.getGotoRow2() > nextRow) {
+            logger.atSevere().log("CFEC at row %d has both GOTOs forward to rows %d and %d. Must be an OR?", lt.getRowNbr(), cfec.getGotoRow1(), cfec.getGotoRow2());
+            if(cfec.getGotoRow2() > cfec.getGotoRow1()) {
+                return new EndScope(EndScopeType.IF_END, cfec.getGotoRow2());
+            } else {
+                return new EndScope(EndScopeType.IF_END, cfec.getGotoRow1());
+            }
+        } else {
+            if(cfec.getGotoRow2() > cfec.getGotoRow1()) {
+                return new EndScope(EndScopeType.IF_END, cfec.getGotoRow2());
+            } else {
+                return new EndScope(EndScopeType.IF_END, cfec.getGotoRow1());
+            }
+        }
+    }
+
+    @Override
+    protected void getPredicateAndProcessFunctionCode(LTRecord lt) {
+        cfec = (LogicTableF1)lt;
         LogicTableArg arg = cfec.getArg();
-        logger.atInfo().log("CFEC from pos %d len %d %s %s", arg.getStartPosition()-1,  arg.getFieldLength(), cfec.getCompareType(), arg.getValue().getPrintString());
-        trueGoto = cfec.getGotoRow1();
-        falseGoto = cfec.getGotoRow2();
-        this.lt = lt;
-        return new ExtractorEntry(
-        String.format("        if(new String(src, %d , %d).equals(\"%s\")) {", arg.getStartPosition()-1,  arg.getFieldLength(), arg.getValue().getPrintString()));
-    }
+        cfSource = String.format("(%d)CFEC if src pos %d len %d equals %s True %d False %d", lt.getRowNbr(), arg.getStartPosition(),  arg.getFieldLength(), arg.getValue().getPrintString(), cfec.getGotoRow1(), cfec.getGotoRow2());
+        logger.atInfo().log(cfSource);
+        trueRow = cfec.getGotoRow1();
+        falseRow = cfec.getGotoRow2();
 
-    public int getFalseRow() {
-        return falseGoto;
-    }
-
-    public int getTrueGoto() {
-        return trueGoto;
+        predicate = String.format("new String(src, %d , %d).equals(\"%s\")", arg.getStartPosition()-1,  arg.getFieldLength(), arg.getValue().getPrintString());
     }
 
 }

@@ -9,8 +9,6 @@ import com.google.common.flogger.FluentLogger;
 
 public class NVGenerator extends ExtractRecordGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-    int outputLength;
-    int lrLength;
 
     @Override
     public ExtractorEntry processRecord(LTRecord lt)  {
@@ -19,14 +17,6 @@ public class NVGenerator extends ExtractRecordGenerator {
         lrLength = Repository.getLRLength(nv.getSourceLrId());
         outputLength = nv.getDtAreaLen();
         return new ExtractorEntry(String.format("//Output length %d",outputLength ));
-    }
-
-    public int getOutputLength() {
-        return outputLength;
-    }
-
-    public int getLrLength() {
-        return lrLength;
     }
 
 }
