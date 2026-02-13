@@ -56,4 +56,6 @@ And just what it says for 5 6 and 7.
 
 Note. By design the app does not remember the state of tests once you leave the app and restart it.  
 It does not take long to run the whole lot.  
-And when developing tests use your own specfilelist to concentrate on the tests you're interested in.
+And when developing tests use your own specfilelist to concentrate on the tests you're interested in.  
+
+Follow this link for details of [how to create your own tests](./How-To-Create-New-Tests.md).
