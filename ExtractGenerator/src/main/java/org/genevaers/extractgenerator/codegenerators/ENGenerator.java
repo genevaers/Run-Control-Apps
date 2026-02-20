@@ -12,7 +12,7 @@ public class ENGenerator extends ExtractRecordGenerator{
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableF0 en = new LogicTableF0();
         logger.atInfo().log("EN - end of extract");
-        return new ExtractorEntry(String.format("//EN - end of extract"));
+        return new ExtractorEntry(String.format("//(%d) EN - end of extract", lt.getRowNbr()));
     }
 
 }

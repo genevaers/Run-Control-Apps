@@ -31,7 +31,7 @@ public class JoinGenerator extends ExtractRecordGenerator implements EndScopeGen
         recLength = Repository.getLRLength(9000000 + fileid);
         trueGoto = join.getGotoRow1();
         falseGoto = join.getGotoRow2();
-        String joinSource = String.format("(%s)Join %d -> %s targ LF %d LR %d True:%d False:%d", join.getRowNbr(), joinid, newid, targLf, targLr, trueGoto, falseGoto);
+        String joinSource = String.format("(%d) Join %d -> %s targ LF %d LR %d True:%d False:%d", join.getRowNbr(), joinid, newid, targLf, targLr, trueGoto, falseGoto);
         logger.atInfo().log(joinSource);
         this.lt = lt;
         return new ExtractorEntry(String.format("//%s\n" +

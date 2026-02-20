@@ -45,46 +45,57 @@ public abstract class ComparisonGenerator extends ExtractRecordGenerator {
         LTRecord lookAhead = xlt.getFromPosition(ltr.getRowNbr() + 1);
 
         if(section == FunctionSection.FILTER) {
-            if(trueRec.getSuffixSeqNbr() == 1 || falseRec.getSuffixSeqNbr() == 1) {
-                if(level == 0) {
-                    String CFORIfFormat = "//%s\n        if( %s ) {\n            columnLogic(src, target, outWriter, numrecords);\n        }\n";
-                    return new ExtractorEntry(String.format(CFORIfFormat, cfSource, predicate));
-                } else {
-                    return new ExtractorEntry(predicate);
-                }
-            } else {
-                String CFECANDIfFormat = "//%s\n        if( %s ) {\n            columnLogic(src, target, outWriter, numrecords);\n        }\n";
-                while(lookAhead != null && lookAhead.getSuffixSeqNbr() == 0) {
-                    level++;
-                    ExtractorEntry exe = addFunctionCode(lookAhead, filterRecs, section);
-                    predicate += " && " + exe.getEntryString();
-                    lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
-                }
-                currentRow = lookAhead.getRowNbr();
-                // if(currentRow < lookAhead.getRowNbr()) {
-                //     currentRow = lookAhead.getRowNbr() - 1;
-                // }   
-                level = 0;
-                return new ExtractorEntry(String.format(CFECANDIfFormat, cfSource, predicate));
-            }
+            return generateExtractFilter(trueRec, falseRec, lookAhead);
         } else {
-            while(lookAhead != null && lookAhead.getSuffixSeqNbr() != currentColumnNumber) {
-                addFunctionCode(lookAhead, columnRecs, section);
+            boolean bodyDone = false;
+            String bodyEnd;
+            if(trueRec.getSuffixSeqNbr() == currentColumnNumber && falseRec.getSuffixSeqNbr() == currentColumnNumber) {
+                bodyEnd = "        } else { \n";
+            } else {
+                bodyEnd = "        }\n";
+            }
+            //Will always be within column scope
+            String body = "";
+            String CFIfFormat = "//%s\n        if( %s ) {\n %s        }\n";
+            CFHeader = String.format("%s\n//for column logic", cfSource);
+            while(lookAhead != null && lookAhead.getSuffixSeqNbr() == currentColumnNumber) {
+                //get the body up to a GOTO? (not is nested if?) but we have the true and false rows
+                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+                body += exe.getEntryString() + "\n";
+                if(!bodyDone && (trueRow == lookAhead.getRowNbr() || falseRow == lookAhead.getRowNbr())) {
+                    body += bodyEnd;
+                    bodyDone = true;
+                }
                 lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
             }
+            currentRow = lookAhead.getRowNbr();
+            return new ExtractorEntry(String.format(CFIfFormat, cfSource, predicate, body));
         }
+    }
 
-        if(section == FunctionSection.FILTER) {
-            //if we are in an OR add to it
-            //if we are in an AND add to it
-            //if neither work out which we have
-
-
-
+    private ExtractorEntry generateExtractFilter(LTRecord trueRec, LTRecord falseRec, LTRecord lookAhead) {
+        if(trueRec.getSuffixSeqNbr() == 1 || falseRec.getSuffixSeqNbr() == 1) {
+            if(level == 0) {
+                String CFORIfFormat = "//%s\n        if( %s ) {\n            columnLogic(src, target, outWriter, numrecords);\n        }\n";
+                return new ExtractorEntry(String.format(CFORIfFormat, cfSource, predicate));
+            } else {
+                return new ExtractorEntry(predicate);
+            }
         } else {
-            CFHeader = String.format("%s\n//for column logic", cfSource);
+            String CFECANDIfFormat = "//%s\n        if( %s ) {\n            columnLogic(src, target, outWriter, numrecords);\n        }\n";
+            while(lookAhead != null && lookAhead.getSuffixSeqNbr() == 0) {
+                level++;
+                ExtractorEntry exe = addFunctionCode(lookAhead, filterRecs, section);
+                predicate += " && " + exe.getEntryString();
+                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            }
+            currentRow = lookAhead.getRowNbr();
+            // if(currentRow < lookAhead.getRowNbr()) {
+            //     currentRow = lookAhead.getRowNbr() - 1;
+            // }   
+            level = 0;
+            return new ExtractorEntry(String.format(CFECANDIfFormat, cfSource, predicate));
         }
-        return new ExtractorEntry(" ");
     }
 
     protected abstract void getPredicateAndProcessFunctionCode(LTRecord ltr);

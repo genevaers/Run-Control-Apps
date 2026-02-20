@@ -44,7 +44,7 @@ public class DTEGenerator extends ExtractRecordGenerator {
         // Need to trigger end of aggregation in the Extractor if aggregation was in
         // progress but this DTE is not aggregating
         if (!dteAggregationInProgress) {
-            String dteSource = String.format("(%d)DTE from pos %d len %d to pos %d len %d", lt.getRowNbr(), arg1.getStartPosition(),
+            String dteSource = String.format("(%d) DTE from pos %d len %d to pos %d len %d", lt.getRowNbr(), arg1.getStartPosition(),
                     arg1.getFieldLength(), arg2.getStartPosition(), arg2.getFieldLength());
             logger.atInfo().log(dteSource);
             return new ExtractorEntry(

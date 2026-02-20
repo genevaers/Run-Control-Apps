@@ -13,7 +13,7 @@ public class LKEGenerator {
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableF2 lke = (LogicTableF2)lt;
         logger.atInfo().log("LKE" );
-        return new ExtractorEntry(String.format("//LKE - make the key value\n             jn.addToKey(src, 0, 1);"));
+        return new ExtractorEntry(String.format("//(%d) LKE - make the key value\n             jn.addToKey(src, 0, 1);", lt.getRowNbr()));
     }
 
 }

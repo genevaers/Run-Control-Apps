@@ -13,7 +13,7 @@ public class ESGenerator extends ExtractRecordGenerator{
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableF0 es = new LogicTableF0();
         logger.atInfo().log("ES - end of set");
-        return new ExtractorEntry(String.format("//ES - end of set"));
+        return new ExtractorEntry(String.format("//(%d) ES - end of set", lt.getRowNbr()));
     }
 
 }

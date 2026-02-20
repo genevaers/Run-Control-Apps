@@ -213,7 +213,8 @@ public abstract class ExtractRecordGenerator {
         if(endScopes.size() > 0) {
             logger.atInfo().log("GOTO stack size %d top row %d fc %s", endScopes.size(), endScopes.peek().getTargetRow(), endScopes.peek().getType().name());
         }
-        return exe != null ? exe : new ExtractorEntry("//" + fc);
+        return exe != null ? exe : new ExtractorEntry(String.format("//(%d) %s",lt.getRowNbr(), fc));
+        //  + fc);
          //return null;
     }
 

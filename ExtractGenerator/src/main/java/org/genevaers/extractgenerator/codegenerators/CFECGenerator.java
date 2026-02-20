@@ -37,7 +37,7 @@ public class CFECGenerator extends ComparisonGenerator implements EndScopeGenera
     protected void getPredicateAndProcessFunctionCode(LTRecord lt) {
         cfec = (LogicTableF1)lt;
         LogicTableArg arg = cfec.getArg();
-        cfSource = String.format("(%d)CFEC if src pos %d len %d equals %s True %d False %d", lt.getRowNbr(), arg.getStartPosition(),  arg.getFieldLength(), arg.getValue().getPrintString(), cfec.getGotoRow1(), cfec.getGotoRow2());
+        cfSource = String.format("(%d) CFEC if src pos %d len %d equals %s True %d False %d", lt.getRowNbr(), arg.getStartPosition(),  arg.getFieldLength(), arg.getValue().getPrintString(), cfec.getGotoRow1(), cfec.getGotoRow2());
         logger.atInfo().log(cfSource);
         trueRow = cfec.getGotoRow1();
         falseRow = cfec.getGotoRow2();

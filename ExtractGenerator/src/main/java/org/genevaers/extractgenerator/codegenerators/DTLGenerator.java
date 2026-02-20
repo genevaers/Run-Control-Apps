@@ -19,7 +19,7 @@ public class DTLGenerator extends ExtractRecordGenerator {
         // way as the preformance engine
         // It is restarted from the data and so does not include the key fields
         // That would be managed in the JOIN function code.
-        String dtlSource = String.format("(%d)DTL from pos %d len %d to pos %d len %d", lt.getRowNbr(),
+        String dtlSource = String.format("(%d) DTL from pos %d len %d to pos %d len %d", lt.getRowNbr(),
                 arg1.getStartPosition(),
                 arg1.getFieldLength(), arg2.getStartPosition(), arg2.getFieldLength());
         logger.atInfo().log(dtlSource);

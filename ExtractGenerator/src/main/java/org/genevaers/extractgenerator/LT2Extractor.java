@@ -50,7 +50,7 @@ public class LT2Extractor {
             //generateExtractFromLT(lte);
         }
         //xlt.getStream().forEach(lte -> LT2JavaRecords.processRecord(lte));
-        ExtractorWriter.addJoinInitialisation(LT2JavaRecords.getJoins());
+        ExtractorWriter.addJoinInitialisation(ExtractRecordGenerator.getJoins());
         logger.atInfo().log("XLT read from %s", rc1.toString());
         ExtractorWriter.write(ExtractRecordGenerator.getFilterRecs( ), ExtractRecordGenerator.getColumnRecs(), ExtractRecordGenerator.getInputDDnames(), ExtractRecordGenerator.getOutputLength(), ExtractRecordGenerator.getLrLength());
     }

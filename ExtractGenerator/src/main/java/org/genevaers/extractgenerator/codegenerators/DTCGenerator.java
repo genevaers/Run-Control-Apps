@@ -14,7 +14,7 @@ public class DTCGenerator extends ExtractRecordGenerator{
     public ExtractorEntry processRecord(LTRecord lt) {
         LogicTableF1 dtc = (LogicTableF1)lt;
         LogicTableArg arg = dtc.getArg();
-        String dtcSource = String.format("(%d)DTC value %s", dtc.getRowNbr(),arg.getValue().getPrintString());
+        String dtcSource = String.format("(%d) DTC value %s", dtc.getRowNbr(),arg.getValue().getPrintString());
         logger.atInfo().log(dtcSource);
         int targfieldLength = arg.getFieldLength();
         String targString = "0";
