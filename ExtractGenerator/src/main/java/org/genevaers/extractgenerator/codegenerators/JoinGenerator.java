@@ -78,7 +78,7 @@ public class JoinGenerator extends ExtractRecordGenerator {
                 lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
             }
             body += String.format(joinLogicFormat, logicbody, elsebody);
-            currentRow = lookAhead.getRowNbr() + 1;
+            currentRow = lookAhead.getRowNbr();
         }
         return new ExtractorEntry(String.format(JOINFormat, joinEntry, body));
     }
