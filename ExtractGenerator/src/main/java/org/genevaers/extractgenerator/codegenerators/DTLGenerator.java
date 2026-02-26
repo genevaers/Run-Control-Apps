@@ -25,9 +25,8 @@ public class DTLGenerator extends ExtractRecordGenerator {
         logger.atInfo().log(dtlSource);
         fieldLength = arg1.getFieldLength();
         return new ExtractorEntry(
-                String.format("//%s\n        if(joinBuffer != null) {\n" + //
-                        "            target.put(joinBuffer.bytes.array(), %d, %d);\n" + //
-                        "        }", dtlSource, arg1.getStartPosition() - 1, fieldLength));
+                String.format("//%s\n" + //
+                        "            target.put(joinBuffer.bytes.array(), %d, %d);\n", dtlSource, arg1.getStartPosition() - 1, fieldLength));
     }
 
     public int getFieldLength() {

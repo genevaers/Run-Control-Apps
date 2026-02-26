@@ -27,11 +27,12 @@ public abstract class ExtractRecordGenerator {
     protected static List<String> inputDDnames = new ArrayList<>();
     protected static int outputLength;
     protected static int lrLength;
-    protected static Stack<EndScope> endScopes = new Stack<>();
     protected static int endScopeRow;
     protected static int lookupFieldLength;
 
     protected static Map<String, JoinGenerator> joins = new HashMap<>();
+
+    private static boolean selectionFilterFound;
 
     public abstract ExtractorEntry processRecord(LTRecord lt);
     public String generateCode() { return ""; }
@@ -44,8 +45,21 @@ public abstract class ExtractRecordGenerator {
         return dteAggregationInProgress;
     }
 
-    public static void setXLT(LogicTable xlt) {
+    public static void setXLTandLookaheadForSelectFilter(LogicTable xlt) {
         ExtractRecordGenerator.xlt = xlt;
+        lookaheadForSelectFilter(xlt);
+    }
+
+    protected static void lookaheadForSelectFilter(LogicTable xlt){
+        LTRecord lt = xlt.getFromPosition(4);
+        String fc = lt.getFunctionCode();
+        if(lt.getSuffixSeqNbr() == 0 && (!fc.equals("EN") && !fc.equals("ES") && !fc.startsWith("WR"))) {
+            logger.atInfo().log("Lookahead found selection filter at row %d", currentRow);
+            selectionFilterFound = true;
+        } else {
+            logger.atInfo().log("No selection filter found in XLT, treating all logic as column logic");
+        }
+
     }
 
     public static boolean notAtEndOfXLT() {
@@ -57,11 +71,17 @@ public abstract class ExtractRecordGenerator {
         currentRow++;
         String fc = lt.getFunctionCode();
         currentColumnNumber = lt.getSuffixSeqNbr();
-        if(currentColumnNumber == 0 && (!fc.equals("EN") && !fc.equals("ES") && !fc.startsWith("WR"))) {
-            addToSectionFilter(lt);
+        //Want to track header function codes but not add to filter unless there is a filter section
+        //Use lookahead?    
+        if(selectionFilterFound) {
+            if(currentColumnNumber == 0 && (!fc.equals("EN") && !fc.equals("ES") && !fc.startsWith("WR"))) {
+                addToSectionFilter(lt);
+            } else {
+                addToColumnLogic(lt);
+            }
         } else {
             addToColumnLogic(lt);
-        }
+        }   
         return null;
     }
     private static void addToColumnLogic(LTRecord lt) {
@@ -98,8 +118,6 @@ public abstract class ExtractRecordGenerator {
         if(ExtractRecordGenerator.isDteAggregationInProgress() && !fc.equals("DTE")) {
             //we should remove the last added DTE and replace with aggregated one
             logger.atInfo().log("Finalising DTE aggregation before processing %s at row %d", fc, lt.getRowNbr());
-            //exrecs.remove(exrecs.size()-1);
-//            entryList.add(DTEGenerator.getAggregatedDTE());
         }
         switch(fc) {
             case "RENX":
@@ -128,11 +146,9 @@ public abstract class ExtractRecordGenerator {
             case "CFEC":
                 CFECGenerator cfec = new CFECGenerator(section);
                 exe = cfec.processRecord(lt);
-//                entryList.add(exe);
-                //endScopes.push(cfec.getEndScope());
                 break;
             case "JOIN":
-                JoinGenerator join = new JoinGenerator();
+                JoinGenerator join = new JoinGenerator(section);
                 //Collect the Reference information needed
                 // Input DDName - record len, key Len, so we can populate the Map of data
                 //We also need to generate the if logic that is a JOIN - three way
@@ -145,8 +161,6 @@ public abstract class ExtractRecordGenerator {
 //                entryList.add(join.processRecord(lt));
                 exe = join.processRecord(lt);
                 joins.computeIfAbsent(join.getNewid(), id -> addJoin(join));
-//                endScopes.push(join.getNotFoundEndScope());
-//                endScopes.push(join.getEndScope());
                 break;
             case "LKE":
                 LKEGenerator lke = new LKEGenerator();
@@ -158,14 +172,6 @@ public abstract class ExtractRecordGenerator {
                 break;
             case "GOTO":
                 GOTOGenerator gotofc = new GOTOGenerator();
-                // if(endScopes.size() > 0) {
-                //     if(endScopes.peek().getLt().getGotoRow2() == lt.getRowNbr()+1) {
-                //         ExtractRecordGenerator gotFrom = endScopes.pop();
-                //         gotofc.setFrom(gotFrom);
-                //     }
-                // }
-                // entryList.add(gotofc.processRecord(lt));
-                // endScopeRow = gotofc.getEndScopeRow();
                 break;
             case "WRDT":
                 WRDTGenerator wrdt = new WRDTGenerator();
@@ -186,32 +192,6 @@ public abstract class ExtractRecordGenerator {
         }
         if(lt.getRowNbr() > 0 && lt.getRowNbr() == endScopeRow) {
             //entryList.add(new ExtractorEntry("        }"));  //will need a stack here? And manage indent
-        }
-        if(endScopes.size() > 0 && (lt.getRowNbr() == endScopes.peek().getTargetRow())) {
-            //while(gotos.size() > 0 && (lt.getRowNbr() == gotos.peek().getLt().getGotoRow1() || lt.getRowNbr() == gotos.peek().getLt().getGotoRow2())) {
-            EndScope es = endScopes.pop();
-            switch(es.getType()) {
-                case IF_END:
-                    String endScopeSource = String.format("End of scope for Goto at row %d", lt.getRowNbr());
-                    logger.atInfo().log(endScopeSource);
-                    entryList.add(new ExtractorEntry(String.format("//%s\n        }", endScopeSource))); 
-                    break;
-                case JOIN_FOUND:
-                    String joinEndScopeSource = String.format("End of scope for JOIN Found at row %d", lt.getRowNbr());
-                    logger.atInfo().log(joinEndScopeSource);
-                    entryList.add(new ExtractorEntry(String.format("//%s\n         else {", joinEndScopeSource))); 
-                    break;
-                case JOIN_NOT_FOUND:
-                    String joinNFEndScopeSource = String.format("End of scope for JOIN Not Found at row %d", lt.getRowNbr());
-                    logger.atInfo().log(joinNFEndScopeSource);
-                    entryList.add(new ExtractorEntry(String.format("//%s\n        }", joinNFEndScopeSource))); 
-                    break;
-                default:
-                    break;
-            }
-        }
-        if(endScopes.size() > 0) {
-            logger.atInfo().log("GOTO stack size %d top row %d fc %s", endScopes.size(), endScopes.peek().getTargetRow(), endScopes.peek().getType().name());
         }
         return exe != null ? exe : new ExtractorEntry(String.format("//(%d) %s",lt.getRowNbr(), fc));
         //  + fc);

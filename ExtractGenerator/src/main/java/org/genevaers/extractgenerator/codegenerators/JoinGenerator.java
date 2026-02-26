@@ -6,7 +6,7 @@ import org.genevaers.repository.Repository;
 
 import com.google.common.flogger.FluentLogger;
 
-public class JoinGenerator extends ExtractRecordGenerator implements EndScopeGenerator {
+public class JoinGenerator extends ExtractRecordGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private int joinid;
     private int targLf;
@@ -18,10 +18,15 @@ public class JoinGenerator extends ExtractRecordGenerator implements EndScopeGen
     private int recLength;
     private int fileid;
     private LogicTableF1 join;
+    private FunctionSection section;
+
+    public JoinGenerator(FunctionSection section) {
+        this.section = section;
+    }
 
     @Override
-    public ExtractorEntry processRecord(LTRecord lt) {
-        join = (LogicTableF1)lt;
+    public ExtractorEntry processRecord(LTRecord ltr) {
+        join = (LogicTableF1)ltr;
         joinid = join.getColumnId();
         targLf = join.getArg().getLogfileId();
         targLr = join.getArg().getLrId();
@@ -31,14 +36,56 @@ public class JoinGenerator extends ExtractRecordGenerator implements EndScopeGen
         recLength = Repository.getLRLength(9000000 + fileid);
         trueGoto = join.getGotoRow1();
         falseGoto = join.getGotoRow2();
+        LTRecord trueRec = xlt.getFromPosition(trueGoto);
+        LTRecord falseRec = xlt.getFromPosition(falseGoto);
+
         String joinSource = String.format("(%d) Join %d -> %s targ LF %d LR %d True:%d False:%d", join.getRowNbr(), joinid, newid, targLf, targLr, trueGoto, falseGoto);
         logger.atInfo().log(joinSource);
-        this.lt = lt;
-        return new ExtractorEntry(String.format("//%s\n" +
-"         jn = JoinsRepo.getJoin(\"%s\");\n" +
+        String joinEntry = String.format("//%s\n" +
+"        jn = JoinsRepo.getJoin(\"%s\");\n" +
 "        //Record count used for do again \n" +
 "        joinBuffer = jn.getBufferForRecord(numrecords);\n" +
-"        if(joinBuffer == null && jn.updateRequired()) {", joinSource, getNewid()));
+"        if(joinBuffer == null && jn.updateRequired()) {", joinSource, getNewid());
+
+        String joinLogicFormat = "        if(joinBuffer != null) {\n%s\n        } else {\n%s\n        }";
+
+        String JOINFormat = "%s\n%s\n";
+        String body = "";
+        String logicbody = "";
+        String elsebody = "";
+        LTRecord lookAhead = xlt.getFromPosition(ltr.getRowNbr() + 1);
+        if(section == FunctionSection.FILTER) {
+            return null; //generateExtractFilter(trueRec, falseRec, lookAhead);
+        } else {
+            while(lookAhead != null && !lookAhead.getFunctionCode().equals("LUSM")) {
+                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+                body += exe.getEntryString() + "\n";
+                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            }
+            //Drop out on the LUSM which will be the join buffer update and end of the join logic
+            //LUSM is itself a recurse up to the False
+            body +=addLUSMCode(lookAhead);
+            lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            while(lookAhead != null && !lookAhead.getFunctionCode().equals("GOTO")) {
+                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+                logicbody += exe.getEntryString() + "\n";
+                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            }
+            lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            while(lookAhead != null && lookAhead.getRowNbr() <= falseGoto) {
+                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+                elsebody += exe.getEntryString() + "\n";
+                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            }
+            body += String.format(joinLogicFormat, logicbody, elsebody);
+            currentRow = lookAhead.getRowNbr() + 1;
+        }
+        return new ExtractorEntry(String.format(JOINFormat, joinEntry, body));
+    }
+
+    private String addLUSMCode(LTRecord lookAhead) {
+            ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+            return exe.getEntryString() + "\n";
     }
 
     public int getJoinid() {
@@ -76,13 +123,5 @@ public class JoinGenerator extends ExtractRecordGenerator implements EndScopeGen
     public int getFileid() {
         return fileid;
     }
-
-    @Override
-    public EndScope getEndScope() {
-        return new EndScope(EndScopeType.JOIN_FOUND, join.getGotoRow1());
-    }
- 
-    public EndScope getNotFoundEndScope() {
-        return new EndScope(EndScopeType.JOIN_NOT_FOUND, join.getGotoRow2());
-    }
 }
+

@@ -37,11 +37,15 @@ import org.genevaers.utilities.GersCodePage;
     public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
         FileRecord joinBuffer;
         Join jn;
-
+<#if filterRecs?size gt 0>
 // Filter Logic
 <#list filterRecs as rec>
 ${rec}
 </#list>
+<#else>
+        // No filter logic defined for this extract 
+        columnLogic(src, target, outWriter, numrecords);
+</#if>
     }
 
 // Column Logic
