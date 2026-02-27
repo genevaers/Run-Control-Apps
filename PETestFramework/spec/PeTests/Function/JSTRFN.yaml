@@ -86,3 +86,23 @@ tests:
     recfm: "FB"
     lrecl: "35"
     comparable: "true"
+- name: "STRFNC"
+  header: "String Concatenation"
+  description: "String Concatenation assignments"
+  source: "WBXML"
+  xmlfiles:
+  - name: "ConcatAssign.xml"
+  eventfiles:
+  - ddname: "CONCAT"
+    filename: "CONCAT"
+  reffiles:
+  - ddname: "CONTARG"
+    filename: "CONTARG"
+  extractfiles:
+  - ddname: "F0012262"
+    space: "TRK"
+    primary: "1"
+    secondary: "10"
+    recfm: "FB"
+    lrecl: "95"
+    comparable: "true"
