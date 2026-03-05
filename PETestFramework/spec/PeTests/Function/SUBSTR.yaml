@@ -35,7 +35,7 @@ tests:
   description: "SUBSTR, LEFT and RIGHT function with LU fields"
   source: "WBXML"
   xmlfiles:
-  - name: "RTC_22356_01_SUBSTR_ALPHA_FROM_LOOKUP[10730].xml"
+  - name: "RTC_22356_02_SUBSTR_ALPHA_FROM_LOOKUP[10730].xml"
   eventfiles:
   - ddname: "I2235601"
     filename: "I2235601"
@@ -62,7 +62,7 @@ tests:
   description: "SUBSTR, LEFT and RIGHT function with COL.nn"
   source: "WBXML"
   xmlfiles:
-  - name: "RTC_22356_01_SUBSTR_ALPHA_FROM_PRIOR_COLUMN[10818].xml"
+  - name: "RTC_22356_04_SUBSTR_ALPHA_FROM_PRIOR_COLUMN[10818].xml"
   eventfiles:
   - ddname: "I2235601"
     filename: "I2235601"
@@ -86,7 +86,7 @@ tests:
   description: "SUBSTR, LEFT and RIGHT function with PRIOR record"
   source: "WBXML"
   xmlfiles:
-  - name: "RTC_22356_01_SUBSTR_ALPHA_FROM_PRIOR_RECORD[10819].xml"
+  - name: "RTC_22356_05_SUBSTR_ALPHA_FROM_PRIOR_RECORD[10819].xml"
   eventfiles:
   - ddname: "I2235601"
     filename: "I2235601"
