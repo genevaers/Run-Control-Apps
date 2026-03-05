@@ -24,6 +24,7 @@ specFileSets:
       - "PeTests/PreviousColumnRefs/PRVCOL.yaml"  
       - "PeTests/RTCs/FIXES.yaml"
       - "PeTests/Function/JSTRFN.yaml" 
+      - "PeTests/Function/SUBSTR.yaml"       
       - "PeTests/FormatReports/ReportZeroSuppress.yaml"
       - "PeTests/FormatReports/ReportHeaderTest.yaml"
       - "PeTests/FormatReports/NEWP2.yaml"
