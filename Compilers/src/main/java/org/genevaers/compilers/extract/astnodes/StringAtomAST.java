@@ -136,13 +136,19 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         //This is different in that we need to get the original string value and change it?
         //arg.setStartPosition(start);
         int fieldlen = arg.getValue().length();
-        if(length < fieldlen) { 
-            String val = ((StringAtomAST)rhs).getValue();
-            arg.setValue(new Cookie(val.substring(start, start+length)));
-            ltEmitter.addToLogicTable((LTRecord)f1);
-        } else {
-            //Error 
+        
+        if(start <= 0){
+            addError("SUBSTR() parameter Start position must be greater than 0");
+            return length;
         }
+        if(start + length - 1 > fieldlen) {
+            addError(String.format("Invalid SUBSTR() parameters start position: %d length: %d for field length: %d", start, length, fieldlen));
+            return length;
+        }
+        int beginIndex = start - 1;
+        String val = ((StringAtomAST)rhs).getValue();
+        arg.setValue(new Cookie(val.substring(beginIndex, beginIndex+length)));
+        ltEmitter.addToLogicTable((LTRecord)f1);
         return length;
     }
 
