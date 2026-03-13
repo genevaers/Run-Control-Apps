@@ -1,7 +1,7 @@
 ---
 name: "JSTRFN"
-title: "String Function Function Tests Java MR91"
-description: "String Function Function Tests supported by Java MR91"
+title: "String Function Function Tests for RCA"
+description: "String Function Function Tests supported by RCA"
 category: "PeTests/Function"
 cq: ""
 note: ""
