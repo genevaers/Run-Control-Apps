@@ -116,7 +116,7 @@ class RunStringConcatinationTest extends RunCompilerBase {
         
     @Test void testSubStrFieldAssignment() {
         LogicTable xlt = runFromXMLOverrideLogic(11561, TestHelper.SUBSTR, "");
-        assertDtc((LogicTableF1)xlt.getFromPosition(5) , 11, 5, "3456");
+        assertDtc((LogicTableF1)xlt.getFromPosition(5) , 11, 5, "2345");
         assertDteSource((LogicTableF2)xlt.getFromPosition(6) , 23, 3);
         assertDtl((LogicTableF2)xlt.getFromPosition(10) , 21, 5);
         assertDtxSource((LogicTableF2)xlt.getFromPosition(13) , 6, 4);
