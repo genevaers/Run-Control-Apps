@@ -185,10 +185,10 @@ public class ColumnRefAST extends FormattedASTNode implements CalculationSource,
         LogicTableArg arg1 = ((LogicTableF2)dtx).getArg1();
         short fieldlen = arg1.getFieldLength();
         if(length < fieldlen) { 
-            arg1.setStartPosition((short)(arg1.getStartPosition() + start));
+            arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
             arg1.setFieldLength(length);
         } else {
-            //Error 
+            addError(String.format("Invalid SUBSTR() parameter length: %d for field length: %d", length, fieldlen));
         }
         return length;
     }
