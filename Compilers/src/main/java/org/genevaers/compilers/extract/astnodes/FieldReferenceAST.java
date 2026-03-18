@@ -252,11 +252,11 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
         LogicTableArg arg1 = ((LogicTableF2)f2).getArg1();
         short fieldlen = arg1.getFieldLength();
         if(length < fieldlen) { 
-            arg1.setStartPosition((short)(arg1.getStartPosition() + start));
+            arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
             arg1.setFieldLength(length);
             ltEmitter.addToLogicTable((LTRecord)f2);
         } else {
-            //Error 
+            addError(String.format("Invalid SUBSTR() parameter length: %d for field length: %d", length, fieldlen));
         }
         return length;
     }
