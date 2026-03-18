@@ -1,7 +1,7 @@
 ---
 name: "SELIF"
 title: "Format SELECTIF Function Tests"
-description: ""
+description: "Format-phase record filter SELECTIF test"
 category: "PeTests/Format"
 cq: ""
 note: ""
