@@ -8,7 +8,7 @@ note: ""
 tests:
 - name: "SELIF"
   header: ""
-  description: "Simple"
+  description: "Format phase rec filter SELECTIF"
   source: "WBXML"
   xmlfiles:
   - name: "FormatCompileTest[12087].xml"
