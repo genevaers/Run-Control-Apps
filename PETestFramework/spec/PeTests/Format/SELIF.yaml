@@ -22,7 +22,6 @@ tests:
     secondary: "10"
     recfm: "VB"
     lrecl: "122"
-    comparable: "true"
     workfile: "1"
   formatfiles:
   - ddname: "F0012087"

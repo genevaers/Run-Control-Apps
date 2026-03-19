@@ -22,7 +22,6 @@ tests:
     secondary: "10"
     recfm: "VB"
     lrecl: "256"
-    comparable: "true"
     workfile: "1"
   - ddname: "EXTR002"
     space: "TRK"
@@ -30,7 +29,6 @@ tests:
     secondary: "10"
     recfm: "VB"
     lrecl: "256"
-    comparable: "true"
     workfile: "2"
   formatfiles:
   - ddname: "F1000084"
