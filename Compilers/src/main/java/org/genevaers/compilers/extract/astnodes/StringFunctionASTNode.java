@@ -101,14 +101,14 @@ public class StringFunctionASTNode extends FormattedASTNode implements Assignabl
         switch (c.getType()) {
             case LRFIELD:
             case PRIORLRFIELD:
-                return ((FieldReferenceAST)c).getRef().getStartPosition();
+                return ((FieldReferenceAST)c).getRef().getStartPosition()-1;
             case LOOKUPFIELDREF:
                 LookupFieldRefAST lkf = (LookupFieldRefAST) getChild(0);
                 JLTView jv = Repository.getJoinViews().getJLTViewFromLookup(lkf.getLookup(), false);
                 LRField redFld = jv.getRedFieldFromLookupField(lkf.getRef().getComponentId());
-                return redFld.getStartPosition();
+                return redFld.getStartPosition()-1;
             case COLUMNREF:
-                return ((ColumnRefAST)c).getViewColumn().getExtractAreaPosition();
+                return ((ColumnRefAST)c).getViewColumn().getExtractAreaPosition()-1;
             default:
                 return 0;
         }
