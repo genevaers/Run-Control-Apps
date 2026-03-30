@@ -568,6 +568,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             }
 		} else {
             logger.atSevere().log("addLookupReferenceToNode null lookup for %s\n", lkname);
+            lkRef.addError("Lookup " + lkname + " not found");
         }		
     }
 
@@ -846,7 +847,8 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         //or len only ... so really just a left
         if(ctx.getChildCount() == 6) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
-            resolveLength(ctx.getChild(4).getText(), sn);
+            sn.setStartOffest(ctx.getChild(4).getText());
+            resolveLength(null, sn);
         } else if(ctx.getChildCount() == 8) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
             sn.setStartOffest(ctx.getChild(4).getText());
@@ -857,7 +859,9 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
 
     private void resolveLength(String len, SubStringASTNode sn) {
         Integer parsedLen = checkLengthOkay(len);
-        if(parsedLen == null || parsedLen.equals(0) || parsedLen < 0) {
+        if(parsedLen == null){
+            sn.addError("Missing SUBSTR() parameter length");
+        } else if (parsedLen.equals(0) || parsedLen < 0) {
             sn.addError(String.format("The length %s is not valid", len));
         } else {
             sn.setLength(len);                

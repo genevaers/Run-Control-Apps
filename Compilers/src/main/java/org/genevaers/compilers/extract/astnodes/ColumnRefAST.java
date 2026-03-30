@@ -172,7 +172,7 @@ public class ColumnRefAST extends FormattedASTNode implements CalculationSource,
             arg1.setStartPosition((short)(arg1.getStartPosition() + fieldlen - length));
             arg1.setFieldLength(length);
         } else {
-            //Error 
+            addError(String.format("Invalid RIGHT() parameter length: %d for field length: %d", length, fieldlen));
         }
         return length;
     }
@@ -184,20 +184,16 @@ public class ColumnRefAST extends FormattedASTNode implements CalculationSource,
         LogicTableF2 dtx = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtx).getArg1();
         short fieldlen = arg1.getFieldLength();
-        if(start <= 0){
-            addError("SUBSTR() parameter Start position must be greater than 0");
+        if(start <= 0 || start > fieldlen) {
+            addError(String.format("Invalid SUBSTR() parameter start position: %d for field length: %d", start, fieldlen));
             return length;
         }
-        if(start >= fieldlen) {
-            addError(String.format("Invalid SUBSTR() parameters start position: %d for field length: %d", start, fieldlen));
+        if(start + length > fieldlen + 1) {
+            addError(String.format("Invalid SUBSTR() parameters start position: %d and length: %d for field length: %d", start, length, fieldlen));
             return length;
         }
-        if(length <= fieldlen) { 
-            arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
-            arg1.setFieldLength(length);
-        } else {
-            addError(String.format("Invalid SUBSTR() parameter length: %d for field length: %d", length, fieldlen));
-        }
+        arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
+        arg1.setFieldLength(length);
         return length;
     }
 

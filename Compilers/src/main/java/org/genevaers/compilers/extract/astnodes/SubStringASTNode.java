@@ -34,7 +34,7 @@ public class SubStringASTNode extends StringFunctionASTNode implements Assignabl
     public LTFileObject getAssignmentEntry(ColumnAST col, ExtractBaseAST rhs) {
         if(getNumberOfChildren() == 1) {
             Concatable cc =  (Concatable) getChildIterator().next();
-            cc.getSubstreEntry(col, (ExtractBaseAST) cc, Short.valueOf(startOffest), (short)getLength());
+            cc.getSubstreEntry(col, (ExtractBaseAST) cc, Short.valueOf(startOffest), Short.valueOf(length));
         }
         return null;
     }

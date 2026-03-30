@@ -30,8 +30,8 @@ import org.genevaers.repository.jltviews.JLTView;
 
 public class StringFunctionASTNode extends FormattedASTNode implements Assignable{
 
-    protected String startOffest = "0";
-    protected String length;
+    protected String startOffest  = "0";
+    protected String length = "0";
 
     public int getLength() {
         return Integer.valueOf(length);

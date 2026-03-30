@@ -241,7 +241,7 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
             arg1.setFieldLength(length);
             ltEmitter.addToLogicTable((LTRecord)f2);
         } else {
-            //Error 
+            addError(String.format("Invalid RIGHT() parameter length: %d for field length: %d", length, fieldlen));
         }
         return length;
     }
@@ -251,21 +251,17 @@ public class FieldReferenceAST extends FormattedASTNode implements Assignable, C
         LogicTableF2 f2 = (LogicTableF2) getAssignmentEntry(col, rhs);
         LogicTableArg arg1 = ((LogicTableF2)f2).getArg1();
         short fieldlen = arg1.getFieldLength();
-        if(start <= 0){
-            addError("SUBSTR() parameter Start position must be greater than 0");
+        if(start <= 0 || start > fieldlen) {
+            addError(String.format("Invalid SUBSTR() parameter start position: %d for field length: %d", start, fieldlen));
             return length;
         }
-        if(start >= fieldlen) {
-            addError(String.format("Invalid SUBSTR() parameters start position: %d for field length: %d", start, fieldlen));
+        if(start + length > fieldlen + 1) {
+            addError(String.format("Invalid SUBSTR() parameters start position: %d and length: %d for field length: %d", start, length, fieldlen));
             return length;
         }
-        if(length <= fieldlen) { 
-            arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
-            arg1.setFieldLength(length);
-            ltEmitter.addToLogicTable((LTRecord)f2);
-        } else {
-            addError(String.format("Invalid SUBSTR() parameter length: %d for field length: %d", length, fieldlen));
-        }
+        arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
+        arg1.setFieldLength(length);
+        ltEmitter.addToLogicTable((LTRecord)f2);
         return length;
     }
 

@@ -249,6 +249,10 @@ public class StringComparisonAST extends ExtractBaseAST implements EmittableASTN
     }   
 
     private int checkAndUpdateArg(StringFunctionASTNode sstr, LogicTableArg arg) {
+        if(Short.valueOf(sstr.getStartOffest())== 0 || Short.valueOf(arg.getFieldLength()) == 0) {
+            Repository.addErrorMessage(ExtractBaseAST.makeCompilerMessage("Invalid SUBSTR() parameter start position or length of 0"));
+            return sstr.getLength();
+        } 
         if(sstr.getChildStartPosition() + sstr.getLength() <= arg.getStartPosition() + arg.getFieldLength()) {
             arg.setFieldLength((short)sstr.getLength());
             arg.setStartPosition((short)(sstr.getChildStartPosition()));
