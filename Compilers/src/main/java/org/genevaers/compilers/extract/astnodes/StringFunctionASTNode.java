@@ -30,8 +30,8 @@ import org.genevaers.repository.jltviews.JLTView;
 
 public class StringFunctionASTNode extends FormattedASTNode implements Assignable{
 
-    protected String startOffest = "0";
-    protected String length;
+    protected String startOffest  = "0";
+    protected String length = "0";
 
     public int getLength() {
         return Integer.valueOf(length);
@@ -101,14 +101,14 @@ public class StringFunctionASTNode extends FormattedASTNode implements Assignabl
         switch (c.getType()) {
             case LRFIELD:
             case PRIORLRFIELD:
-                return ((FieldReferenceAST)c).getRef().getStartPosition()-1;
+                return ((FieldReferenceAST)c).getRef().getStartPosition();
             case LOOKUPFIELDREF:
                 LookupFieldRefAST lkf = (LookupFieldRefAST) getChild(0);
                 JLTView jv = Repository.getJoinViews().getJLTViewFromLookup(lkf.getLookup(), false);
                 LRField redFld = jv.getRedFieldFromLookupField(lkf.getRef().getComponentId());
-                return redFld.getStartPosition()-1;
+                return redFld.getStartPosition();
             case COLUMNREF:
-                return ((ColumnRefAST)c).getViewColumn().getExtractAreaPosition()-1;
+                return ((ColumnRefAST)c).getViewColumn().getExtractAreaPosition();
             default:
                 return 0;
         }
@@ -124,6 +124,8 @@ public class StringFunctionASTNode extends FormattedASTNode implements Assignabl
                 return ((LookupFieldRefAST)c).getRef().getLength();
             case COLUMNREF:
                 return ((ColumnRefAST)c).getViewColumn().getFieldLength();
+            case STRINGATOM:
+                return ((StringAtomAST)c).getValue().length();
             default:
                 return 0;
         }

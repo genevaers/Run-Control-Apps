@@ -568,6 +568,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
             }
 		} else {
             logger.atSevere().log("addLookupReferenceToNode null lookup for %s\n", lkname);
+            lkRef.addError("Lookup " + lkname + " not found");
         }		
     }
 
@@ -827,15 +828,25 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
     
     @Override  public ExtractBaseAST visitRight(GenevaERSParser.RightContext ctx) {
         RightASTNode rn = (RightASTNode) ASTFactory.getNodeOfType(ASTFactory.Type.RIGHT);
+        rn.setLineNumber(ctx.getStart().getLine());
+        rn.setCharPostionInLine(ctx.getStart().getCharPositionInLine());
         rn.addChildIfNotNull(visit(ctx.getChild(2)));
         rn.setLength(ctx.getChild(4).getText());
+        if(rn.getLength() > rn.getChildLength()) {
+            rn.addError("RIGHT() length cannot be greater than field length");
+        }
         return rn;
      }
   
     @Override  public ExtractBaseAST visitLeft(GenevaERSParser.LeftContext ctx) {
         LeftASTNode ln = (LeftASTNode) ASTFactory.getNodeOfType(ASTFactory.Type.LEFT);
+        ln.setLineNumber(ctx.getStart().getLine());
+        ln.setCharPostionInLine(ctx.getStart().getCharPositionInLine());
         ln.addChildIfNotNull(visit(ctx.getChild(2)));
         ln.setLength(ctx.getChild(4).getText());
+        if(ln.getLength() > ln.getChildLength()) {
+            ln.addError("LEFT() length cannot be greater than field length");
+        }
         return ln;
      }
   
@@ -843,21 +854,34 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         SubStringASTNode sn = (SubStringASTNode) ASTFactory.getNodeOfType(ASTFactory.Type.SUBSTR);
         //Subtring may have one or two numbers
         //start and len
-        //or len only ... so really just a left
+        sn.setLineNumber(ctx.getStart().getLine());
+        sn.setCharPostionInLine(ctx.getStart().getCharPositionInLine());
         if(ctx.getChildCount() == 6) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
-            resolveLength(ctx.getChild(4).getText(), sn);
+            sn.setStartOffest(ctx.getChild(4).getText());
+            resolveLength(null, sn);
         } else if(ctx.getChildCount() == 8) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
             sn.setStartOffest(ctx.getChild(4).getText());
             resolveLength(ctx.getChild(6).getText(), sn);
+        }
+        int start = sn.getStartOffestInt();
+        int length = sn.getLength();
+        int fieldlen = sn.getChildLength();
+         if(start <= 0 || start > fieldlen) {
+            sn.addError("SUBSTR() parameter start position must be greater than zero and less than field length");
+        }
+        if(start + length > fieldlen + 1) {
+            sn.addError(String.format("Invalid SUBSTR() parameters start position: %d and length: %d for field length: %d", start, length, fieldlen));
         }
         return sn;
     }
 
     private void resolveLength(String len, SubStringASTNode sn) {
         Integer parsedLen = checkLengthOkay(len);
-        if(parsedLen == null || parsedLen.equals(0) || parsedLen < 0) {
+        if(parsedLen == null){
+            sn.addError("Missing SUBSTR() parameter length");
+        } else if (parsedLen.equals(0) || parsedLen < 0) {
             sn.addError(String.format("The length %s is not valid", len));
         } else {
             sn.setLength(len);                
