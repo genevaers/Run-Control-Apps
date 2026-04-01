@@ -41,6 +41,6 @@ public class SubStringASTNode extends StringFunctionASTNode implements Assignabl
 
     @Override
     public int getChildStartPosition() {
-        return super.getChildStartPosition() + getStartOffestInt();
+        return super.getChildStartPosition() -1 + getStartOffestInt();
     }
 }

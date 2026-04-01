@@ -346,12 +346,7 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
         int numRecords = ltEmitter.getNumberOfRecords();
         LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
-        short fieldlen = arg1.getFieldLength();
-        if(length < fieldlen) { 
-            arg1.setFieldLength(length);
-        } else {
-            //Error 
-        }
+        arg1.setFieldLength(length);
         return length;
     }
 
@@ -362,12 +357,8 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
         LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
         short fieldlen = arg1.getFieldLength();
-        if(length < fieldlen) { 
-            arg1.setStartPosition((short)(arg1.getStartPosition() + fieldlen - length));
-            arg1.setFieldLength(length);
-        } else {
-            addError(String.format("Invalid RIGHT() parameter length: %d for field length: %d", length, fieldlen));
-        }
+        arg1.setStartPosition((short)(arg1.getStartPosition() + fieldlen - length));
+        arg1.setFieldLength(length);
         return length;
     }
 
@@ -377,15 +368,6 @@ public class LookupFieldRefAST extends LookupPathAST implements Assignable, Calc
         int numRecords = ltEmitter.getNumberOfRecords();
         LogicTableF2 dtl = (LogicTableF2) ltEmitter.getLogicTable().getFromPosition(numRecords -1);
         LogicTableArg arg1 = ((LogicTableF2)dtl).getArg1();
-        short fieldlen = arg1.getFieldLength();
-        if(start <= 0 || start > fieldlen) {
-            addError(String.format("Invalid SUBSTR() parameter start position: %d for field length: %d", start, fieldlen));
-            return length;
-        }
-        if(start + length > fieldlen + 1) {
-            addError(String.format("Invalid SUBSTR() parameters start position: %d and length: %d for field length: %d", start, length, fieldlen));
-            return length;
-        } 
         arg1.setStartPosition((short)(arg1.getStartPosition()-1 + start));
         arg1.setFieldLength(length);
         return length;

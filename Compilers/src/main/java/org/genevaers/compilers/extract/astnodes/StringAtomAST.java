@@ -101,15 +101,10 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
     public short getLeftEntry(ColumnAST col, ExtractBaseAST rhs, short length) {
         LogicTableF1 f1 = (LogicTableF1) getAssignmentEntry(col, rhs);
         LogicTableArg arg = f1.getArg();
-        //This is different in that we need to get the original string value and change it?
-        int fieldlen = arg.getValue().length();
-        if(length < fieldlen) { 
-            String val = ((StringAtomAST)rhs).getValue();
-            arg.setValue(new Cookie(val.substring(0, length)));
-            ltEmitter.addToLogicTable((LTRecord)f1);
-        } else {
-            //Error 
-        }
+        //This is different in that we need to get the original string value and change it? 
+        String val = ((StringAtomAST)rhs).getValue();
+        arg.setValue(new Cookie(val.substring(0, length)));
+        ltEmitter.addToLogicTable((LTRecord)f1);
         return length;
     }
 
@@ -119,13 +114,9 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         LogicTableArg arg = f1.getArg();
         //This is different in that we need to get the original string value and change it?
         int fieldlen = arg.getValue().length();
-        if(length < fieldlen) { 
-            String val = ((StringAtomAST)rhs).getValue();
-            arg.setValue(new Cookie(val.substring(fieldlen-length, fieldlen)));
-            ltEmitter.addToLogicTable((LTRecord)f1);
-        } else {
-            addError(String.format("Invalid RIGHT() parameter length: %d for field length: %d", length, fieldlen));
-        }
+        String val = ((StringAtomAST)rhs).getValue();
+        arg.setValue(new Cookie(val.substring(fieldlen-length, fieldlen)));
+        ltEmitter.addToLogicTable((LTRecord)f1);
         return length;
     }
 
@@ -135,15 +126,6 @@ public class StringAtomAST extends FormattedASTNode implements GenevaERSValue, A
         LogicTableArg arg = f1.getArg();
         //This is different in that we need to get the original string value and change it?
         //arg.setStartPosition(start);
-        int fieldlen = arg.getValue().length();
-        if(start <=0 || start > fieldlen) {
-            addError(String.format("Invalid SUBSTR() parameter start position: %d for field length: %d", start, fieldlen));
-            return length;
-        }
-        if(start + length > fieldlen + 1) {
-            addError(String.format("Invalid SUBSTR() parameters start position: %d length: %d for field length: %d", start, length, fieldlen));
-            return length;
-        }
         int beginIndex = start - 1;
         String val = ((StringAtomAST)rhs).getValue();
         arg.setValue(new Cookie(val.substring(beginIndex, beginIndex+length)));
