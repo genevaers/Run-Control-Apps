@@ -776,7 +776,7 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
                     strcmp.setComparisonOperator(op);
                     strcmp.addChildIfNotNull(rhs);
                     restrictLeftAndRight(strcmp);
-                    return strcmp; 
+                    return strcmp;
                 } else {
                     ExprComparisonAST exprcmp = (ExprComparisonAST)ASTFactory.getNodeOfType(ASTFactory.Type.EXPRCOMP);
                     exprcmp.addChildIfNotNull(lhs);
@@ -859,30 +859,33 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         if(ctx.getChildCount() == 6) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
             sn.setStartOffest(ctx.getChild(4).getText());
-            resolveLength(null, sn);
+            resolveLengthPosition(null, sn);
         } else if(ctx.getChildCount() == 8) {
             sn.addChildIfNotNull(visit(ctx.getChild(2)));
             sn.setStartOffest(ctx.getChild(4).getText());
-            resolveLength(ctx.getChild(6).getText(), sn);
+            resolveLengthPosition(ctx.getChild(4).getText(), sn);
+            resolveLengthPosition(ctx.getChild(6).getText(), sn);
+        } else {
+            sn.addError("SUBSTR() requires a start position and length");
         }
         int start = sn.getStartOffestInt();
         int length = sn.getLength();
         int fieldlen = sn.getChildLength();
-         if(start <= 0 || start > fieldlen) {
-            sn.addError("SUBSTR() parameter start position must be greater than zero and less than field length");
+        if(start > fieldlen) {
+            sn.addError("SUBSTR() parameter start position must be less than or equal to field length");
         }
         if(start + length > fieldlen + 1) {
-            sn.addError(String.format("Invalid SUBSTR() parameters start position: %d and length: %d for field length: %d", start, length, fieldlen));
+            sn.addError(String.format("SUBSTR() start position: %d and length: %d exceeds field length of: %d", start, length, fieldlen));
         }
         return sn;
     }
 
-    private void resolveLength(String len, SubStringASTNode sn) {
+    private void resolveLengthPosition(String len, SubStringASTNode sn) {
         Integer parsedLen = checkLengthOkay(len);
-        if(parsedLen == null){
+        if(len == null){
             sn.addError("Missing SUBSTR() parameter length");
-        } else if (parsedLen.equals(0) || parsedLen < 0) {
-            sn.addError(String.format("The length %s is not valid", len));
+        } else if (parsedLen.equals(0) || parsedLen < 0 || parsedLen == null) {
+            sn.addError("SUBSTR() start position and length must be a number greater than zero");
         } else {
             sn.setLength(len);                
         }
