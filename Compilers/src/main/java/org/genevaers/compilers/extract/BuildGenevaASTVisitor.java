@@ -832,8 +832,8 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         rn.setCharPostionInLine(ctx.getStart().getCharPositionInLine());
         rn.addChildIfNotNull(visit(ctx.getChild(2)));
         rn.setLength(ctx.getChild(4).getText());
-        if(rn.getLength() > rn.getChildLength()) {
-            rn.addError("RIGHT() length cannot be greater than field length");
+        if(rn.getLength() == 0 || rn.getLength() > rn.getChildLength()) {
+            rn.addError("RIGHT() length must be greater than 0 and less than field length");
         }
         return rn;
      }
@@ -844,8 +844,8 @@ public class BuildGenevaASTVisitor extends GenevaERSBaseVisitor<ExtractBaseAST> 
         ln.setCharPostionInLine(ctx.getStart().getCharPositionInLine());
         ln.addChildIfNotNull(visit(ctx.getChild(2)));
         ln.setLength(ctx.getChild(4).getText());
-        if(ln.getLength() > ln.getChildLength()) {
-            ln.addError("LEFT() length cannot be greater than field length");
+        if(ln.getLength() == 0 ||ln.getLength() > ln.getChildLength()) {
+            ln.addError("LEFT() length must be greater than 0 and less than field length");
         }
         return ln;
      }
