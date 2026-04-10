@@ -268,7 +268,7 @@ public class FormatAST2Dot {
     private static void writeHeader() throws IOException {
         fw.write("digraph xml {\nrankdir=TB\n//Nodes\n");
         fw.write(
-                "graph [label=\" MR91 Format Logic Trees\", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22, concentrate=true];\n");
+                "graph [label=\" Format Logic Trees\", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22, concentrate=true];\n");
         fw.write("labeljust=center;\n");
     }
 
