@@ -6,7 +6,7 @@ category: "PeTests/Comparison/String"
 cq: ""
 note: ""
 tests:
-- name: "BEGINEND"
+- name: "STRCOMP"
   header: "BEGINS_WITH and ENDS_WITH with SUBSTR"
   description: "BEGINS_WITH and ENDS_WITH string comparisons with SUBSTR "
   source: "WBXML"
