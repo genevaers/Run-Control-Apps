@@ -1,5 +1,5 @@
 ---
-name: "CMSTRING"
+name: "CMSTR"
 title: "String comparisons"
 description: "CFxx functions with SUBSTR"
 category: "PeTests/Comparison/String"
@@ -8,7 +8,7 @@ note: ""
 tests:
 - name: "STRCOMP"
   header: "BEGINS_WITH and ENDS_WITH with SUBSTR"
-  description: "BEGINS_WITH and ENDS_WITH string comparisons with SUBSTR "
+  description: "CFxx funcs BEGINS_WITH and ENDS_WITH string comparisons with SUBSTR "
   source: "WBXML"
   xmlfiles:
   - name: "BeginsEndsWithSubstr[1615].xml"
