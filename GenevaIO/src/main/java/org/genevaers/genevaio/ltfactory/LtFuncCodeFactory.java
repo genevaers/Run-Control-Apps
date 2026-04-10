@@ -1436,7 +1436,7 @@ public class LtFuncCodeFactory implements LtFunctionCodeFactory{
     @Override
     public LTFileObject getSKX(ViewColumn c, ViewColumn v, ViewSortKey sk) {
         LogicTableF2 skx = new LogicTableF2();
-        skx.setArg1(getColumnArg(c));
+        skx.setArg1(getColumnRefArg(c));
         skx.setArg2(getColumnArg(v));
         skx.setFunctionCode("SKX");
         skx.setRecordType(LtRecordType.F2);
