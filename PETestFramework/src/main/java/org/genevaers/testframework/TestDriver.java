@@ -859,7 +859,8 @@ public class TestDriver {
 				logger.atSevere().log("Environment variable GERS_RCA_JAR_DIR is not set or empty");
 				return;
 			}
-			Path jarPath = Paths.get(winrcapps).resolve("rcapps-latest.jar").normalize();
+			Path baseDir = Paths.get(winrcapps).toAbsolutePath().normalize();
+			Path jarPath = baseDir.resolve("rcapps-latest.jar").normalize();
 			if (!Files.exists(jarPath) || !Files.isRegularFile(jarPath)) {
 				logger.atSevere().log("RCA jar not found at expected location: %s", jarPath.toString());
 				return;
