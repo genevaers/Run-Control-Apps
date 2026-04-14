@@ -249,6 +249,24 @@ public class StringComparisonAST extends ExtractBaseAST implements EmittableASTN
     }   
 
     private int checkAndUpdateArg(StringFunctionASTNode sstr, LogicTableArg arg) {
+        if(sstr instanceof SubStringASTNode){
+            if(Short.valueOf(sstr.getStartOffest())== 0 || sstr.getLength() == 0) {
+                Repository.addErrorMessage(ExtractBaseAST.makeCompilerMessage("SUBSTR() parameters start position and length must be greater than 0"));
+                return sstr.getLength();
+            } 
+        } 
+        if(sstr instanceof LeftASTNode) {
+            if(sstr.getLength() == 0) {
+                Repository.addErrorMessage(ExtractBaseAST.makeCompilerMessage("LEFT() parameter length must be greater than 0"));
+                return sstr.getLength();
+            } 
+        }
+        if(sstr instanceof RightASTNode) {
+            if(sstr.getLength() == 0) {
+                Repository.addErrorMessage(ExtractBaseAST.makeCompilerMessage("RIGHT() parameter length must be greater than 0"));
+                return sstr.getLength();
+            } 
+        }
         if(sstr.getChildStartPosition() + sstr.getLength() <= arg.getStartPosition() + arg.getFieldLength()) {
             arg.setFieldLength((short)sstr.getLength());
             arg.setStartPosition((short)(sstr.getChildStartPosition()));
