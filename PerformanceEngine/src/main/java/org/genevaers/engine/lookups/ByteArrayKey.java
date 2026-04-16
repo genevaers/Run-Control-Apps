@@ -25,4 +25,8 @@ class ByteArrayKey {
     public int hashCode() {
         return hashCode;
     }
+
+    public byte[] getData() {
+        return data;
+    }
 }

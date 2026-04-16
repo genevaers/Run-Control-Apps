@@ -124,7 +124,7 @@ public class PERun {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        rr.setRecLen(j.getKeyLength() + j.getRecLength() + 2);//for CR/LF
+        rr.setRecLen(j.getRecLength());//for CR/LF
         FileRecord rec = rr.readRecord();
         while (rr.isAtFileEnd() == false) {
             numrecords++;

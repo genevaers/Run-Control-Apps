@@ -31,6 +31,7 @@ import org.genevaers.compilers.extract.BuildGenevaASTVisitor;
 import org.genevaers.compilers.extract.ExtractColumnCompiler;
 import org.genevaers.compilers.extract.ExtractFilterCompiler;
 import org.genevaers.compilers.extract.ExtractOutputCompiler;
+import org.genevaers.compilers.extract.JavaEmitter.ExtractAST2Java;
 import org.genevaers.compilers.extract.astnodes.ASTFactory;
 import org.genevaers.compilers.extract.astnodes.ExtractAST2Dot;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
@@ -95,6 +96,7 @@ public class ExtractPhaseCompiler {
 			buildTheJoinLogicTable();
 			buildTheExtractLogicTable();
 			wholeViewChecks();
+			writeJavaXLTIfEnabled();
 		}
 		return Repository.getCompilerErrors().size() > 0 ? Status.ERROR : Status.OK;
 	}
@@ -172,6 +174,12 @@ public class ExtractPhaseCompiler {
 			ExtractAST2Dot.setViews(GersConfigration.getViewDots().split(","));
 			ExtractAST2Dot.setCols(GersConfigration.getColumnDots().split(","));
 			ExtractAST2Dot.write(extractRoot, Paths.get("target/XLT.dot"));
+		}
+	}
+
+	private static void writeJavaXLTIfEnabled() {
+		if(GersConfigration.isXltDotEnabled()) {
+			ExtractAST2Java.write(extractRoot);
 		}
 	}
 
