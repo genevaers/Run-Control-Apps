@@ -70,10 +70,14 @@ public class ExtractorWriter {
 
 	private static  void generateTemplatedOutput(Template template, Map<String, Object> nodeMap, String reportFileName) {
         //Generate the output file into the generated source area of the Performance Engine
-        String genSrcDir = GersConfigration.getPerformanceEngineGenSourceDir();
-        File targdir = new File(genSrcDir);
-        targdir.mkdirs();
-        reportFileName = genSrcDir + System.getProperty("file.separator") + reportFileName;
+        if (GersConfigration.isZos()) {
+            reportFileName = "PEJAVA";
+        } else {
+            String genSrcDir = GersConfigration.getPerformanceEngineGenSourceDir();
+            File targdir = new File(genSrcDir);
+            targdir.mkdirs();
+            reportFileName = genSrcDir + System.getProperty("file.separator") + reportFileName;
+        }
         try(Writer fw = new GersFile().getWriter(reportFileName)) {
 	    	template.process(nodeMap, fw);
 		} catch (IOException | TemplateException e) {
