@@ -19,6 +19,7 @@ public class JoinGenerator extends ExtractRecordGenerator {
     private int fileid;
     private LogicTableF1 join;
     private FunctionSection section;
+    private LTRecord lookAhead;
 
     public JoinGenerator(FunctionSection section) {
         this.section = section;
@@ -53,37 +54,66 @@ public class JoinGenerator extends ExtractRecordGenerator {
         String body = "";
         String logicbody = "";
         String elsebody = "";
-        LTRecord lookAhead = xlt.getFromPosition(ltr.getRowNbr() + 1);
+        lookAhead = xlt.getFromPosition(ltr.getRowNbr() + 1);
         if(section == FunctionSection.FILTER) {
             return null; //generateExtractFilter(trueRec, falseRec, lookAhead);
         } else {
-            while(lookAhead != null && !lookAhead.getFunctionCode().equals("LUSM")) {
-                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
-                body += exe.getEntryString() + "\n";
-                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
-            }
+            body += getLookupKeyCode();
             //Drop out on the LUSM which will be the join buffer update and end of the join logic
             //LUSM is itself a recurse up to the False
-            body +=addLUSMCode(lookAhead);
+            body +=addLUSMCode();
+            //What happens now is a function of the codes following?
+            //Assignment of comparison... or arithmetic?
             lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+
+            //Need to know is this is a comparison of assignment or an arithmetic
+
+
+            boolean isAssignment = false;
             while(lookAhead != null && !lookAhead.getFunctionCode().equals("GOTO")) {
-                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
-                logicbody += exe.getEntryString() + "\n";
-                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+                if(lookAhead.getFunctionCode().startsWith("CF")) {
+                    ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+                    body += exe.getEntryString() + "\n";
+                    lookAhead = null; //force break out CF handles its own look ahead
+                } else if(lookAhead.getFunctionCode().equals("DTL")) {
+                    isAssignment = true;
+                    ExtractorEntry dtl = addFunctionCode(lookAhead, columnRecs, section);
+                    logicbody += dtl.getEntryString() + "\n";
+                    lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);  
+                }
             }
-            lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
-            while(lookAhead != null && lookAhead.getRowNbr() <= falseGoto) {
-                ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
-                elsebody += exe.getEntryString() + "\n";
-                lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+            if(isAssignment) {
+                elsebody +=addLookupFailCode();
+                currentColumnNumber = lookAhead.getRowNbr();
+                return new ExtractorEntry(String.format(joinLogicFormat, logicbody, elsebody));
             }
-            body += String.format(joinLogicFormat, logicbody, elsebody);
-            currentRow = lookAhead.getRowNbr();
         }
         return new ExtractorEntry(String.format(JOINFormat, joinEntry, body));
     }
 
-    private String addLUSMCode(LTRecord lookAhead) {
+    private String getLookupKeyCode() {
+        String keycode = "";
+        while(lookAhead != null && !lookAhead.getFunctionCode().equals("LUSM")) {
+            ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+            keycode += exe.getEntryString() + "\n";
+            lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+        }
+        return keycode;
+    }
+
+    private String addLookupFailCode() {
+        String elsebody = "";
+        lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+        while(lookAhead != null && lookAhead.getRowNbr() <= falseGoto) {
+            ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
+            elsebody += exe.getEntryString() + "\n";
+            lookAhead = xlt.getFromPosition(lookAhead.getRowNbr() + 1);
+        }
+        currentRow = lookAhead.getRowNbr();
+        return elsebody;
+    }
+
+    private String addLUSMCode() {
             ExtractorEntry exe = addFunctionCode(lookAhead, columnRecs, section);
             return exe.getEntryString() + "\n";
     }

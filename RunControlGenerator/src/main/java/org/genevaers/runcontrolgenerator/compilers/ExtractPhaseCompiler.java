@@ -178,7 +178,7 @@ public class ExtractPhaseCompiler {
 	}
 
 	private static void writeJavaXLTIfEnabled() {
-		if(GersConfigration.isXltDotEnabled()) {
+		if(GersConfigration.isGeneratePeCode()) {
 			ExtractAST2Java.write(extractRoot);
 		}
 	}

@@ -85,6 +85,7 @@ public abstract class ExtractRecordGenerator {
         return null;
     }
     private static void addToColumnLogic(LTRecord lt) {
+        columnRecs.add(new ExtractorEntry(String.format("//Columm Number %d", currentColumnNumber)));  //will need a stack here? And manage indent
         ExtractorEntry exe = addFunctionCode(lt, columnRecs, FunctionSection.COLUMN);
         columnRecs.add(exe);
     }
@@ -147,6 +148,10 @@ public abstract class ExtractRecordGenerator {
                 CFECGenerator cfec = new CFECGenerator(section);
                 exe = cfec.processRecord(lt);
                 break;
+            case "CFLC":
+                CFLCGenerator cflc = new CFLCGenerator(section);
+                exe = cflc.processRecord(lt);
+                break;
             case "JOIN":
                 JoinGenerator join = new JoinGenerator(section);
                 //Collect the Reference information needed
@@ -163,6 +168,7 @@ public abstract class ExtractRecordGenerator {
                 joins.computeIfAbsent(join.getNewid(), id -> addJoin(join));
                 break;
             case "LKE":
+                //Handled as part of the JOIN
                 LKEGenerator lke = new LKEGenerator();
                 exe = lke.processRecord(lt);
                 break;

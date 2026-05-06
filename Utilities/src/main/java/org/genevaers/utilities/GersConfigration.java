@@ -52,6 +52,7 @@ public class GersConfigration {
     public static final String LTCOV = "LTCOV";
     
     public static final String GENERATE = "GENERATE_RC_FILES";
+    public static final String GENERATE_PE_CODE = "GENERATE_PE_CODE";
     public static final String WRITE_VDPXML = "GENERATE_VDPXML";
     public static final String VDPXML_OUT_FILE = "VDPXML";
 
@@ -121,7 +122,7 @@ public class GersConfigration {
     private static final String EXTRACTOR_LOG_FILENAME = "EXLOG";
     private static final String EXTRACTOR_REPORT_FILENAME = "EXRPT";
     
-    private static final String CODE_BASE = "CODE_BASE";
+    private static final String CODE_BASE = "PE_CODE_DIR";
 
     protected static Map<String, ConfigEntry> parmToValue = new TreeMap<>();
 
@@ -138,6 +139,7 @@ public class GersConfigration {
         zosCodePage = new GersCodePage().getCodePage();
  
         parmToValue.put(GENERATE, new ConfigEntry("N", false));
+        parmToValue.put(GENERATE_PE_CODE, new ConfigEntry("N", false));
 
         //Hidden defaults
         parmToValue.put(REPORT_FILE, new ConfigEntry(REPORT_FILE, true));
@@ -152,7 +154,6 @@ public class GersConfigration {
         parmToValue.put(PF_DOTS, new ConfigEntry("N", true));
         parmToValue.put(DOT_FORMAT, new ConfigEntry("N", true));
 
-        parmToValue.put(GENERATE, new ConfigEntry("Y", false));
         parmToValue.put(INPUT_TYPE, new ConfigEntry("", false));
 
         parmToValue.put(XLT_DDNAME, new ConfigEntry("XLTNEW", true));
@@ -288,6 +289,14 @@ public class GersConfigration {
 
     public static boolean generatorRunRequested() {
         return parmToValue.get(GENERATE).getValue().equalsIgnoreCase("Y");
+    }
+
+    public static boolean isGeneratePeCode() {
+        if(parmToValue.get(GENERATE_PE_CODE) != null) {
+            return parmToValue.get(GENERATE_PE_CODE).getValue().equalsIgnoreCase("Y");
+        } else {
+            return false;
+        }
     }
 
     public static boolean isXltReport() {
