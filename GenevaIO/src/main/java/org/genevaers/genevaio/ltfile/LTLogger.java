@@ -91,6 +91,7 @@ public class LTLogger {
 	private static final String WRSU = "%s Dest=%s, Buffered records=%d, Partition ID=%d, Prog ID = %d, Param = '%s'";
 	private static final String WRSUNOPF = "%s Dest=%s, Buffered records=%d";
 	private static final String WRDT = "%s Dest=%s, Partition ID=%d, Prog ID = %d, Param = '%s'";
+	private static final String WRTK = "%s Dest=%s, Partition ID=%d";
 	private static final String WRDESTONLY = "%s Dest=%s";
 	private static final String FILEID = "%s %d";
 	private static final String CFA = "%s %47s  %s %-47s %s";
@@ -331,6 +332,7 @@ public class LTLogger {
 					return(String.format(WRSU, leadin, getWrDest(wr), wr.getExtrSumRecCnt(), wr.getOutputFileId(), wr.getWriteExitId(),wr.getWriteExitParms()));
 				}
 			}
+			case "WRTK":
 			case "WRDT": 
 			case "WRXT": {
 				LogicTableWR wr = (LogicTableWR) ltr;
@@ -340,6 +342,8 @@ public class LTLogger {
 					} else {
 						return(String.format(WRDT, leadin, getWrDest(wr), wr.getOutputFileId(), wr.getWriteExitId(),wr.getWriteExitParms()));
 					}
+				} else if("WRTK".equalsIgnoreCase(wr.getFunctionCode())){
+					return(String.format(WRTK, leadin, getWrDest(wr), wr.getOutputFileId()));
 				} else {
 					return(String.format(WRDT, leadin, getWrDest(wr), wr.getOutputFileId(), wr.getWriteExitId(),wr.getWriteExitParms()));
 				}
@@ -379,7 +383,7 @@ public class LTLogger {
 						LogicTableF2 f2 = (LogicTableF2) ltr;
 						return(String.format(ASSIGNMENT, leadin, getFullArg(f2.getArg1()), getColArgDetails(f2.getArg2())));
 					default:
-						return(leadin + " More details?");
+						return(leadin + "  " + ltr.getFunctionCode() + " (unknown record type)");
 				}
 			}
 		}
