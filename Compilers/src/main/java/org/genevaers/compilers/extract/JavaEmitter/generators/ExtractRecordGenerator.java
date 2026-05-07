@@ -38,6 +38,7 @@ public abstract class ExtractRecordGenerator {
     protected static LogicTable xlt;
     protected static int currentRow = 0;
     protected static int currentColumnNumber;
+    protected static int valueNumber = 0;
     protected List<ExtractorEntry> exrecs = new ArrayList<>();
 
     protected static List<String> filterRecs = new ArrayList<>();
@@ -295,5 +296,10 @@ public abstract class ExtractRecordGenerator {
     public static Map<Integer, LookupInfo> getHiddenLookupIds() {
         return hiddenLookupIds;
     }
+
+    protected String getValueName() {
+        return "value_" + valueNumber++;
+     }
+
 
 }

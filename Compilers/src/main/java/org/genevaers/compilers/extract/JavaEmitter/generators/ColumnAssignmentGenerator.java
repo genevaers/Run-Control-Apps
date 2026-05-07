@@ -140,15 +140,13 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case BCD:
                 break;
             case BINARY:
-//        int value = ((src[27] & 0xFF) << 8) |
-//                        ((src[28] & 0xFF));
-//        target.put(String.format("%4d", value).getBytes());
                 StringBuilder sb = new StringBuilder();
                 int offset =fr.getRef().getStartPosition() - 1;
                 //make this a for loop base on field length
-                sb.append(String.format("int value = ((src[%d] & 0xFF) << 8) |\n", offset));
+                String vn = getValueName();
+                sb.append(String.format("int %s = ((src[%d] & 0xFF) << 8) |\n", vn, offset));
                 sb.append(String.format("                        ((src[%d] & 0xFF));\n", offset + 1));
-                return String.format("%s        target.put(String.format(\"%%%dd\", value).getBytes());", sb.toString(),col.getViewColumn().getFieldLength());
+                return String.format("%s        target.put(String.format(\"%%%dd\", %s).getBytes());", sb.toString(), col.getViewColumn().getFieldLength(), vn);
             case BSORT:
                 break;
             case CONSTDATE:
@@ -178,6 +176,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
         return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
     }
+
 
 }
     
