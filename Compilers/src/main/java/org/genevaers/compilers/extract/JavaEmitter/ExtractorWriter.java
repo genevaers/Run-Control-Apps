@@ -61,7 +61,7 @@ public class ExtractorWriter {
             nodeMap.put("outLen", outLen);
             nodeMap.put("lrLen", lrLen);
             nodeMap.put("joins", joins);
-            generateTemplatedOutput(template, nodeMap, "XLT.java");
+            generateTemplatedOutput(template, nodeMap, "PECode.java");
             logger.atInfo().log("Extract Java Generated");
         } catch (IOException e) {
             logger.atSevere().log("Extract Java error %s",e.getMessage());

@@ -4,20 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.genevaers.engine.extractor.Extract;
-import org.genevaers.engine.extractor.Extractor;
+import org.genevaers.engine.extractor.PECode;
 import org.genevaers.engine.lookups.Join;
 import org.genevaers.engine.lookups.JoinsRepo;
 import org.genevaers.genevaio.recordreader.FileRecord;
@@ -26,8 +20,6 @@ import org.genevaers.genevaio.recordreader.RecordFileReaderWriter;
 import org.genevaers.genevaio.recordreader.RecordFileWriter;
 import org.genevaers.utilities.GersCodePage;
 import org.genevaers.utilities.GersConfigration;
-import org.genevaers.utilities.GersFilesUtils;
-
 import com.google.common.flogger.FluentLogger;
 
 public class PERun {
@@ -139,7 +131,7 @@ public class PERun {
 
     private void readWrite() {
         try {
-            extractor = getExtractor();
+            extractor = new PECode(); getExtractor();
             setupReferences();
             setupIO();
             openInput(Paths.get(inputDDnames.get(0)));
