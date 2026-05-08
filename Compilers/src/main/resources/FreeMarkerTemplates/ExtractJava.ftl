@@ -24,10 +24,10 @@ import com.google.common.flogger.FluentLogger;
  * 
  */
  
-public class XLT extends Extract {
+public class PECode extends Extract {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    public XLT() {
+    public PECode() {
 //Input DD names ${inputdds?size}
 <#if inputdds?size gt 0>
 <#list inputdds as ip>
