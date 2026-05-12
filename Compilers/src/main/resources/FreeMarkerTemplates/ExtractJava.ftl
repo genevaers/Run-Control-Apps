@@ -5,6 +5,7 @@ package org.genevaers.engine.extractor;
 
 import java.io.FileWriter;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.recordreader.FileRecord;
 import org.genevaers.genevaio.recordreader.RecordFileWriter;
 import org.genevaers.utilities.GersCodePage;
+import org.genevaers.utilities.GersConfigration;
 import com.google.common.flogger.FluentLogger;
 
 /**

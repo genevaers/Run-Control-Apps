@@ -55,18 +55,22 @@ public class JoinGenerator extends ExtractRecordGenerator {
         recs.add(String.format("/* lookup %d code here*/", li.getLookupId()));
         LookupPath lkp = li.getLkast().getLookup();
         ReferenceJoin jltv = Repository.getJoinViews().getReferenceJLTViews().getJLTView(lkp.getTargetLRID(), false);
-
-        String joinSource = String.format("Join %d -> %s targ LF %d LR %d", li.getLookupId(), jltv.getUniqueKey(),
-                lkp.getTargetLFID(), lkp.getTargetLRID());
-        logger.atInfo().log(joinSource);
-        String joinEntry = String.format("//%s\n" +
-                "        jn = JoinsRepo.getJoin(\"%s\");\n" +
-                "        //Record count used for do again \n" +
-                "        joinBuffer = jn.getBufferForRecord(numrecords);\n" +
-                "        if(joinBuffer == null && jn.updateRequired()) {\n%s" +
-                "            joinBuffer = jn.updateBuffer();\n" + 
-                "        }\n" , joinSource, li.getNewid(), getLookupKeys(li));
-        recs.add(joinEntry);
+        if(jltv == null) {
+            logger.atSevere().log("Unable to find join view for LR %d", lkp.getTargetLRID());
+            return;
+        } else {
+            String joinSource = String.format("Join %d -> %s targ LF %d LR %d", li.getLookupId(), jltv.getUniqueKey(),
+                    lkp.getTargetLFID(), lkp.getTargetLRID());
+            logger.atInfo().log(joinSource);
+            String joinEntry = String.format("//%s\n" +
+                    "        jn = JoinsRepo.getJoin(\"%s\");\n" +
+                    "        //Record count used for do again \n" +
+                    "        joinBuffer = jn.getBufferForRecord(numrecords);\n" +
+                    "        if(joinBuffer == null && jn.updateRequired()) {\n%s" +
+                    "            joinBuffer = jn.updateBuffer();\n" + 
+                    "        }\n" , joinSource, li.getNewid(), getLookupKeys(li));
+            recs.add(joinEntry);
+        }
     }
 
     private static String getLookupKeys(LookupInfo li) {

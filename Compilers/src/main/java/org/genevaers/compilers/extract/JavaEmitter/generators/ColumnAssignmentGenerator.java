@@ -10,9 +10,13 @@ import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.enums.DataType;
+
+import com.google.common.flogger.FluentLogger;
+
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 
 public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private ColumnAssignmentASTNode ca;
     private ExtractRecordGenerator srcgen;
@@ -58,6 +62,10 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             // buffer?
             LogicalRecord refLR = Repository.getLogicalRecords().get(9000000 + lfr.getNewJoinId());
             LRField reffld = refLR.findFromFieldsByName(fld.getName());
+            if(reffld == null) {
+                logger.atSevere().log("Unable to find reference field for lookup field reference %s", fld.getName());
+                return "/* Unable to find reference field for lookup field reference " + fld.getName() + " */";
+            }
             String joinLogicFormat = "        if(joinBuffer != null) {\n        %s\n        } else {\n        %s\n        }";
             String body = String.format("target.put(joinBuffer.bytes.array(), %d, %d);", reffld.getStartPosition() - 1,
                     reffld.getLength());
@@ -75,7 +83,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             return String.format("        target.put(\"%s\".getBytes());", targString);
         } else {
-            return "ASSTBD";
+            return "/* Assignment type not yet implemented " + trg.getType() + " = " + src.getType() + " */";
         }
     }
 
@@ -146,7 +154,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 String vn = getValueName();
                 sb.append(String.format("int %s = ((src[%d] & 0xFF) << 8) |\n", vn, offset));
                 sb.append(String.format("                        ((src[%d] & 0xFF));\n", offset + 1));
-                return String.format("%s        target.put(String.format(\"%%%dd\", %s).getBytes());", sb.toString(), col.getViewColumn().getFieldLength(), vn);
+                return String.format("%s        target.put(String.format(\"%%%dd\", %s).getBytes(Charset.forName(GersConfigration.getZosCodePage())));", sb.toString(), col.getViewColumn().getFieldLength(), vn);
             case BSORT:
                 break;
             case CONSTDATE:
