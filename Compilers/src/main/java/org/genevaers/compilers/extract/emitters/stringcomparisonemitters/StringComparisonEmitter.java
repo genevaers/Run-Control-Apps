@@ -30,7 +30,7 @@ public abstract class StringComparisonEmitter extends CodeEmitter{
     
 
     public static LtCompareType getCompareType(String op) {
-        switch(op) {
+        switch(op.toUpperCase()) {
             case "CONTAINS":
             return LtCompareType.CONTAINS;
             case "BEGINS_WITH":
