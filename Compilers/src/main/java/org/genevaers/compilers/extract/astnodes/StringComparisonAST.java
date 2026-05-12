@@ -192,7 +192,7 @@ public class StringComparisonAST extends ExtractBaseAST implements EmittableASTN
     }
 
     private void notContainsFix(String op, LTRecord ltr) {
-        if(!op.equals("CONTAINS")) {
+        if(!op.equalsIgnoreCase("CONTAINS")) {
             ltr.setFunctionCode(ltr.getFunctionCode().replace("SF", "CF"));
             if(ltr.getRecordType() == LtRecordType.F2) {
                 LogicTableF2 f2 = (LogicTableF2)ltr;
