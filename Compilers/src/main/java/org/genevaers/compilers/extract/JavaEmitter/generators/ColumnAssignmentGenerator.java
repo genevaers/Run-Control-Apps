@@ -60,17 +60,17 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             // fields are strings and use the String
             // We need the key length since the record start after the key in the join
             // buffer?
-            LogicalRecord refLR = Repository.getLogicalRecords().get(9000000 + lfr.getNewJoinId());
-            LRField reffld = refLR.findFromFieldsByName(fld.getName());
-            if(reffld == null) {
+            LRField redField = Repository.getREDfieldFrom(lfr.getLookup(), fld);
+            if(redField == null) {
                 logger.atSevere().log("Unable to find reference field for lookup field reference %s", fld.getName());
                 return "/* Unable to find reference field for lookup field reference " + fld.getName() + " */";
             }
-            String joinLogicFormat = "        if(joinBuffer != null) {\n        %s\n        } else {\n        %s\n        }";
-            String body = String.format("target.put(joinBuffer.bytes.array(), %d, %d);", reffld.getStartPosition() - 1,
-                    reffld.getLength());
+            String joinBufString = "joinBuffer" + lfr.getNewJoinId();
+            String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
+            String body = String.format("target.put(%s.bytes.array(), %d, %d);", joinBufString, redField.getStartPosition() - 1,
+                    redField.getLength());
             String elseBody = String.format("target.put(String.format(\"%%-%ds\", \" \").getBytes(), 0, %d);",
-                    reffld.getLength(), reffld.getLength());
+                    redField.getLength(), redField.getLength());
             return String.format(joinLogicFormat, body, elseBody);
         } else if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.STRINGATOM) {
             StringAtomAST sa = (StringAtomAST) src;

@@ -46,7 +46,6 @@ public class PECode extends Extract {
     }
 
     public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
-        FileRecord joinBuffer = null;
         Join jn;
 <#if filterRecs?size gt 4>
 // Filter Logic
@@ -61,7 +60,6 @@ ${rec}
 
 // Column Logic
     public void columnLogic(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
-        FileRecord joinBuffer = null;
         Join jn;
 <#list columnRecs as rec>
 ${rec}

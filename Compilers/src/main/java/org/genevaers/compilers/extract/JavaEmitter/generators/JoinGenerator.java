@@ -2,6 +2,8 @@ package org.genevaers.compilers.extract.JavaEmitter.generators;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.genevaers.genevaio.ltfile.LTRecord;
 import org.genevaers.genevaio.ltfile.LogicTableF1;
@@ -10,6 +12,7 @@ import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
+import org.genevaers.repository.jltviews.JLTViewMap;
 import org.genevaers.repository.jltviews.ReferenceJoin;
 
 import com.google.common.flogger.FluentLogger;
@@ -54,22 +57,29 @@ public class JoinGenerator extends ExtractRecordGenerator {
     private static void generateLookupCode(List<String> recs, LookupInfo li) {
         recs.add(String.format("/* lookup %d code here*/", li.getLookupId()));
         LookupPath lkp = li.getLkast().getLookup();
-        ReferenceJoin jltv = Repository.getJoinViews().getReferenceJLTViews().getJLTView(lkp.getTargetLRID(), false);
-        if(jltv == null) {
-            logger.atSevere().log("Unable to find join view for LR %d", lkp.getTargetLRID());
-            return;
-        } else {
-            String joinSource = String.format("Join %d -> %s targ LF %d LR %d", li.getLookupId(), jltv.getUniqueKey(),
-                    lkp.getTargetLFID(), lkp.getTargetLRID());
-            logger.atInfo().log(joinSource);
-            String joinEntry = String.format("//%s\n" +
-                    "        jn = JoinsRepo.getJoin(\"%s\");\n" +
-                    "        //Record count used for do again \n" +
-                    "        joinBuffer = jn.getBufferForRecord(numrecords);\n" +
-                    "        if(joinBuffer == null && jn.updateRequired()) {\n%s" +
-                    "            joinBuffer = jn.updateBuffer();\n" + 
-                    "        }\n" , joinSource, li.getNewid(), getLookupKeys(li));
-            recs.add(joinEntry);
+        Map<Integer, JLTViewMap<ReferenceJoin>> refDataset = Repository.getJoinViews().getReferenceDataSet();
+        Iterator<Entry<Integer, JLTViewMap<ReferenceJoin>>> refi = refDataset.entrySet().iterator();
+        while (refi.hasNext()) {
+            Entry<Integer, JLTViewMap<ReferenceJoin>> refEntry = refi.next();
+
+            ReferenceJoin jltv = refEntry.getValue().getJLTView(lkp.getTargetLRID(), false);
+            if(jltv == null) {
+                logger.atSevere().log("Unable to find join view for LR %d", lkp.getTargetLRID());
+                recs.add(String.format("/*Unable to find join view for LR %d*/", lkp.getTargetLRID()));
+            } else {
+                String joinSource = String.format("Join %d -> %s targ LF %d LR %d", li.getLookupId(), jltv.getUniqueKey(),
+                        lkp.getTargetLFID(), lkp.getTargetLRID());
+                logger.atInfo().log(joinSource);
+                String joinBufName = String.format("joinBuffer%d", li.getLookupId());
+                String joinEntry = String.format("//%s\n" +
+                        "        jn = JoinsRepo.getJoin(\"%d/%d\");\n" +
+                        "        //Record count used for do again \n" +
+                        "        FileRecord %s = jn.getBufferForRecord(numrecords);\n" +
+                        "        if(%s == null && jn.updateRequired()) {\n%s" +
+                        "            %s = jn.updateBuffer();\n" + 
+                        "        }\n" , li.getNewid() , li.getTargetLf(), lkp.getTargetLRID(), joinBufName, joinBufName, getLookupKeys(li), joinBufName);
+                recs.add(joinEntry);
+            }
         }
     }
 
