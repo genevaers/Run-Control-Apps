@@ -82,7 +82,7 @@ public class Join {
 
     public void addToKey(byte[] src, int offset, int len) {
         //This will need to be a ByteBuffer wrapping the key array
-        key = new ByteArrayKey(src, offset, len);
+        key = new ByteArrayKey(src, 0, len);
     }
 
     public FileRecord updateBuffer() {
