@@ -195,7 +195,7 @@ public class PERun {
         //Then a join statement means get the join...
         //If lookup not already performed buuild the key and get the buffer
         //A DTL etc then uses the buffer rather than the source record
-        extractor.processRecord(rec.bytes.array(), outputRecord.bytes, outWriter, recnum);
+        extractor.processRecord(rec.bytes.array(), outputRecord.bytes.array(), outWriter, recnum);
      }
 
     private Extract getExtractor() {

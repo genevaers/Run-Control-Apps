@@ -49,6 +49,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     }
 
     private String getAssignmentFormatString() {
+        ColumnAST col = (ColumnAST) trg;
         if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.LRFIELD) {
             FieldReferenceAST fr = (FieldReferenceAST) src;
             // Break out base on source and target data types.
@@ -67,15 +68,14 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             String joinBufString = "joinBuffer" + lfr.getNewJoinId();
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
-            String body = String.format("target.put(%s.bytes.array(), %d, %d);", joinBufString, redField.getStartPosition() - 1,
-                    redField.getLength());
-            String elseBody = String.format("target.put(String.format(\"%%-%ds\", \" \").getBytes(), 0, %d);",
-                    redField.getLength(), redField.getLength());
+            String body = String.format("System.arraycopy(%s.bytes.array(), %d, target, %d, %d);", joinBufString, redField.getStartPosition() - 1,
+                    redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+            String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
+                    redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             return String.format(joinLogicFormat, body, elseBody);
         } else if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.STRINGATOM) {
             StringAtomAST sa = (StringAtomAST) src;
             String targString = sa.getValue();
-            ColumnAST col = (ColumnAST) trg;
             if (targString.equals("")) {
                 targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", " ");
             } else {

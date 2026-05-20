@@ -19,8 +19,8 @@ public class PackedToEdited extends RunColumn {
     public static void transformField(int srcOffset, int srcLength, int offset, int length) {
         int precision = (srcLength * 2) - 1;
         PackedDecimalAsLongField packedField = new PackedDecimalAsLongField(srcOffset, precision, true);
-        long value = packedField.getLong(src.bytes.array());
-        System.arraycopy(String.format("%" + length + "d", value).getBytes(Charset.forName(GersConfigration.getZosCodePage())), 0, target.bytes.array(), offset, length);
+        long value = packedField.getLong(src);
+        System.arraycopy(String.format("%" + length + "d", value).getBytes(Charset.forName(GersConfigration.getZosCodePage())), 0, target, offset, length);
     }
 
 }

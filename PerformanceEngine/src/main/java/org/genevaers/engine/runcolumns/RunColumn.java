@@ -9,8 +9,8 @@ public abstract class RunColumn {
     protected int srcOffset;
     protected int srcLength;
 
-    protected static FileRecord src;
-    protected static FileRecord target;
+    protected static byte[] src;
+    protected static byte[] target;
 
     //public abstract void transformField(int offset, int length, int srcOffset, int srcLength);
 }
