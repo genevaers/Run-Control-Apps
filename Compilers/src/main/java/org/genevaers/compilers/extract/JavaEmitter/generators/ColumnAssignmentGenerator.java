@@ -91,10 +91,8 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
 
         ColumnAST col = (ColumnAST) trg;
         FieldReferenceAST fr = (FieldReferenceAST) src;
-        if (col.getViewColumn().getDataType() == fr.getRef().getDatatype()) {
-            // We can do a straight copy.
-            return String.format("        target.put(src, %d, %d);", fr.getRef().getStartPosition() - 1,
-                    fr.getRef().getLength());
+        if (col.getViewColumn().getDataType() == fr.getRef().getDatatype() && col.getViewColumn().getFieldLength() >= fr.getRef().getLength()) {
+            return String.format("        DirectColumn.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
         } else {
             // We need to do a data type conversion.
             // Break out based on source and target data types.
@@ -103,6 +101,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 case ALPHA:
                     break;
                 case ALPHANUMERIC:
+                    break;
                 case BCD:
                     break;
                 case BINARY:
@@ -140,6 +139,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     }
 
     private String getEditedResult(ColumnAST col, FieldReferenceAST fr) {
+        StringBuilder sb = new StringBuilder();
         switch (fr.getRef().getDatatype()) {
             case ALPHA:
                 break;
@@ -148,13 +148,8 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case BCD:
                 break;
             case BINARY:
-                StringBuilder sb = new StringBuilder();
-                int offset =fr.getRef().getStartPosition() - 1;
-                //make this a for loop base on field length
-                String vn = getValueName();
-                sb.append(String.format("int %s = ((src[%d] & 0xFF) << 8) |\n", vn, offset));
-                sb.append(String.format("                        ((src[%d] & 0xFF));\n", offset + 1));
-                return String.format("%s        target.put(String.format(\"%%%dd\", %s).getBytes(Charset.forName(GersConfigration.getZosCodePage())));", sb.toString(), col.getViewColumn().getFieldLength(), vn);
+                sb.append(String.format("        Bin2ToEdited.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                break;
             case BSORT:
                 break;
             case CONSTDATE:
@@ -174,6 +169,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case MASKED:
                 break;
             case PACKED:
+                sb.append(String.format("        PackedToEdited.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             case PSORT:
                 break;
@@ -182,7 +178,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             default:
                 return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
             }
-        return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
+        return sb.toString();
     }
 
 
