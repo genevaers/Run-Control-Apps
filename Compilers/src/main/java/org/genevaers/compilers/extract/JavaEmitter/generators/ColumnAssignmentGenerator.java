@@ -69,7 +69,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             String joinBufString = "joinBuffer" + lfr.getNewJoinId();
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
             String body = String.format("System.arraycopy(%s.bytes.array(), %d, target, %d, %d);", joinBufString, redField.getStartPosition() - 1,
-                    redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+                    col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
                     redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             return String.format(joinLogicFormat, body, elseBody);
