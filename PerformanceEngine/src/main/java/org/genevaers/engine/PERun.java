@@ -131,7 +131,7 @@ public class PERun {
 
     private void readWrite() {
         try {
-            extractor = new PECode(); getExtractor();
+            extractor = new PECode(); 
             setupReferences();
             setupIO();
             openInput(Paths.get(inputDDnames.get(0)));
