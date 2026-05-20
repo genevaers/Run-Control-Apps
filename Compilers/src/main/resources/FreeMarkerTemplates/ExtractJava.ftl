@@ -47,7 +47,7 @@ public class PECode extends Extract {
 </#if>
     }
 
-    public void processRecord(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
+    public void processRecord(byte[] src, byte[] target, RecordFileWriter outWriter, int numrecords) {
         Join jn;
 <#if filterRecs?size gt 4>
 // Filter Logic
@@ -61,7 +61,9 @@ ${rec}
     }
 
 // Column Logic
-    public void columnLogic(byte[] src, ByteBuffer target, RecordFileWriter outWriter, int numrecords) {
+    public void columnLogic(byte[] src, byte[] target, RecordFileWriter outWriter, int numrecords) {
+        DirectColumn.setSource(src);
+        DirectColumn.setTarget(target);
         Join jn;
 <#list columnRecs as rec>
 ${rec}
