@@ -85,25 +85,25 @@ public class Join {
         key = new ByteArrayKey(src, 0, len);
     }
 
-    public FileRecord updateBuffer() {
+    public byte[] updateBuffer() {
         currentBuffer = data.get(key);
         // if(currentBuffer != null) {
         //     currentBuffer.bytes.position(keyLength);
         // }
-        return currentBuffer;
+        return currentBuffer.bytes.array();
     }
 
     public boolean found() {
         return found;
     }
 
-    public FileRecord getBufferForRecord(int numrecords) {
+    public byte[] getBufferForRecord(int numrecords) {
         if(currentRecord != numrecords) {
             currentRecord = numrecords;
             currentBuffer = null;
             updateRequired = true;
         }
-        return currentBuffer;
+        return currentBuffer.bytes.array();
     }
 
     public boolean updateRequired() {

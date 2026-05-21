@@ -16,7 +16,7 @@ public class PackedToEdited extends RunColumn {
         this.srcLength = srcLength;
     }
 
-    public static void transformField(int srcOffset, int srcLength, int offset, int length) {
+    public static void transformField(byte[] src, int srcOffset, int srcLength, int offset, int length) {
         int precision = (srcLength * 2) - 1;
         PackedDecimalAsLongField packedField = new PackedDecimalAsLongField(srcOffset, precision, true);
         long value = packedField.getLong(src);

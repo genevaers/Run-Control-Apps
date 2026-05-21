@@ -1,8 +1,5 @@
 package org.genevaers.engine.runcolumns;
 
-import java.nio.ByteBuffer;
-
-import org.genevaers.genevaio.recordreader.FileRecord;
 
 public class DirectColumn extends RunColumn {
 
@@ -14,7 +11,7 @@ public class DirectColumn extends RunColumn {
         this.srcLength = srcLength;
     }
 
-    public static void transformField(int srcOffset, int srcLength,  int offset, int length ) {
+    public static void transformField(byte[] src, int srcOffset, int srcLength,  int offset, int length ) {
         // Copy directly from source to target
         System.arraycopy(src, srcOffset, target, offset, length);
     }

@@ -74,7 +74,7 @@ public class JoinGenerator extends ExtractRecordGenerator {
                 String joinEntry = String.format("//%s\n" +
                         "        jn = JoinsRepo.getJoin(\"%d/%d\");\n" +
                         "        //Record count used for do again \n" +
-                        "        FileRecord %s = jn.getBufferForRecord(numrecords);\n" +
+                        "        byte[] %s = jn.getBufferForRecord(numrecords);\n" +
                         "        if(%s == null && jn.updateRequired()) {\n%s" +
                         "            %s = jn.updateBuffer();\n" + 
                         "        }\n" , li.getNewid() , li.getTargetLf(), lkp.getTargetLRID(), joinBufName, joinBufName, getLookupKeys(li), joinBufName);

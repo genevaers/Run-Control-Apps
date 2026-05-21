@@ -68,8 +68,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             String joinBufString = "joinBuffer" + lfr.getNewJoinId();
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
-            String body = String.format("System.arraycopy(%s.bytes.array(), %d, target, %d, %d);", joinBufString, redField.getStartPosition() - 1,
-                    col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+            String body = dtlEquivalentBasedOnTypes(joinBufString, redField);// String.format("System.arraycopy(%s.bytes.array(), %d, target, %d, %d);", joinBufString, redField.getStartPosition() - 1,
             String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
                     redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             return String.format(joinLogicFormat, body, elseBody);
@@ -88,11 +87,19 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     }
 
     private String dteEquivalentBasedOnTypes() {
+        FieldReferenceAST fr = (FieldReferenceAST) src;
+        return assignBasedOnTypes(fr.getRef().getDatatype(), "src", fr.getRef().getStartPosition() - 1, fr.getRef().getLength());
+    }
+
+    private String dtlEquivalentBasedOnTypes(String joinbuffer, LRField redField) {
+        return assignBasedOnTypes(redField.getDatatype(), joinbuffer, redField.getStartPosition() - 1, redField.getLength());
+    }
+
+    private String assignBasedOnTypes(DataType sourceDataType, String source, int offset, int length) {
 
         ColumnAST col = (ColumnAST) trg;
-        FieldReferenceAST fr = (FieldReferenceAST) src;
-        if (col.getViewColumn().getDataType() == fr.getRef().getDatatype() && col.getViewColumn().getFieldLength() >= fr.getRef().getLength()) {
-            return String.format("        DirectColumn.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+        if (col.getViewColumn().getDataType() == sourceDataType && col.getViewColumn().getFieldLength() >= length) {
+            return String.format("        DirectColumn.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
         } else {
             // We need to do a data type conversion.
             // Break out based on source and target data types.
@@ -115,7 +122,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 case CONSTSTRING:
                     break;
                 case EDITED:
-                    return getEditedResult(col, fr);
+                    return getEditedResult(col, sourceDataType, source, offset, length);
                 case FLOAT:
                     break;
                 case GENEVANUMBER:
@@ -138,9 +145,9 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         }
     }
 
-    private String getEditedResult(ColumnAST col, FieldReferenceAST fr) {
+    private String getEditedResult(ColumnAST col, DataType sourceDataType, String source, int offset, int length) {
         StringBuilder sb = new StringBuilder();
-        switch (fr.getRef().getDatatype()) {
+        switch (sourceDataType) {
             case ALPHA:
                 break;
             case ALPHANUMERIC:
@@ -148,7 +155,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case BCD:
                 break;
             case BINARY:
-                sb.append(String.format("        Bin2ToEdited.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                sb.append(String.format("        Bin2ToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             case BSORT:
                 break;
@@ -169,7 +176,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case MASKED:
                 break;
             case PACKED:
-                sb.append(String.format("        PackedToEdited.transformField(%d, %d, %d, %d);", fr.getRef().getStartPosition() - 1, fr.getRef().getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                sb.append(String.format("        PackedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             case PSORT:
                 break;

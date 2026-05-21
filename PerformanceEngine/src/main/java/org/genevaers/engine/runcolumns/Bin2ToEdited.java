@@ -14,7 +14,7 @@ public class Bin2ToEdited extends RunColumn {
         this.srcLength = srcLength;
     }
 
-    public static void transformField(int srcOffset, int srcLength, int offset, int length) {
+    public static void transformField(byte[] src, int srcOffset, int srcLength, int offset, int length) {
         int value = ((src[srcOffset] & 0xFF) << 8) |
                         ((src[srcOffset + 1] & 0xFF));
         System.arraycopy(String.format("%" + length + "d", value).getBytes(Charset.forName(GersConfigration.getZosCodePage())), 0, target, offset, length);
