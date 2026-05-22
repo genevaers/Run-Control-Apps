@@ -68,7 +68,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             String joinBufString = "joinBuffer" + lfr.getNewJoinId();
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
-            String body = dtlEquivalentBasedOnTypes(joinBufString, redField);// String.format("System.arraycopy(%s.bytes.array(), %d, target, %d, %d);", joinBufString, redField.getStartPosition() - 1,
+            String body = dtlEquivalentBasedOnTypes(joinBufString, redField);
             String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
                     redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             return String.format(joinLogicFormat, body, elseBody);
@@ -181,13 +181,13 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case PSORT:
                 break;
             case ZONED:
+                sb.append(String.format("        ZonedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             default:
                 return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
-            }
+        }
         return sb.toString();
     }
 
 
 }
-    

@@ -87,10 +87,11 @@ public class Join {
 
     public byte[] updateBuffer() {
         currentBuffer = data.get(key);
-        // if(currentBuffer != null) {
-        //     currentBuffer.bytes.position(keyLength);
-        // }
-        return currentBuffer.bytes.array();
+        if(currentBuffer != null) {
+            return currentBuffer.bytes.array();
+        } else {
+            return null;
+        }
     }
 
     public boolean found() {
