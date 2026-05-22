@@ -104,7 +104,11 @@ public class Join {
             currentBuffer = null;
             updateRequired = true;
         }
-        return currentBuffer.bytes.array();
+        if(currentBuffer != null) {
+            return currentBuffer.bytes.array();
+        } else {
+            return null;
+        }
     }
 
     public boolean updateRequired() {
