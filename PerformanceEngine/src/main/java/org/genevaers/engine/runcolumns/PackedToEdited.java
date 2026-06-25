@@ -1,10 +1,11 @@
 package org.genevaers.engine.runcolumns;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import org.genevaers.utilities.GersConfigration;
 
-import com.ibm.jzos.fields.PackedDecimalAsLongField;
+import com.ibm.jzos.fields.BigDecimalAccessor;
 
 public class PackedToEdited extends RunColumn {
 
@@ -16,11 +17,10 @@ public class PackedToEdited extends RunColumn {
         this.srcLength = srcLength;
     }
 
-    public static void transformField(byte[] src, int srcOffset, int srcLength, int offset, int length) {
-        int precision = (srcLength * 2) - 1;
-        PackedDecimalAsLongField packedField = new PackedDecimalAsLongField(srcOffset, precision, true);
-        long value = packedField.getLong(src);
-        System.arraycopy(String.format("%" + length + "d", value).getBytes(Charset.forName(GersConfigration.getZosCodePage())), 0, target, offset, length);
+    public static void transformField(byte[] src, BigDecimalAccessor fld, int offset, int length) {
+        BigDecimal value = fld.getBigDecimal(src);
+        System.out.println("PackedToEdited " + value.toString());
+        System.arraycopy(String.format("%" + length + "f", value).getBytes(Charset.forName(GersConfigration.getZosCodePage())), 0, target, offset, length);
     }
 
 }
