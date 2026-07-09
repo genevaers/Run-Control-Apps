@@ -8,11 +8,13 @@ import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.compilers.extract.astnodes.StringAtomAST;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
-import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.enums.DataType;
 
 import com.google.common.flogger.FluentLogger;
 
+import java.util.Map;
+
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 
 public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
@@ -68,7 +70,8 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             String joinBufString = "joinBuffer" + lfr.getNewJoinId();
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
-            String body = dtlEquivalentBasedOnTypes(joinBufString, redField);
+            String name = lfr.getLookup().getName() + "_" + redField.getName();
+            String body = dtlEquivalentBasedOnTypes(joinBufString, redField , name);
             String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
                     redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
             return String.format(joinLogicFormat, body, elseBody);
@@ -88,18 +91,23 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
 
     private String dteEquivalentBasedOnTypes() {
         FieldReferenceAST fr = (FieldReferenceAST) src;
-        return assignBasedOnTypes(fr.getRef().getDatatype(), "src", fr.getRef().getStartPosition() - 1, fr.getRef().getLength());
+        //return assignBasedOnTypes(fr.getRef().getDatatype(), "src", fr.getRef().getStartPosition() - 1, fr.getRef().getLength());
+        return assignBasedOnTypes(fr.getRef(), "src", fr.getRef().getName());
     }
 
-    private String dtlEquivalentBasedOnTypes(String joinbuffer, LRField redField) {
-        return assignBasedOnTypes(redField.getDatatype(), joinbuffer, redField.getStartPosition() - 1, redField.getLength());
+    private String dtlEquivalentBasedOnTypes(String joinbuffer, LRField redField, String name) {
+        return assignBasedOnTypes(redField, joinbuffer, name);
+        //return "TBD"; //assignBasedOnTypes(redField.getDatatype(), joinbuffer, redField.getStartPosition() - 1, redField.getLength());
     }
 
-    private String assignBasedOnTypes(DataType sourceDataType, String source, int offset, int length) {
+    private String assignBasedOnTypes(LRField f, String source, String name) {
 
         ColumnAST col = (ColumnAST) trg;
-        if (col.getViewColumn().getDataType() == sourceDataType && col.getViewColumn().getFieldLength() >= length) {
-            return String.format("        DirectColumn.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+        if (col.getViewColumn().getDataType() == f.getDatatype() && col.getViewColumn().getFieldLength() >= f.getLength()) {
+                    //COL_1.putString(ORDER_ID.getString(src), target);
+
+        //System.arraycopy(src, srcOffset, target, offset, length);
+             return String.format("                COL_%d.putString(%s.getString(%s), target);", col.getViewColumn().getColumnNumber(), name,  source);
         } else {
             // We need to do a data type conversion.
             // Break out based on source and target data types.
@@ -121,8 +129,10 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                     break;
                 case CONSTSTRING:
                     break;
-                case EDITED:
-                    return getEditedResult(col, sourceDataType, source, offset, length);
+                case EDITED: {
+                    //return getEditedResult(col, sourceDataType, source, offset, length);
+                    return getEditedResult(col, f.getDatatype(), source, name);
+                }
                 case FLOAT:
                     break;
                 case GENEVANUMBER:
@@ -142,10 +152,11 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             }
             String targString = String.format("%." + col.getViewColumn().getFieldLength() + "s", "!!!!!!!!");
             return String.format("        target.put(\"%s\".getBytes());", targString);
-        }
+       }
     }
 
-    private String getEditedResult(ColumnAST col, DataType sourceDataType, String source, int offset, int length) {
+//    private String getEditedResult(ColumnAST col, DataType sourceDataType, String source, int offset, int length) {
+    private String getEditedResult(ColumnAST col, DataType sourceDataType, String source, String fieldName) {
         StringBuilder sb = new StringBuilder();
         switch (sourceDataType) {
             case ALPHA:
@@ -155,7 +166,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case BCD:
                 break;
             case BINARY:
-                sb.append(String.format("        Bin2ToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                //sb.append(String.format("        Bin2ToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             case BSORT:
                 break;
@@ -175,19 +186,30 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 break;
             case MASKED:
                 break;
-            case PACKED:
-                sb.append(String.format("        PackedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+            case PACKED: {
+                //We need to distinguish which PackedToEdited it is.
+                //Put them in a FieldHolder and then use the accessor to determine which one to use.
+                //         COL_5.putString(String.format("%f", PRICE.getBigDecimal(src)), target);
+                //sb.append(String.format("        PackedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                Map<String, ComponentFieldHolder> holders;
+                if(source.equals("src")) {
+                    holders = sourceFieldHolders;
+                } else {
+                    holders = lookupFieldHolders;
+                }
+                sb.append(String.format("        COL_%d.putString(String.format(\"%%f\", %s.%s(%s)), target);", 
+                col.getViewColumn().getColumnNumber(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
+            }
             case PSORT:
                 break;
             case ZONED:
-                sb.append(String.format("        ZonedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                //sb.append(String.format("        ZonedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
                 break;
             default:
                 return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
         }
         return sb.toString();
     }
-
 
 }

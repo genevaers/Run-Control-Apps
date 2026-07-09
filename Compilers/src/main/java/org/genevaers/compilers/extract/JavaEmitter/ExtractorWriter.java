@@ -48,13 +48,16 @@ public class ExtractorWriter {
     //private static Collection<JoinGenerator> joins;
     protected static Collection<LookupInfo> joins;
 
-	public static void write(List<String> filterRecs, List<String> columnRecs, List<String> inputdds, int outLen, int lrLen){
+	public static void write(List<String> srcdefs, List<String> coldefs, List<String> lkfdefs, List<String> filterRecs, List<String> columnRecs, List<String> inputdds, int outLen, int lrLen){
 		configureFreeMarker();
         Template template;
         try {
             //ClassLoader loader = Thread.currentThread().getContextClassLoader();
             template = cfg.getTemplate(EXTRACTOR_TEMPLATE);
             Map<String, Object> nodeMap = new HashMap<>();
+            nodeMap.put("srcdefs", srcdefs);
+            nodeMap.put("coldefs", coldefs);
+            nodeMap.put("lkfdefs", lkfdefs);
             nodeMap.put("filterRecs", filterRecs);
             nodeMap.put("columnRecs", columnRecs);
             nodeMap.put("inputdds", inputdds);

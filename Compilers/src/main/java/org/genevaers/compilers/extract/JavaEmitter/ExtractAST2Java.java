@@ -56,7 +56,10 @@ public class ExtractAST2Java {
         try {
             generateJavaEntries(root);
             ExtractorWriter.addJoinInitialisation();
-            ExtractorWriter.write(  ExtractRecordGenerator.getFilterRecs(), 
+            ExtractorWriter.write(  ExtractRecordGenerator.getSourceFieldDefinitons(),
+                                    ExtractRecordGenerator.getColumnFieldDefinitons(),
+                                    ExtractRecordGenerator.getLookupFieldDefinitons(),
+                                    ExtractRecordGenerator.getFilterRecs(), 
                                     ExtractRecordGenerator.getColumnRecs(), 
                                     ExtractRecordGenerator.getInputDDnames(), 
                                     ExtractRecordGenerator.getOutputLength(), 

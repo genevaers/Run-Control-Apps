@@ -65,6 +65,11 @@ under the License.
 			<groupId>com.google.flogger</groupId>
 			<artifactId>flogger-system-backend</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>jzos</artifactId>
+			<version>2.4.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>

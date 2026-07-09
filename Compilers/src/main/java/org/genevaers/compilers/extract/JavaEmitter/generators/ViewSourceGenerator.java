@@ -1,20 +1,28 @@
 package org.genevaers.compilers.extract.JavaEmitter.generators;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
+import java.util.Map.Entry;
 import org.genevaers.compilers.base.ASTBase;
-import org.genevaers.compilers.extract.JavaEmitter.ExtractorEntry;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.compilers.extract.astnodes.LookupPathAST;
 import org.genevaers.compilers.extract.astnodes.ViewSourceAstNode;
 import org.genevaers.repository.Repository;
-import org.genevaers.repository.components.LookupPath;
+import org.genevaers.repository.components.ComponentNode;
+import org.genevaers.repository.components.FieldPositionComparator;
+import org.genevaers.repository.components.LRField;
+import org.genevaers.repository.components.LogicalRecord;
+import org.genevaers.repository.components.ViewColumn;
+import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.ViewSource;
+import org.genevaers.repository.components.enums.DataType;
 
 import com.google.common.flogger.FluentLogger;
 
@@ -36,6 +44,9 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         //Want to separate out the extract filter lookups
         lookAheadForJoins(vst, 0, false);
         logJoins();
+        generateSourceLRFields(vst);
+        generateViewColumnFields(vst);
+        generateLookupFields(vst);
         generateFromChildNodes(vst);
         outputLength = vst.getAreaValues().getDtLen();
         lrLength = Repository.getLRLength(vst.getViewSource().getSourceLRID());
@@ -44,6 +55,172 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         columnRecs.add(String.format("            outWriter.getRecordToFill().bytes.position(%d);\n" + //
                         "            outWriter.writeAndClearTheRecord();\n", outputLength));
      }
+
+    private void generateLookupFields(ViewSourceAstNode vst) {
+        columnLookupIds.entrySet().stream().forEach(e -> addLookupFieldHolder(e));
+        
+    }
+
+    private void  addLookupFieldHolder(Entry<Integer, LookupInfo> e) {
+        String lkname = e.getValue().getLkast().getLookup().getName();
+        LogicalRecord targlr = e.getValue().getLkast().getLookup().getTargetLR();
+        Iterator<LRField> rfi = targlr.getIteratorForFieldsByID();
+        List<LRField> fieldsByPosition = new ArrayList<>();
+        while(rfi.hasNext()) {
+            fieldsByPosition.add(rfi.next());
+        }
+        FieldPositionComparator fpc = new FieldPositionComparator();
+        Collections.sort(fieldsByPosition, fpc);
+
+        Iterator<LRField> fbpi = fieldsByPosition.iterator();
+        while (fbpi.hasNext()) {
+            LRField lrf = fbpi.next();
+            String lkfldName = lkname + "_" + lrf.getName();
+            addFieldToHolders(lkfldName, lrf, lrf.getDatatype(), lrf.getLength(), lrf.isSigned(), lrf.getNumDecimalPlaces(), lookupFieldHolders);
+        }
+    }
+
+    private void addFieldToHolders(String name, ComponentNode node, DataType dataType, short length, boolean signed, int numDecimals, Map<String, ComponentFieldHolder> holders) {
+        switch(dataType) {
+            case ALPHA:
+                break;
+            case ALPHANUMERIC: {
+                //To cater for redefines we will need to set the offset directly - or correct for redefines
+                //Detect redefines as we iterate through the fields?
+                ComponentFieldHolder cfh = new ComponentFieldHolder(node);
+                cfh.setAccessor("getString");
+                cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d)", name, length));
+                holders.put(name, cfh);
+                break;
+            }
+            case BCD:
+                break;
+            case BINARY:
+                addBinaryField(name, node, length, signed, holders);
+                break;
+            case BSORT:
+                break;
+            case CONSTDATE:
+                break;
+            case CONSTNUM:
+                break;
+            case CONSTSTRING:
+                break;
+            case EDITED: {
+                ComponentFieldHolder cfh = new ComponentFieldHolder(node);
+                cfh.setAccessor("getString");
+                cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d); //For Edited Numeric", name, length));
+                holders.put(name, cfh);
+                break;
+            }
+            case FLOAT:
+                break;
+            case GENEVANUMBER:
+                break;
+            case INVALID:
+                break;
+            case MASKED:
+                break;
+            case PACKED: {
+                addPackedField(name, node, length, signed, numDecimals, holders);
+                break;
+            }
+            case PSORT:
+                break;
+            case ZONED:
+                break;
+            default: {
+                ComponentFieldHolder cfh = new ComponentFieldHolder(node);
+                cfh.setAccessor("Default");
+                cfh.setDefinition(String.format("//private static final TBD %s = factory.getStringField(%d)", name, length));
+                holders.put(name, cfh);
+                break;
+            }
+            
+        }
+    }
+
+    private void generateViewColumnFields(ViewSourceAstNode vst) {
+        ViewNode view = Repository.getViews().get(vst.getViewSource().getViewId());
+        Iterator<ViewColumn> ci = view.getColumnIterator();
+        while(ci.hasNext()) {
+            ViewColumn col = ci.next();
+            addFieldToHolders("COL_" + col.getColumnNumber(), col, col.getDataType(), col.getFieldLength(), col.isSigned(), col.getDecimalCount(), columnFieldHolders);
+        }
+    }
+
+    private void generateSourceLRFields(ViewSourceAstNode vst) {
+        ViewSource vs = vst.getViewSource();
+        LogicalRecord lr = Repository.getLogicalRecords().get(vs.getSourceLRID());
+        //We really want the fields sorted by position
+        
+        List<LRField> fieldsByPosition = new ArrayList<>();
+        Iterator<LRField> rfi = lr.getIteratorForFieldsByID();
+        while(rfi.hasNext()) {
+            fieldsByPosition.add(rfi.next());
+        }
+        FieldPositionComparator fpc = new FieldPositionComparator();
+        Collections.sort(fieldsByPosition, fpc);
+
+        Iterator<LRField> fbpi = fieldsByPosition.iterator();
+        while (fbpi.hasNext()) {
+            LRField lrf = fbpi.next();
+            addFieldToHolders(lrf.getName(), lrf, lrf.getDatatype(), lrf.getLength(), lrf.isSigned(), lrf.getNumDecimalPlaces(), sourceFieldHolders);
+        }
+    }
+
+    private void addBinaryField(String name, ComponentNode node, short length, boolean signed, Map<String, ComponentFieldHolder> holders) {
+        ComponentFieldHolder cfh = new ComponentFieldHolder(node);
+        if ((length <= 0 || length >= 4) && (length != 4 || !signed)) {
+            if (length <= 8) {
+                cfh.setAccessor("getLong");
+                cfh.setDefinition(String.format("private static final BinaryAsLongField %s = factory.getBinaryAsLongField(%d, %b)", name, length, signed));
+            } else if (length > 8) {
+                cfh.setAccessor("getBigInteger");
+                cfh.setDefinition(String.format("private static final BinaryAsBigIntegerField %s = factory.getBinaryAsBigIntegerField(%d, %b)", name, length, signed));
+            } else {
+                cfh.setAccessor("illegal length");
+            }
+        } else {
+                cfh.setAccessor("getInt");
+                cfh.setDefinition(String.format("private static final BinaryAsIntField %s = factory.getBinaryAsIntField(%d, %b)", name, length, signed));
+        }
+        holders.put(name, cfh);
+    }
+
+    private void addStringFieldtoDefinitions(LRField f, List<String> defs) {
+        defs.add(String.format("private static final StringField %s = factory.getStringField(%d);", f.getName(), f.getLength()));
+    }
+    private String getStringFieldDefinitions(LRField f) {
+        return String.format("private static final StringField %s = factory.getStringField(%d);", f.getName(), f.getLength());
+    }
+
+    private void addPackedField(String name, ComponentNode node, short length, boolean signed, int numDecimals, Map<String, ComponentFieldHolder> holders) {
+        // private static final PackedDecimalAsIntField AdmissionDate =
+        // factory.getPackedDecimalAsIntField(7, true);
+        // Different lengths mean use different converters
+        int precision = length * 2 - 1;
+        ComponentFieldHolder fh = new ComponentFieldHolder(node);
+        if (numDecimals > 0) {
+            fh.setAccessor("getBigDecimal");
+            fh.setDefinition(String.format("private static final PackedDecimalAsBigDecimalField %s = factory.getPackedDecimalAsBigDecimalField(%d, %d, %b);", name, length, numDecimals, signed));
+        } else if (numDecimals < 0) {
+            fh.setAccessor("getBigDecimal");
+            fh.setDefinition(String.format("private static final PackedDecimalAsBigDecimalField %s = factory.getPackedDecimalAsBigDecimalField(%d, %d, %b);", name, length, numDecimals, signed));
+        } else if (precision <= 9) {
+            fh.setAccessor("getInt");
+            fh.setDefinition(String.format("private static final PackedDecimalAsIntField %s = factory.getPackedDecimalAsIntField(%d, %b);", name, length, signed));
+        } else if (precision <= 18) {
+            fh.setAccessor("getLong");
+            fh.setDefinition(String.format("private static final PackedDecimalAsLongField %s = factory.getPackedDecimalAsLongField(%d, %b);", name, length, signed));
+        } else if (precision <= 31) {
+            fh.setAccessor("getBigInteger");
+            fh.setDefinition(String.format("private static final PackedDecimalAsBigIntegerField %s = factory.getPackedDecimalAsBigIntegerField(%d, %d, %b);", name, length, numDecimals, signed));
+        } else {
+            fh.setAccessor("length too long");
+        }
+        holders.put(name, fh);
+    }
 
     //Want the levels to check for hidden?
     //Probably better to loo at parents?

@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.JavaEmitter.ExtractorEntry;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.FieldHolder;
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
@@ -41,6 +44,9 @@ public abstract class ExtractRecordGenerator {
     protected static int valueNumber = 0;
     protected List<ExtractorEntry> exrecs = new ArrayList<>();
 
+    protected static Map<String, ComponentFieldHolder> sourceFieldHolders = new LinkedHashMap<>();
+    protected static Map<String, ComponentFieldHolder> columnFieldHolders = new LinkedHashMap<>();
+    protected static Map<String, ComponentFieldHolder> lookupFieldHolders = new LinkedHashMap<>();
     protected static List<String> filterRecs = new ArrayList<>();
     protected static List<String> columnRecs = new ArrayList<>();
     protected static List<String> inputDDnames = new ArrayList<>();
@@ -261,6 +267,12 @@ public abstract class ExtractRecordGenerator {
         return "No code generated for node " + node.getClass().getSimpleName();
     }
 
+    public static List<String> getSourceFieldDefinitons() {
+        List<String> defs = new ArrayList<>();
+        sourceFieldHolders.values().stream().forEach(c -> defs.add(c.getDefinition()));
+        return defs;
+    }
+
     public static List<String> getFilterRecs() {
         return filterRecs;
     }
@@ -300,6 +312,18 @@ public abstract class ExtractRecordGenerator {
     protected String getValueName() {
         return "value_" + valueNumber++;
      }
+
+    public static List<String> getColumnFieldDefinitons() {
+        List<String> defs = new ArrayList<>();
+        columnFieldHolders.values().stream().forEach(c -> defs.add(c.getDefinition()));
+        return defs;
+    }
+
+    public static List<String> getLookupFieldDefinitons() {
+        List<String> defs = new ArrayList<>();
+        lookupFieldHolders.values().stream().forEach(c -> defs.add(c.getDefinition()));
+        return defs;
+    }
 
 
 }

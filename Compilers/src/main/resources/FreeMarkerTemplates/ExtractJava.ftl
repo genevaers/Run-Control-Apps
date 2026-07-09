@@ -18,6 +18,12 @@ import org.genevaers.genevaio.recordreader.RecordFileWriter;
 import org.genevaers.utilities.GersCodePage;
 import org.genevaers.utilities.GersConfigration;
 import com.google.common.flogger.FluentLogger;
+import com.ibm.jzos.fields.AssemblerDatatypeFactory;
+import com.ibm.jzos.fields.BinaryAsIntField;
+import com.ibm.jzos.fields.ByteArrayField;
+import com.ibm.jzos.fields.PackedDecimalAsBigDecimalField;
+import com.ibm.jzos.fields.PackedDecimalAsIntField;
+import com.ibm.jzos.fields.StringField;
 
 import org.genevaers.engine.runcolumns.*;
 
@@ -30,6 +36,21 @@ import org.genevaers.engine.runcolumns.*;
  
 public class PECode extends Extract {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    protected static AssemblerDatatypeFactory factory = new AssemblerDatatypeFactory();
+//Source LR Fields
+<#list srcdefs as def>
+    ${def};
+</#list>
+
+//Column Fields
+<#list coldefs as coldef>
+    ${coldef};
+</#list>
+
+//Lookup Fields
+<#list lkfdefs as lkfdef>
+    ${lkfdef};
+</#list>
 
     public PECode() {
 //Input DD names ${inputdds?size}
