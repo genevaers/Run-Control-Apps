@@ -19,11 +19,11 @@ package org.genevaers.runcontrolanalyser.ltcoverage;
  * under the License.
  */
 
-
-import java.io.IOException;
 import java.nio.file.Path;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.flogger.FluentLogger;
 
 public class LtCoverageYamlWriter {
@@ -34,7 +34,7 @@ public class LtCoverageYamlWriter {
     public static void writeYaml(Path output, LTCoverageFile ltcovFile) {
         try {
             yamlMapper.writeValue(output.toFile(), ltcovFile);
-        } catch (IOException e) {
+        } catch (JacksonIOException e) {
             logger.atSevere().log("write coverage failed\n%s", e.getMessage());
         }
     }

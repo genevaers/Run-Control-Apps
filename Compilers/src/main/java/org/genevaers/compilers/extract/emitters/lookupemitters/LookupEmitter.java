@@ -85,8 +85,12 @@ public class LookupEmitter extends CodeEmitter {
         // First step mean JOIN or LKLR
         LogicTableF1 retEntry = null;
         LookupPath lookup = lookupAST.getLookup();
+        if(lookup == null) {
+            logger.atSevere().log("LookupEmitter.emitJoin called with null LookupPath in LookupPathAST ");
+            return null;
+        }
         optimizable = isLookupOptimizable(lookup);
-        Iterator<LookupPathStep> si = lookup.getStepIterator();
+        Iterator<LookupPathStep> si = lookup !=null ? lookup.getStepIterator(): null;
         //Uncomment me for some help lookup.dumpDetails("emitJoin");
         while (si.hasNext()) {
             LookupPathStep step = si.next();
@@ -388,7 +392,9 @@ public class LookupEmitter extends CodeEmitter {
             if(firstLookupRecord != null) {
                 firstLookupRecord.setGotoRow1(joinT);
             }
+            if(lusm != null) {
             lusm.setGotoRow1(joinT);
+            }
         }
         if(joinF != null) {
             setFalseGotos(joinF);

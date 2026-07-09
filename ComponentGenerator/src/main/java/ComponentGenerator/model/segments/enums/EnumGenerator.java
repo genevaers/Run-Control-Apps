@@ -30,14 +30,11 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.google.common.flogger.FluentLogger;
 
 import ComponentGenerator.model.generators.GeneratorBase;
-import ComponentGenerator.model.segments.ModelSegment;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 public class EnumGenerator extends GeneratorBase {
 

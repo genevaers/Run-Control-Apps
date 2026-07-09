@@ -18,12 +18,7 @@ package ComponentGenerator.model.segments.components.members;
  */
 
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 /*
  * Make this a base type

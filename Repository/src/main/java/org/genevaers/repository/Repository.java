@@ -36,6 +36,7 @@ import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
+import org.genevaers.repository.components.OutputFile;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.UserExit;
 import org.genevaers.repository.components.ViewDefinition;
@@ -87,6 +88,7 @@ public class Repository {
 	private static ComponentCollection<LookupPath> lookups = new ComponentCollection<LookupPath>();
 	private static ComponentCollection<ViewNode> views = new ComponentCollection<ViewNode>();
 	private static ComponentCollection<ViewNode> formatViews = new ComponentCollection<ViewNode>();
+	private static ComponentCollection<OutputFile> outputFiles = new ComponentCollection<OutputFile>();
 	private static JoinViewsManager jvm = new JoinViewsManager();
 
 	private static ExtractDependencyCache dependencyCache = new ExtractDependencyCache();
@@ -116,6 +118,7 @@ public class Repository {
 		views = new ComponentCollection<ViewNode>();
 		formatViews = new ComponentCollection<ViewNode>();
 		jvm = new JoinViewsManager();	
+		outputFiles = new ComponentCollection<OutputFile>();
 		compilerErrors.clear();
 		warnings.clear();
 		dependencyCache.clear();
@@ -253,6 +256,11 @@ public class Repository {
     public static OptionalInt getMaxFileID() {
 		return lfs.getValues().stream().mapToInt(lf -> lf.getID()).max();
     }
+
+	public static ComponentCollection<OutputFile> getOutputFiles() {
+		return outputFiles;
+	}
+
 
 	public static void addPhysicalFile(PhysicalFile pf) {
 		// The Record ID is the LF number
@@ -468,12 +476,16 @@ public class Repository {
 			view.fixupMaxHeaderLines();
 			fixupSortKeyTitles(view);
 			fixupOutputFile(view);
+			// Add OutputFile to Repository after it's been set up
+			if(view.getOutputFile() != null) {
+				outputFiles.add(view.getOutputFile(), view.getID(), view.getName());
+			}
 		}
 	}
 
 	private static void fixupOutputFile(ViewNode view) {
 		if(view.getOutputFile().getOutputDDName().isEmpty() && view.getViewDefinition().getDefaultOutputFileId() > 0) {
-			PhysicalFile pf = pfs.get(view.getViewDefinition().getDefaultOutputFileId()); 
+			PhysicalFile pf = pfs.get(view.getViewDefinition().getDefaultOutputFileId());
 			if(pf != null) {
 				view.setOutputFileFrom(pf);
 			} else {

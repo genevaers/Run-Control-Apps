@@ -147,4 +147,17 @@ public class ViewColumnSourceAstNode extends ExtractBaseAST implements Emittable
             }
         }
     }
+
+    public void checkSktDataTypes() {
+        ViewSortKey vsk = Repository.getViews().get(currentViewColumn.getViewId()).getViewSortKeyFromColumnId(currentViewColumn.getComponentId());
+        if (vsk != null) {
+            String sktDt = vsk.getSktDataType() != null ? vsk.getSktDataType().value() : vsk.getSortKeyDataType().value();
+            String dt = currentViewColumn.getDataType().value();
+            System.out.println("Checking SKT data type " + sktDt + " against column data type " + dt);
+            if (!sktDt.equalsIgnoreCase(dt)) {
+                CompilerMessage cm = ExtractBaseAST.makeCompilerMessage("Sort Title Lookup field data type is not compatible with Sort Key data type for column " + vcs.getColumnNumber());
+                Repository.addErrorMessage(cm);
+            }
+        }
+    }
 }

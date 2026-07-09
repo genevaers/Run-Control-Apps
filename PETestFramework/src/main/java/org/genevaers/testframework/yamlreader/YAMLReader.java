@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.flogger.FluentLogger;
 
 import org.genevaers.utilities.GenevaLog;
@@ -52,7 +52,6 @@ public class YAMLReader {
         GenevaLog.initLoggerWithColours("YAML Reader", Level.FINE);
         logger.atConfig().log("YAML Reader");
         mapper = new ObjectMapper(new YAMLFactory());
-        mapper.findAndRegisterModules();
     }
 
     public Spec readSpec(String path) throws StreamReadException, DatabindException, IOException {
