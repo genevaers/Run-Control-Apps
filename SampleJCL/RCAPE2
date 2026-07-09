@@ -1,0 +1,137 @@
+//RCAPE2 JOB (ACCT),'JAVA RCA PE2',
+//************************************************************
+//*
+//* This job will run java created by RCA PE
+//*
+//* 1) Change the HLQ to your personal HLQ
+//* 2) Change the MLQ to something appropriate for the test
+//* 3) Add the source and reference files required for test
+//*    This example has some Demo data sets included
+//*
+//************************************************************
+//          NOTIFY=&SYSUID.,
+//          CLASS=A,
+//          MSGLEVEL=(1,1),
+//          MSGCLASS=H
+//*
+//         EXPORT SYMLIST=(USER,MLQ)
+//         SET USER=GTEST
+//         SET HLQ=<userid>
+//         SET MLQ=DEMO
+//*
+//         JCLLIB ORDER=AJV.V21R0M0.PROCLIB
+//*
+//JOBLIB   DD DISP=SHR,DSN=AJV.V21R0M0.SIEALNKE
+//*
+//*********************************************************************
+//*   DELETE DATA SETS
+//*********************************************************************
+//*
+//DELETE    EXEC PGM=IDCAMS
+//*
+//SYSPRINT  DD SYSOUT=*,DCB=(LRECL=133,BLKSIZE=12901,RECFM=FBA)
+//*
+//SYSIN     DD *,SYMBOLS=JCLONLY
+ DELETE  GEBT.&USER..&MLQ..JAVAPE.LOG PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..JAVAPE.EXT1 PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..JAVAPE.SXT1 PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..SYSMDUMP PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+//*******************************************************************
+//* Licensed Materials - Property of IBM
+//* 5655-DGJ
+//* Copyright IBM Corp. 1997, 2021
+//* STATUS = HJVBB00
+//*
+//*******************************************************************
+//JAVA EXEC PROC=JVMPRC21,
+// JAVACLS='org.genevaers.engine.Engine'
+//STDENV DD *
+. /etc/profile
+export JAVA_HOME=/Java/J21.0_64
+export IBM_JAVA_OPTIONS="-Dfile.encoding=ISO8859-1"
+export APP_HOME=/u/<userid>/git/public/RCA_jar
+export APP_NAME=pe-latest.jar
+export CLASSPATH=$APP_HOME:"$JAVA_HOME"/lib
+LIBPATH=/lib:/usr/lib:"$JAVA_HOME"/bin
+LIBPATH="$LIBPATH":"$JAVA_HOME"/lib
+LIBPATH="$LIBPATH":"$JAVA_HOME"/lib/j9vm
+export LIBPATH="$LIBPATH":
+CLASSPATH="$CLASSPATH":"$APP_HOME"/"$APP_NAME"
+echo $CLASSPATH
+export CLASSPATH="$CLASSPATH":
+
+# Configure JVM options
+#   -Xms sets the minimum heap size
+#   -Xmx sets the maximum heap size
+#   You can increase these values if you are encountering memory problems.
+IJO="-Xms16m -Xmx512m"
+# Uncomment the following to aid in debugging "Class Not Found" problems
+#IJO="$IJO -verbose:class"
+IJO="$IJO -Dfile.encoding=ISO8859-1"
+export IBM_JAVA_OPTIONS="$IJO "
+//*
+//*        INPUTS
+//PEPARM DD *
+# Input
+LOG_LEVEL=DEBUG # DEBUG or STANDARD
+//*
+//*        <<< INPUT REFERENCE FILES >>>
+//*
+//*CUSTNAME DD DISP=SHR,DSN=&HLQ..GVBDEMO.CUSTNAME
+//*CUSTOMER DD DISP=SHR,DSN=&HLQ..GVBDEMO.CUSTOMER
+//*CUSTADDR DD DISP=SHR,DSN=&HLQ..GVBDEMO.CUSTADDR
+//*ORDER001 DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDER
+//*PRODDESC DD DISP=SHR,DSN=&HLQ..GVBDEMO.PRODDESC
+//*STORE001 DD DISP=SHR,DSN=&HLQ..GVBDEMO.STOREADR
+//* REFR001  DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDER
+//* REFR001  DD DISP=SHR,DSN=&HLQ..GVBDEMO.SMALL.ORDER
+//REFR002  DD DISP=SHR,DSN=GEBT.&USER..&MLQ..TEST.MR95.RED1
+//REFR001  DD DISP=SHR,DSN=GEBT.&USER..&MLQ..TEST.MR95.RED2
+//*
+//*        <<< INPUT SOURCE FILES >>>
+//*
+//ORDIT001 DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDITM01.SMALL
+//ORDIT002 DD DUMMY
+//ORDIT003 DD DUMMY
+//*RDIT001 DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDITM01
+//*RDIT002 DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDITM02
+//*RDIT003 DD DISP=SHR,DSN=&HLQ..GVBDEMO.ORDITM03
+//*
+//*        OUTPUT GENEVA FILES
+//*
+//PERPT    DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//CEEDUMP  DD SYSOUT=*
+//PELOG    DD DSN=GEBT.&USER..&MLQ..JAVAPE.LOG,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(20,20),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=8192)
+//*
+//IDIOFF   DD DUMMY
+//*
+//DUMMYOUT DD DSN=GEBT.&USER..&MLQ..JAVAPE.EXT1,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(20,20),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=8192)
+//*
+//SORT001  DD DSN=GEBT.&USER..&MLQ..JAVAPE.SXT1,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(1,1),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=8192)
+//*
+//SYSMDUMP DD DSN=GEBT.&USER..&MLQ..SYSMDUMP,
+//            DISP=(NEW,DELETE,CATLG),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(1000,1000),RLSE),
+//            DCB=(DSORG=PS,RECFM=FBS,LRECL=4160)

@@ -1,0 +1,160 @@
+//RCAPE1 JOB (ACCT),'JAVA RCA PE1',
+//************************************************************
+//*
+//* This job will create PECode.java using RCA java
+//*
+//* This job reads from Workbench Db2
+//*
+//* 1) Change the HLQ to your personal HLQ
+//* 2) Change the MLQ to something appropriate for the test
+//* 3) Check the RCAPARM and DBVIEWS are pointing to
+//*    correct Db2 and view
+//* 4) Check you are pointing to the correct RCA build path
+//*    in STDENV 
+//* 5) Set logon details for Db2 in the JINFO data set  
+//* 6) Check PEJAVA references /u/<tso-userid>/PEJAVA/PECode.java 
+//*
+//************************************************************
+//          NOTIFY=&SYSUID.,
+//          CLASS=A,
+//          MSGLEVEL=(1,1),
+//          MSGCLASS=H
+//*
+//         EXPORT SYMLIST=(USER,MLQ)
+//         SET USER=GTEST
+//         SET MLQ=DEMO.JAVAPE
+//*
+//         JCLLIB ORDER=AJV.V21R0M0.PROCLIB
+//*
+//JOBLIB   DD DISP=SHR,DSN=AJV.V21R0M0.SIEALNKE
+//*
+//*********************************************************************
+//*   DELETE DATA SETS
+//*********************************************************************
+//*
+//DELETE    EXEC PGM=IDCAMS
+//*
+//SYSPRINT  DD SYSOUT=*,DCB=(LRECL=133,BLKSIZE=12901,RECFM=FBA)
+//*
+//SYSIN     DD *,SYMBOLS=JCLONLY
+ DELETE  GEBT.&USER..&MLQ..GRCA.VDPRPT PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..GRCA.XLTRPT PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..GRCA.JLTRPT PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..GRCA.VDP PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..GRCA.XLT PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+ DELETE  GEBT.&USER..&MLQ..GRCA.JLT PURGE
+ IF LASTCC > 0  THEN        /* IF OPERATION FAILED,     */    -
+     SET MAXCC = 0          /* PROCEED AS NORMAL ANYWAY */
+//*******************************************************************
+//* Licensed Materials - Property of IBM
+//* 5655-DGJ
+//* Copyright IBM Corp. 1997, 2021
+//* STATUS = HJVBB00
+//*
+//*******************************************************************
+//JAVA EXEC PROC=JVMPRC21,
+// JAVACLS='org.genevaers.rcapps.Runner'
+//STDENV DD *
+. /etc/profile
+export JAVA_HOME=/Java/J21.0_64
+export IBM_JAVA_OPTIONS="-Dfile.encoding=ISO8859-1"
+export APP_HOME=/u/<userid>/git/public/RCA_jar <-- $GERS_RCA_JAR_DIR
+export APP_NAME=rcapps-latest.jar
+export CLASSPATH=$APP_HOME:"$JAVA_HOME"/lib
+LIBPATH=/lib:/usr/lib:"$JAVA_HOME"/bin
+LIBPATH="$LIBPATH":"$JAVA_HOME"/lib
+LIBPATH="$LIBPATH":"$JAVA_HOME"/lib/j9vm
+export LIBPATH="$LIBPATH":
+CLASSPATH="$CLASSPATH":"$APP_HOME"/"$APP_NAME"
+echo $CLASSPATH
+export CLASSPATH="$CLASSPATH":
+
+# Configure JVM options
+#   -Xms sets the minimum heap size
+#   -Xmx sets the maximum heap size
+#   You can increase these values if you are encountering memory problems.
+IJO="-Xms16m -Xmx512m"
+# Uncomment the following to aid in debugging "Class Not Found" problems
+#IJO="$IJO -verbose:class"
+IJO="$IJO -Dfile.encoding=ISO8859-1"
+export IBM_JAVA_OPTIONS="$IJO "
+//       DD DISP=SHR,DSN=<userid>.JINFO      <-- for db2 logon
+//*
+//*        INPUTS
+//*
+//RCAPARM DD *
+# Input
+GENERATE_RC_FILES=Y
+GENERATE_PE_CODE=Y
+INPUT_TYPE=DB2
+DB_SERVER=xxx.yyy.com
+DB_PORT=nnnn
+DB_DATABASE=abc
+DB_SCHEMA=SAFRxxx
+ENVIRONMENT_ID=806
+#
+# Reports required
+#
+XLT_REPORT=N
+JLT_REPORT=N
+VDP_REPORT=N
+REPORT_FORMAT=TEXT
+COVERAGE=Y
+RCA_REPORT=N
+LOG_LEVEL=DEBUG
+PE_CODE_DIR=PEJAVA
+//*
+//DBVIEWS DD *
+# view numbers
+12276
+
+//*
+//*        OUTPUT FILES
+//*
+//RCARPT  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
+//RCALOG  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
+//VDPNEW   DD DSN=GEBT.&USER..&MLQ..GRCA.VDP,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(CYL,(100,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=8192,BLKSIZE=0)
+//*
+//JLTNEW   DD DSN=GEBT.&USER..&MLQ..GRCA.JLT,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(100,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=4004,BLKSIZE=32036)
+//*
+//XLTNEW   DD DSN=GEBT.&USER..&MLQ..GRCA.XLT,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(CYL,(100,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=4004,BLKSIZE=32036)
+//XLTRPT   DD DSN=GEBT.&USER..&MLQ..GRCA.XLTRPT,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(10,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=150)
+//JLTRPT   DD DSN=GEBT.&USER..&MLQ..GRCA.JLTRPT,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(10,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=150)
+//VDPRPT   DD DSN=GEBT.&USER..&MLQ..GRCA.VDPRPT,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=SYSDA,
+//            SPACE=(TRK,(10,50),RLSE),
+//            DCB=(DSORG=PS,RECFM=VB,LRECL=150)
+//*PEJAVA  DD SYSOUT=*,DCB=(RECFM=VB,LRECL=255)
+//PEJAVA  DD PATH='/u/<userid>/PEJAVA/PECode.java',
+//     PATHOPTS=(ORDWR,OCREAT,OTRUNC),PATHMODE=(SIRWXU,SIRWXG,SIROTH)
