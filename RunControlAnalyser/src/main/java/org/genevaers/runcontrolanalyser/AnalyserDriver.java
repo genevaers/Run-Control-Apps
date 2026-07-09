@@ -36,7 +36,6 @@ import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
 import org.genevaers.genevaio.ltfile.writer.LTCSVWriter;
 import org.genevaers.genevaio.report.LogicTableTextWriter;
-import org.genevaers.genevaio.report.VDPReportWriter;
 import org.genevaers.genevaio.report.VDPTextWriter;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolanalyser.ltcoverage.LTCoverageAnalyser;
@@ -212,18 +211,23 @@ public class AnalyserDriver {
 			case "TXT":
 				VDPTextWriter vdptw = new VDPTextWriter();
 				vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
-				VDPReportWriter  vdptnw = new VDPReportWriter ();
-				vdptnw.writeFromRecordNodes(recordsRoot, "VPDRPTNEW.txt", generation);
+				break;
+			case "CSV":
 				break;
 			case "HTML":
 				VDPRecordsHTMLWriter vdprw = new VDPRecordsHTMLWriter();
 				vdprw.setIgnores();
-				vdprw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName());
+				vdprw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName());					
 				break;
+		
 			default:
-				logger.atSevere().log("Invalid or no VDP report format specified.");
 				break;
 		}
+	}
+
+	public void writeCoverageResults(Path root) {
+		ltCoverageAnalyser.setName(root.getFileName());
+		ltCoverageAnalyser.writeResults(root.resolve("rca"));
 	}
 
 	public void aggregateLtCoverage() {
