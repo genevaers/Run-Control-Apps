@@ -180,10 +180,6 @@ public class ViewNode extends ComponentNode{
 		return viewDef.getComponentId();
 	}
 
-	public String getStatus() {
-		return viewDef.getStatus().name();
-	}
-
 	public String getIDStr() {
 		return String.format("%7d", viewDef.getComponentId());
 	}
@@ -241,11 +237,6 @@ public class ViewNode extends ComponentNode{
 		outputFile.setName(pf.getName());
 		outputFile.setOutputDDName(pf.getOutputDDName());
 		outputFile.setFileType(pf.getFileType());
-		// Preserve logicalFilename if it was already set (e.g., by JLTView)
-		if (outputFile.getLogicalFilename() == null || outputFile.getLogicalFilename().isEmpty()) {
-			// Set a default logical filename based on the physical file
-			outputFile.setLogicalFilename("LF for " + pf.getName());
-		}
 	}
 
     public void setDefaultOutputFile() {

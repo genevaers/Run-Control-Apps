@@ -40,11 +40,5 @@ members:
 - name: SortTitleFieldId
   type: integer
   vdp_source: desc_xlr_field_id
-- name: lookupLR
-  type: string
-- name: lookupPathName
-  type: string
-- name: lookupField
-  type: integer
 
 

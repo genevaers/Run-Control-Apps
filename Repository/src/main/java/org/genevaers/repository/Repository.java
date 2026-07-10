@@ -44,7 +44,6 @@ import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.LrStatus;
 import org.genevaers.repository.components.enums.ReportFunction;
-import org.genevaers.repository.data.CompilerMessage;
 import org.genevaers.repository.data.ComponentCollection;
 import org.genevaers.repository.data.ExtractDependencyCache;
 import org.genevaers.repository.data.InputReport;
@@ -88,7 +87,6 @@ public class Repository {
 	private static ComponentCollection<LookupPath> lookups = new ComponentCollection<LookupPath>();
 	private static ComponentCollection<ViewNode> views = new ComponentCollection<ViewNode>();
 	private static ComponentCollection<ViewNode> formatViews = new ComponentCollection<ViewNode>();
-	private static ComponentCollection<OutputFile> outputFiles = new ComponentCollection<OutputFile>();
 	private static JoinViewsManager jvm = new JoinViewsManager();
 
 	private static ExtractDependencyCache dependencyCache = new ExtractDependencyCache();
@@ -118,7 +116,6 @@ public class Repository {
 		views = new ComponentCollection<ViewNode>();
 		formatViews = new ComponentCollection<ViewNode>();
 		jvm = new JoinViewsManager();	
-		outputFiles = new ComponentCollection<OutputFile>();
 		compilerErrors.clear();
 		warnings.clear();
 		dependencyCache.clear();
@@ -256,10 +253,6 @@ public class Repository {
     public static OptionalInt getMaxFileID() {
 		return lfs.getValues().stream().mapToInt(lf -> lf.getID()).max();
     }
-
-	public static ComponentCollection<OutputFile> getOutputFiles() {
-		return outputFiles;
-	}
 
 
 	public static void addPhysicalFile(PhysicalFile pf) {
@@ -476,10 +469,6 @@ public class Repository {
 			view.fixupMaxHeaderLines();
 			fixupSortKeyTitles(view);
 			fixupOutputFile(view);
-			// Add OutputFile to Repository after it's been set up
-			if(view.getOutputFile() != null) {
-				outputFiles.add(view.getOutputFile(), view.getID(), view.getName());
-			}
 		}
 	}
 
