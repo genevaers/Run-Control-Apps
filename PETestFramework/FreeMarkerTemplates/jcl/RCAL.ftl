@@ -40,7 +40,7 @@ ${env["GERS_TEST_HLQ"]}.${test.dataSet}</#macro>
 //* Execute the Run-Control App
 //*******************************************************************
 //*
-//JAVA EXEC PROC=JVMPRC16,
+//JAVA EXEC PROC=JVMPRC21,
 // JAVACLS='org.genevaers.rcapps.Runner'
 //*
 //STDENV DD *
