@@ -8,6 +8,7 @@ import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.compilers.extract.astnodes.StringAtomAST;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
+import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.enums.DataType;
 
 import com.google.common.flogger.FluentLogger;
@@ -72,8 +73,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
             String name = lfr.getLookup().getName() + "_" + redField.getName();
             String body = dtlEquivalentBasedOnTypes(joinBufString, redField , name);
-            String elseBody = String.format("System.arraycopy(String.format(\"%%-%ds\", \" \").getBytes(), 0, target, %d, %d);",
-                    redField.getLength(), col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength());
+            String elseBody = getElseBody(col); 
             return String.format(joinLogicFormat, body, elseBody);
         } else if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.STRINGATOM) {
             StringAtomAST sa = (StringAtomAST) src;
@@ -87,6 +87,18 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         } else {
             return "/* Assignment type not yet implemented " + trg.getType() + " = " + src.getType() + " */";
         }
+    }
+
+    private String getElseBody(ColumnAST col) {
+        // Else body is either a numerical 0 or a bunch of spaces
+        ViewColumn vc = col.getViewColumn();
+        if(vc.getDataType() == DataType.ALPHANUMERIC) {
+             return String.format("                COL_%d.putString(String.format(\"%%-%ds\", \" \"), target);", vc.getColumnNumber(), vc.getFieldLength());
+        } else {
+            //need the accessor here because different puts?
+             return String.format("                COL_%d.putString(String.format(\"%%-%ds\", \" \"), target);", vc.getColumnNumber(), vc.getFieldLength());
+        }
+        
     }
 
     private String dteEquivalentBasedOnTypes() {
@@ -165,9 +177,18 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 break;
             case BCD:
                 break;
-            case BINARY:
+            case BINARY: {
                 //sb.append(String.format("        Bin2ToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
+                Map<String, ComponentFieldHolder> holders;
+                if(source.equals("src")) {
+                    holders = sourceFieldHolders;
+                } else {
+                    holders = lookupFieldHolders;
+                }
+                sb.append(String.format("        COL_%d.putString(String.format(\"%%%dd\", %s.%s(%s)), target);", 
+                col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
+            }
             case BSORT:
                 break;
             case CONSTDATE:
