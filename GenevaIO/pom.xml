@@ -121,7 +121,6 @@ under the License.
 				<includes>
 					<include>application.properties</include>
 					<include>RCApps.ftl</include>
-					<include>templates/**/*.ftl</include>
 				</includes>
 			</resource>
 		</resources>

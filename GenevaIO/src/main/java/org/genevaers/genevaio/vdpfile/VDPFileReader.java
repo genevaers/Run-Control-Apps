@@ -410,10 +410,6 @@ public class VDPFileReader{
 		VDPFormatFile vffr = new VDPFormatFile();
 		vffr.readRecord(recordReader, rec);
 		currentVMD.setFormatFile(vffr);
-		// Populate the ViewNode's OutputFile from the VDP record
-		if (currentView != null) {
-			vffr.populateComponent(currentView.getOutputFile());
-		}
 		return vffr;
 	}
 
