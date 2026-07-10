@@ -388,7 +388,9 @@ public class LookupEmitter extends CodeEmitter {
             if(firstLookupRecord != null) {
                 firstLookupRecord.setGotoRow1(joinT);
             }
+            if(lusm != null) {
             lusm.setGotoRow1(joinT);
+            }
         }
         if(joinF != null) {
             setFalseGotos(joinF);

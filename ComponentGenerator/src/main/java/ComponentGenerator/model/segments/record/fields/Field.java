@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 import ComponentGenerator.model.NameUtils;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = IntegerField.class, name = "integer"),
         @JsonSubTypes.Type(value = ShortField.class, name = "short"),

@@ -32,9 +32,9 @@ import org.genevaers.testframework.yamlreader.YAMLReader;
 import org.genevaers.utilities.GersEnvironment;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.flogger.FluentLogger;
 
 public class SpecGenerator {
@@ -196,7 +196,7 @@ public class SpecGenerator {
                 saveSpecList();
                 saveSpec();
             }
-        } catch (JsonProcessingException e) {
+        } catch (JacksonIOException e) {
             logger.atSevere().log("Exception occurred in create new spec  \n%s", e.getMessage());
         }
     }
@@ -207,7 +207,7 @@ public class SpecGenerator {
     private void saveSpecList() {
         try {
              mapper.writeValue(new File(DEVGERS_TEST_SPEC_LIST), specFiles);
-        } catch (IOException e) {
+        } catch (JacksonIOException e) {
             logger.atSevere().log("Exception occurred in save dev spec list \n%s", e.getMessage());
         }
     }

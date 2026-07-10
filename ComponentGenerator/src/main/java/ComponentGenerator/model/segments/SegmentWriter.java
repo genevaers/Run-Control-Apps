@@ -20,9 +20,10 @@ package ComponentGenerator.model.segments;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 
 import freemarker.template.Configuration;
 
@@ -31,6 +32,6 @@ import freemarker.template.Configuration;
  */
 public interface SegmentWriter {
     
-    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, IOException;
+    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, JacksonIOException;
     
 }
