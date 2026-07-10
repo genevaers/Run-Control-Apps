@@ -44,6 +44,7 @@ import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.enums.LrStatus;
 import org.genevaers.repository.components.enums.ReportFunction;
+import org.genevaers.repository.data.CompilerMessage;
 import org.genevaers.repository.data.ComponentCollection;
 import org.genevaers.repository.data.ExtractDependencyCache;
 import org.genevaers.repository.data.InputReport;
