@@ -80,7 +80,7 @@
             "request": "launch",
             "mainClass": "org.genevaers.rcapps.Runner",
             "projectName": "rcapps",
-            "cwd": "${workspaceFolder}/../../RunControlPlay"
+            "cwd": "${workspaceFolder}/../../../RunControlPlayPen"
         },
         {
             "type": "java",
