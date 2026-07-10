@@ -21,6 +21,4 @@ members:
   type: short
 - name: endingPeriod
   type: short
-- name: maxExtrFileNum
-  type: short
 # We need to figure out how to represent the VDP File record that is associated with this type
