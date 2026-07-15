@@ -21,11 +21,20 @@ convE2A() {
     iconv -f"IBM-1047" -t"ISO8859-1" $1.old > $1                                                  
     chtag -c"ISO8859-1" -t $1                                                                     
     rm $1.old                                                                                     
-}                                                                                                 
-                                                                                                  
-cp ~/PEJAVA/PECode.java PerformanceEngine/target/generated-sources/org/genevaers/engine/extractor/
-# cd PerformanceEngine/target/generated-sources/org/genevaers/engine/extractor/                   
-convE2A PerformanceEngine/target/generated-sources/org/genevaers/engine/extractor/PECode.java     
+}             
+
+target_dir=PerformanceEngine/target/generated-sources/org ;                           
+[ -d $target_dir ] || mkdir $target_dir ;                                             
+target_dir=PerformanceEngine/target/generated-sources/org/genevaers ;                 
+[ -d $target_dir ] || mkdir $target_dir ;                                             
+target_dir=PerformanceEngine/target/generated-sources/org/genevaers/engine ;          
+[ -d $target_dir ] || mkdir $target_dir ;                                             
+target_dir=PerformanceEngine/target/generated-sources/org/genevaers/engine/extractor ;
+[ -d $target_dir ] || mkdir $target_dir ;                                             
+                                                                                                                                
+cp ~/PEJAVA/PECode.java $target_dir
+
+convE2A $target_dir/PECode.java     
 mvn clean                                                                                         
 mvn install -Ppe -DskipTests                                                                      
 if [[ ! -z "$GERS_RCA_JAR_DIR" ]]; then                                                           
