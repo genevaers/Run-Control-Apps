@@ -4,7 +4,7 @@
 
 Log on to z/OS UNIX using a git bash session e.g.
 
-ssh username@sp13.xxx.ibm.com
+ssh username@xxx.yyy.com
 
 1. Build RCA from branch 'PerformanceEngine'
 - git pull
