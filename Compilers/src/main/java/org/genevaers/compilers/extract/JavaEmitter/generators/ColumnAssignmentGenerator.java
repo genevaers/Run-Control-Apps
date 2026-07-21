@@ -218,8 +218,8 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 } else {
                     holders = lookupFieldHolders;
                 }
-                sb.append(String.format("        COL_%d.putString(String.format(\"%%f\", %s.%s(%s)), target);", 
-                col.getViewColumn().getColumnNumber(), fieldName, holders.get(fieldName).getAccessor(), source));
+                sb.append(String.format("        COL_%d.putString(String.format(\"%%%d.%df\", %s.%s(%s)), target);", 
+                col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), col.getViewColumn().getDecimalCount(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
             }
             case PSORT:
