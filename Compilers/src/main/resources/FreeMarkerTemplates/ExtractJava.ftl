@@ -4,6 +4,7 @@
 package org.genevaers.engine.extractor;
 
 import java.io.FileWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class PECode extends Extract {
 <#list srcdefs as def>
     ${def};
 </#list>
+
+    static {
+        factory.setOffset(0);
+    }
 
 //Column Fields
 <#list coldefs as coldef>
