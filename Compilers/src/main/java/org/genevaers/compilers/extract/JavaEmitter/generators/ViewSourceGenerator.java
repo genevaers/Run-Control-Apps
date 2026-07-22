@@ -4,6 +4,7 @@ package org.genevaers.compilers.extract.JavaEmitter.generators;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,7 +59,6 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
 
     private void generateLookupFields(ViewSourceAstNode vst) {
         columnLookupIds.entrySet().stream().forEach(e -> addLookupFieldHolder(e));
-        
     }
 
     private void  addLookupFieldHolder(Entry<Integer, LookupInfo> e) {
@@ -72,12 +72,14 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         FieldPositionComparator fpc = new FieldPositionComparator();
         Collections.sort(fieldsByPosition, fpc);
 
+        lookupFieldHolders = new LinkedHashMap<>();
         Iterator<LRField> fbpi = fieldsByPosition.iterator();
         while (fbpi.hasNext()) {
             LRField lrf = fbpi.next();
             String lkfldName = lkname + "_" + lrf.getName();
             addFieldToHolders(lkfldName, lrf, lrf.getDatatype(), lrf.getLength(), lrf.isSigned(), lrf.getNumDecimalPlaces(), lookupFieldHolders);
         }
+        lookupHoldersByName.put(lkname, lookupFieldHolders);
     }
 
     private void addFieldToHolders(String name, ComponentNode node, DataType dataType, short length, boolean signed, int numDecimals, Map<String, ComponentFieldHolder> holders) {

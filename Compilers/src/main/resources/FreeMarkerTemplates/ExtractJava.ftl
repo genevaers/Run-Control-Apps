@@ -53,8 +53,15 @@ public class PECode extends Extract {
 </#list>
 
 //Lookup Fields
-<#list lkfdefs as lkfdef>
+//Num lookups ${lkdefs?size}
+<#list lkdefs as lks>
+    static {
+        factory.setOffset(0);
+    }
+
+<#list lks as lkfdef>
     ${lkfdef};
+</#list>
 </#list>
 
     public PECode() {

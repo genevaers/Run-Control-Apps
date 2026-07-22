@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.genevaers.compilers.base.ASTBase;
@@ -47,6 +48,7 @@ public abstract class ExtractRecordGenerator {
     protected static Map<String, ComponentFieldHolder> sourceFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> columnFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> lookupFieldHolders = new LinkedHashMap<>();
+    protected static Map<String, Map<String, ComponentFieldHolder>> lookupHoldersByName = new LinkedHashMap<>();
     protected static List<String> filterRecs = new ArrayList<>();
     protected static List<String> columnRecs = new ArrayList<>();
     protected static List<String> inputDDnames = new ArrayList<>();
@@ -319,10 +321,17 @@ public abstract class ExtractRecordGenerator {
         return defs;
     }
 
-    public static List<String> getLookupFieldDefinitons() {
+    public static List<List<String>> getLookupFieldDefinitons() {
+        List<List<String>> retList = new ArrayList<>();
+        lookupHoldersByName.entrySet().stream().forEach(e -> addLookupDefs(e, retList));
+        return retList;
+    }
+
+    private static void addLookupDefs(Entry<String, Map<String, ComponentFieldHolder>> e, List<List<String>> lkFields) {
+        String lkname = e.getKey();
         List<String> defs = new ArrayList<>();
-        lookupFieldHolders.values().stream().forEach(c -> defs.add(c.getDefinition()));
-        return defs;
+        e.getValue().values().stream().forEach(c -> defs.add(c.getDefinition()));
+        lkFields.add(defs);
     }
 
 
