@@ -24,6 +24,7 @@ import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewNode;
 import org.genevaers.repository.components.ViewSource;
 import org.genevaers.repository.components.enums.DataType;
+import org.genevaers.repository.jltviews.JLTView;
 
 import com.google.common.flogger.FluentLogger;
 
@@ -63,8 +64,8 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
 
     private void  addLookupFieldHolder(Entry<Integer, LookupInfo> e) {
         String lkname = e.getValue().getLkast().getLookup().getName();
-        LogicalRecord targlr = e.getValue().getLkast().getLookup().getTargetLR();
-        Iterator<LRField> rfi = targlr.getIteratorForFieldsByID();
+        LogicalRecord redLR = Repository.getLogicalRecords().get(JLTView.JOINVIEWBASE + e.getValue().getLookupId());
+        Iterator<LRField> rfi = redLR.getIteratorForFieldsByID();
         List<LRField> fieldsByPosition = new ArrayList<>();
         while(rfi.hasNext()) {
             fieldsByPosition.add(rfi.next());
