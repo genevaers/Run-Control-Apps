@@ -64,8 +64,8 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
 
     private void  addLookupFieldHolder(Entry<Integer, LookupInfo> e) {
         String lkname = e.getValue().getLkast().getLookup().getName();
-        LogicalRecord redLR = Repository.getLogicalRecords().get(JLTView.JOINVIEWBASE + e.getValue().getLookupId());
-        Iterator<LRField> rfi = redLR.getIteratorForFieldsByID();
+        LogicalRecord targlr = e.getValue().getLkast().getLookup().getTargetLR();
+        Iterator<LRField> rfi = targlr.getIteratorForFieldsByID();
         List<LRField> fieldsByPosition = new ArrayList<>();
         while(rfi.hasNext()) {
             fieldsByPosition.add(rfi.next());
@@ -75,12 +75,32 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
 
         lookupFieldHolders = new LinkedHashMap<>();
         Iterator<LRField> fbpi = fieldsByPosition.iterator();
+        int startPos;
+        int nextPos = 1;
+        int keyLen = e.getValue().getKeyLength();
         while (fbpi.hasNext()) {
             LRField lrf = fbpi.next();
-            String lkfldName = lkname + "_" + lrf.getName();
-            addFieldToHolders(lkfldName, lrf, lrf.getDatatype(), lrf.getLength(), lrf.isSigned(), lrf.getNumDecimalPlaces(), lookupFieldHolders);
+            startPos = lrf.getStartPosition();
+            //Want to detect redefines
+            //field start pos < next pos (sp + length)
+            if(startPos >= keyLen) { //will only work if key fields are consecutive
+                if(startPos < nextPos) {
+                    //This is a redefine so we need to redo the offset
+                    addOffsetHolder(lookupFieldHolders, lrf, keyLen);
+                }
+                String lkfldName = lkname + "_" + lrf.getName();
+                addFieldToHolders(lkfldName, lrf, lrf.getDatatype(), lrf.getLength(), lrf.isSigned(), lrf.getNumDecimalPlaces(), lookupFieldHolders);
+            }
+            nextPos = startPos + lrf.getLength();
         }
         lookupHoldersByName.put(lkname, lookupFieldHolders);
+    }
+
+    private void addOffsetHolder(Map<String, ComponentFieldHolder> holders, LRField lrf, int keyLen) {
+                ComponentFieldHolder cfh = new ComponentFieldHolder(lrf);
+                cfh.setAccessor("");
+                cfh.setDefinition(String.format("static { factory.setOffset(%d); }", lrf.getStartPosition()-1-keyLen));
+                holders.put(lrf.getName() + "offset", cfh);
     }
 
     private void addFieldToHolders(String name, ComponentNode node, DataType dataType, short length, boolean signed, int numDecimals, Map<String, ComponentFieldHolder> holders) {
