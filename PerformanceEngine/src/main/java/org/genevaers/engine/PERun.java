@@ -188,7 +188,7 @@ public class PERun {
     }
 
     private void processRecord(FileRecord rec, int recnum) throws Exception {
-        logger.atInfo().log("Do something with the record");
+        logger.atFine().log("Do something with the record");
         //The extractor is going to need to know about the joins
         //A join should really be based on ByteBuffers, maybe the key is a byte array?
         //Make a class that represents a Join and we can them map them

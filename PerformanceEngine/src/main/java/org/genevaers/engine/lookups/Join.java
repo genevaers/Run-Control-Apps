@@ -64,7 +64,7 @@ public class Join {
             for(int i=0; i<recLength-keyLength; i++) {
                 joinrecBuffer[i] = val.bytes.get();
             }
-            logger.atInfo().log("Key %s -> %s", new String(je.getKey().getData()) , new String(joinrecBuffer));
+            logger.atFine().log("Key %s -> %s", new String(je.getKey().getData()) , new String(joinrecBuffer));
         }
     }
 
