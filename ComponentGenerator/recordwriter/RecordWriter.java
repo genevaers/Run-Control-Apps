@@ -50,14 +50,14 @@ public class RecordWriter {
 
     public void write(ByteBuffer bytes) {
         try {
-            int len = 27;
-            if(bytes.position() < 27) {
-                len = bytes.position();
-            }
-            for(int i = 0; i<len; i++) {
-                System.out.print(String.format("%02X ", bytes.get(i)));
-            }
-            System.out.println();
+            // int len = 27;
+            // if(bytes.position() < 27) {
+            //     len = bytes.position();
+            // }
+            // for(int i = 0; i<len; i++) {
+            //     System.out.print(String.format("%02X ", bytes.get(i)));
+            // }
+            // System.out.println();
             if(bytes.position() > 4) {
                 writer.write(bytes.array(), 4, bytes.position() - 4);
             }
