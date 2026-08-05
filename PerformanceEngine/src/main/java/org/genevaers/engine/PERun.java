@@ -125,8 +125,8 @@ public class PERun {
             rec = rr.readRecord();
         }
         rr.close();       
-        logger.atInfo().log("Read %d reference records", numrecords);
-        j.logContent();
+        // logger.atInfo().log("Read %d reference records", numrecords);
+        // j.logContent();
     }
 
     private void readWrite() {
