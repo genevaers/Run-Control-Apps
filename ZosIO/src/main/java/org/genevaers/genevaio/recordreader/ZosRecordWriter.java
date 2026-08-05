@@ -54,14 +54,14 @@ public class ZosRecordWriter extends RecordFileWriter {
     @Override 
     public void write(ByteBuffer bytes) { 
         try { 
-             int len = 36;   
-             if(bytes.position() < 36) {   
-                 len = bytes.position();   
-             }   
-             for(int i = 0; i<len; i++) {   
-                 System.out.print(String.format("%02X ", bytes.get(i)));   
-             }   
-             System.out.println();   
+            //  int len = 36;   
+            //  if(bytes.position() < 36) {   
+            //      len = bytes.position();   
+            //  }   
+            //  for(int i = 0; i<len; i++) {   
+            //      System.out.print(String.format("%02X ", bytes.get(i)));   
+            //  }   
+            //  System.out.println();   
             if(bytes.position() > 4) { 
                 writer.write(bytes.array(), 0, bytes.position() );    
             } 
