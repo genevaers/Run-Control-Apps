@@ -3,6 +3,7 @@ codes:
     lt_record_type: NAMEVALUE
     category: Arithmetic
     description:  Add to an accumulator from another accumulator
+    lt_description: Result Accum + Accum
   - function_code: ADDC
     lt_record_type: NAMEVALUE
     category: Arithmetic
