@@ -59,6 +59,7 @@ public class ExtractAST2Java {
             ExtractorWriter.write(  ExtractRecordGenerator.getSourceFieldDefinitons(),
                                     ExtractRecordGenerator.getColumnFieldDefinitons(),
                                     ExtractRecordGenerator.getLookupFieldDefinitons(),
+                                    ExtractRecordGenerator.getConstantDefinitions(),
                                     ExtractRecordGenerator.getFilterRecs(), 
                                     ExtractRecordGenerator.getColumnRecs(), 
                                     ExtractRecordGenerator.getInputDDnames(), 

@@ -5,6 +5,8 @@ package org.genevaers.engine.extractor;
 
 import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -23,7 +25,9 @@ import com.ibm.jzos.fields.AssemblerDatatypeFactory;
 import com.ibm.jzos.fields.BinaryAsIntField;
 import com.ibm.jzos.fields.ByteArrayField;
 import com.ibm.jzos.fields.PackedDecimalAsBigDecimalField;
+import com.ibm.jzos.fields.PackedDecimalAsBigIntegerField;
 import com.ibm.jzos.fields.PackedDecimalAsIntField;
+import com.ibm.jzos.fields.PackedDecimalAsLongField;
 import com.ibm.jzos.fields.StringField;
 
 import org.genevaers.engine.runcolumns.*;
@@ -62,6 +66,11 @@ public class PECode extends Extract {
 <#list lks as lkfdef>
     ${lkfdef};
 </#list>
+</#list>
+
+//Constants
+<#list constants as cnst>
+    ${cnst};
 </#list>
 
     public PECode() {

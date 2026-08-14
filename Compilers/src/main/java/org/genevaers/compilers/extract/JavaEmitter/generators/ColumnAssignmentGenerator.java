@@ -185,7 +185,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 } else {
                     holders = lookupFieldHolders;
                 }
-                sb.append(String.format("        COL_%d.putString(String.format(\"%%%dd\", %s.%s(%s)), target);", 
+                sb.append(String.format("        COL_%d.putString(String.format(\"%%%dd\", %s.get%s(%s)), target);", 
                 col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
             }
@@ -218,7 +218,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 } else {
                     holders = lookupFieldHolders;
                 }
-                sb.append(String.format("        COL_%d.putString(String.format(\"%%%d.%df\", %s.%s(%s)), target);", 
+                sb.append(String.format("        COL_%d.putString(String.format(\"%%%d.%df\", %s.get%s(%s)), target);", 
                 col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), col.getViewColumn().getDecimalCount(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
             }

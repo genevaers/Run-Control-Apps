@@ -48,7 +48,8 @@ public class ExtractorWriter {
     //private static Collection<JoinGenerator> joins;
     protected static Collection<LookupInfo> joins;
 
-	public static void write(List<String> srcdefs, List<String> coldefs, List<List<String>> lkdefs, List<String> filterRecs, List<String> columnRecs, List<String> inputdds, int outLen, int lrLen){
+	public static void write(List<String> srcdefs, List<String> coldefs, List<List<String>> lkdefs ,List<String> constants, 
+        List<String> filterRecs, List<String> columnRecs, List<String> inputdds, int outLen, int lrLen){
 		configureFreeMarker();
         Template template;
         try {
@@ -58,6 +59,7 @@ public class ExtractorWriter {
             nodeMap.put("srcdefs", srcdefs);
             nodeMap.put("coldefs", coldefs);
             nodeMap.put("lkdefs", lkdefs);
+            nodeMap.put("constants", constants);
             nodeMap.put("filterRecs", filterRecs);
             nodeMap.put("columnRecs", columnRecs);
             nodeMap.put("inputdds", inputdds);

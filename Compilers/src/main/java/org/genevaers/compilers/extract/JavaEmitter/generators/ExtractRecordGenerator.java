@@ -23,6 +23,7 @@ import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.compilers.extract.astnodes.IfAST;
 import org.genevaers.compilers.extract.astnodes.LFAstNode;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
+import org.genevaers.compilers.extract.astnodes.NumAtomAST;
 import org.genevaers.compilers.extract.astnodes.PFAstNode;
 import org.genevaers.compilers.extract.astnodes.SelectIfAST;
 import org.genevaers.compilers.extract.astnodes.StatementList;
@@ -45,10 +46,13 @@ public abstract class ExtractRecordGenerator {
     protected static int valueNumber = 0;
     protected List<ExtractorEntry> exrecs = new ArrayList<>();
 
+    protected String constName;
+
     protected static Map<String, ComponentFieldHolder> sourceFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> columnFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> lookupFieldHolders = new LinkedHashMap<>();
     protected static Map<String, Map<String, ComponentFieldHolder>> lookupHoldersByName = new LinkedHashMap<>();
+    protected static Map<String, String> constantDeclarations = new LinkedHashMap<>();
     protected static List<String> filterRecs = new ArrayList<>();
     protected static List<String> columnRecs = new ArrayList<>();
     protected static List<String> inputDDnames = new ArrayList<>();
@@ -122,9 +126,8 @@ public abstract class ExtractRecordGenerator {
                     return new ViewSourceGenerator((ViewSourceAstNode) node);
                  case VIEWCOLUMNSOURCE:
                     return new ViewColumnSourceGenerator((ViewColumnSourceAstNode) node)    ;
-        //         case NUMATOM:
-        //             dotNumAtomNode(node);
-        //             break;
+                case NUMATOM:
+                    return new NumAtomGenerator((NumAtomAST) node);
                 case STRINGATOM:
                     return new StringAtomGenerator((StringAtomAST) node);
         //         case STRINGCONCAT:
@@ -263,6 +266,9 @@ public abstract class ExtractRecordGenerator {
                 case COLUMNASSIGNMENT:
                     ColumnAssignmentGenerator cagen = new ColumnAssignmentGenerator((ColumnAssignmentASTNode)node);
                     return cagen.getCode(node);
+                case EXPRCOMP:
+                    ExprComparisonGenerator compgen = new ExprComparisonGenerator((ExprComparisonAST) node);
+                    return compgen.getCode(node);
                 default:
                     logger.atInfo().log("No code generated for node type %s", node.getType());
             }
@@ -332,6 +338,20 @@ public abstract class ExtractRecordGenerator {
         List<String> defs = new ArrayList<>();
         e.getValue().values().stream().forEach(c -> defs.add(c.getDefinition()));
         lkFields.add(defs);
+    }
+
+    public static List<String> getConstantDefinitions() {
+        List<String> defs = new ArrayList<>();
+        constantDeclarations.values().stream().forEach(c -> defs.add(c));
+        return defs;
+    }
+
+    public void addConstName(String cn) {
+        constName = cn;
+    }
+
+    public String getConstName() {
+        return constName;
     }
 
 
