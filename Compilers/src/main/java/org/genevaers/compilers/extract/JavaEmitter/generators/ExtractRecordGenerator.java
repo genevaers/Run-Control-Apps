@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.JavaEmitter.ExtractorEntry;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.FieldHolder;
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
@@ -49,7 +50,7 @@ public abstract class ExtractRecordGenerator {
     protected String constName;
 
     protected static Map<String, ComponentFieldHolder> sourceFieldHolders = new LinkedHashMap<>();
-    protected static Map<String, ComponentFieldHolder> columnFieldHolders = new LinkedHashMap<>();
+    protected static Map<String, ColumnFieldHolder> columnFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> lookupFieldHolders = new LinkedHashMap<>();
     protected static Map<String, Map<String, ComponentFieldHolder>> lookupHoldersByName = new LinkedHashMap<>();
     protected static Map<String, String> constantDeclarations = new LinkedHashMap<>();

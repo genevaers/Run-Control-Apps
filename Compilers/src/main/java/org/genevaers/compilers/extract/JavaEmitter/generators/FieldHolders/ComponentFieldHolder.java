@@ -6,6 +6,7 @@ public class ComponentFieldHolder {
     private ComponentNode comp;
     protected String accessor;
     private String definition;
+    protected String name;
 
     public ComponentFieldHolder(ComponentNode c) {
         comp = c;
@@ -30,6 +31,26 @@ public class ComponentFieldHolder {
 
     public ComponentNode getComp() {
         return comp;
+    }
+
+    public String getAssignmentSource(int s) {
+        return "default src";
+    }
+
+    public String getValueFrom(String src) {
+        return getName() + ".get" + accessor + "(" + src + ")";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean useCompareTo() {
+       return false;
     }
 
 }

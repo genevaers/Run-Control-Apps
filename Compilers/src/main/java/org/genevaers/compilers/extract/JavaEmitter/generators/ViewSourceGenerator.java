@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.genevaers.compilers.base.ASTBase;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolderFactory;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
@@ -170,7 +171,8 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         Iterator<ViewColumn> ci = view.getColumnIterator();
         while(ci.hasNext()) {
             ViewColumn col = ci.next();
-            columnFieldHolders.put("COL_" + col.getColumnNumber(), ComponentFieldHolderFactory.getColumnFieldHolder(col));
+            ColumnFieldHolder cfh = ComponentFieldHolderFactory.getColumnFieldHolder(col);
+            columnFieldHolders.put(cfh.getName(), cfh);
         }
     }
 

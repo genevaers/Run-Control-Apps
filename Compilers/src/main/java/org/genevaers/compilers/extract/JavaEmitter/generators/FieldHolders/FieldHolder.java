@@ -1,11 +1,17 @@
 package org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders;
 
+import org.genevaers.repository.components.ComponentNode;
 import org.genevaers.repository.components.LRField;
 
-public class FieldHolder {
+public class FieldHolder extends ComponentFieldHolder{
 
     protected LRField field;
     protected String accessor;
+
+    public FieldHolder(LRField f) {
+        super(f);
+        field = f;
+    }
 
     public LRField getField() {
         return field;
@@ -17,5 +23,15 @@ public class FieldHolder {
 
     public String getAccessor() {
         return accessor;
+    }
+
+    @Override
+    public String getName() {
+        return field.getName();
+    }
+    
+    @Override
+    public String getValueFrom(String src) {
+        return getName() + ".get" + accessor + "(" + src + ")";
     }
 }

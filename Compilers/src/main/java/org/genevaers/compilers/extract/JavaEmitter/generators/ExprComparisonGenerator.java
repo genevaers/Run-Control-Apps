@@ -65,104 +65,38 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
      }
 
      private String getConstDeclaration(ExtractBaseAST t, ExtractBaseAST otherside, ExtractRecordGenerator cg) {
-        String decl = null;
-        
-        if(t.getType() == ASTFactory.Type.STRINGATOM) {
-            
-        } else if(t.getType() == ASTFactory.Type.NUMATOM) {
-            DataType dt = DataType.INVALID;
-            String name = null;
-            //declaration type dependenent on other side type
-        switch(otherside.getType()) {
-            case LRFIELD:
-                FieldReferenceAST lrfr = (FieldReferenceAST)otherside;
-                dt = lrfr.getRef().getDatatype();
-                name = lrfr.getRef().getName();
-                break;
-            case LOOKUPFIELDREF:
-                break;
-            default:
-                break;
-        }
-        switch (dt) {
-            case ALPHA:
-                break;
-            case ALPHANUMERIC:
-                break;
-            case BCD:
-                break;
-            case BINARY: {
-                //sb.append(String.format("        Bin2ToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
-                // Map<String, ComponentFieldHolder> holders;
-                // if(source.equals("src")) {
-                //     holders = sourceFieldHolders;
-                // } else {
-                //     holders = lookupFieldHolders;
-                // }
-                // sb.append(String.format("        COL_%d.putString(String.format(\"%%%dd\", %s.%s(%s)), target);", 
-                // col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), fieldName, holders.get(fieldName).getAccessor(), source));
-                break;
-            }
-            case BSORT:
-                break;
-            case CONSTDATE:
-                break;
-            case CONSTNUM:
-                break;
-            case CONSTSTRING:
-                break;
-            case EDITED:
-                break;
-            case FLOAT:
-                break;
-            case GENEVANUMBER:
-                break;
-            case INVALID:
-                break;
-            case MASKED:
-                break;
-            case PACKED: {
-                ComponentFieldHolder cfh = sourceFieldHolders.get(name);
-                String othertype = cfh.getAccessor();
-                //             final BigDecimal MIN_BALANCE = new BigDecimal("100.00");        
-                NumAtomAST na = (NumAtomAST)t;
-                //How do we manage constant names without duplicating or clashing
-                //Consider case of PRICE = 1 or PRICE=2 need two consts... PRICE_1 and PRICE_2
-                //so name via variable name_value 
-                //But if same value used again for different var...
-                //Name as BIGDECIMAL_1 etc and only add to collection if not found?
-                if(othertype.startsWith("Big")) {
-                    String constName = String.format("%s_%d", othertype, na.getValue());
-                    constantDeclarations.computeIfAbsent(constName, s -> String.format("final %s %s = new %s(\"%d\");", othertype, constName, othertype, na.getValue()));
-                    cg.addConstName(constName);
-                }
-               //We need to distinguish which PackedToEdited it is.
-                //Put them in a FieldHolder and then use the accessor to determine which one to use.
-                //         COL_5.putString(String.format("%f", PRICE.getBigDecimal(src)), target);
-                //sb.append(String.format("        PackedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
-                // Map<String, ComponentFieldHolder> holders;
-                // if(source.equals("src")) {
-                //     holders = sourceFieldHolders;
-                // } else {
-                //     holders = lookupFieldHolders;
-                // }
-                // sb.append(String.format("        COL_%d.putString(String.format(\"%%%d.%df\", %s.%s(%s)), target);", 
-                // col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), col.getViewColumn().getDecimalCount(), fieldName, holders.get(fieldName).getAccessor(), source));
-                break;
-            }
-            case PSORT:
-                break;
-            case ZONED:
-                //sb.append(String.format("        ZonedToEdited.transformField(%s, %d, %d, %d, %d);", source, offset, length, col.getViewColumn().getStartPosition() - 1, col.getViewColumn().getFieldLength()));
-                break;
-            default:
-                break;
-                //return String.format("        target.put(\"%s\".getBytes());", String.format("%." + col.getViewColumn().getFieldLength() + "s", "NNNNNNNNN"));
-        }
+         String decl = null;
 
-        }
-        return decl;
-    }
+         if (t.getType() == ASTFactory.Type.STRINGATOM) {
+
+         } else if (t.getType() == ASTFactory.Type.NUMATOM) {
+             DataType dt = DataType.INVALID;
+             String name = null;
+             // declaration type dependenent on other side type
+             switch (otherside.getType()) {
+                 case LRFIELD:
+                     FieldReferenceAST lrfr = (FieldReferenceAST) otherside;
+                     dt = lrfr.getRef().getDatatype();
+                     name = lrfr.getRef().getName();
+                     break;
+                 case LOOKUPFIELDREF:
+                     break;
+                 default:
+                     break;
+             }
+             ComponentFieldHolder cfh = sourceFieldHolders.get(name);
+             String othertype = cfh.getAccessor();
+             // final BigDecimal MIN_BALANCE = new BigDecimal("100.00");
+             NumAtomAST na = (NumAtomAST) t;
+             if (cfh.useCompareTo()) {
+                 String constName = String.format("%s_%d", othertype, na.getValue());
+                 constantDeclarations.computeIfAbsent(constName, s -> String.format("final %s %s = new %s(\"%d\");",
+                         othertype, constName, othertype, na.getValue()));
+                 cg.addConstName(constName);
+             }
+         }
+         return decl;
+     }
 
       private String getComparisonFormatString() {
         String lhsFormat = "%s";
@@ -198,17 +132,16 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
         if(stringComparison) {
             return String.format("%s%s%s) ", String.format(lhsFormat, lhscg.getCode(lhs)), opFormat, String.format(rhsFormat, rhscg.getCode(rhs)));
         } else {
-            // BigDs need to be treated differently
-            // so need to switch on field datatype
-            //             final BigDecimal MIN_BALANCE = new BigDecimal("100.00");        
-            //if(PRICE.getBigDecimal(src).compareTo(MIN_BALANCE) > 0 ) {
-            //need to switch if need compareTo function
-            if(lhscg.getCode(lhs).contains("Big")) {
-                return String.format("%s(%s) %s 0", lhscg.getCode(lhs), rhscg.getCode(rhs), opFormat);
-            } else {
-                return String.format("%s %s %s", lhscg.getCode(lhs), opFormat, rhscg.getCode(rhs));
+            if(lhs.getType() == ASTFactory.Type.LRFIELD) {
+                FieldReferenceAST lfr = (FieldReferenceAST)lhs;
+                ComponentFieldHolder lhsfh = sourceFieldHolders.get(lfr.getRef().getName());
+                if(lhsfh.useCompareTo()) {
+                    return String.format("%s.compareTo(%s) %s 0", lhsfh.getValueFrom("src"), rhscg.getCode(rhs), opFormat);
+                } else {
+                    return String.format("%s %s %s", lhsfh.getValueFrom("src"), opFormat, rhscg.getCode(rhs));
+                }
             }
-//            return String.format("%s(%s) > 0", lhscg.getCode(lhs), opFormat, rhscg.getCode(rhs));
+            return "Bad Comparison";
         }
         
      }

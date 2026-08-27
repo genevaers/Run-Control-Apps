@@ -15,6 +15,7 @@ import com.google.common.flogger.FluentLogger;
 
 import java.util.Map;
 
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 
@@ -52,41 +53,72 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     }
 
     private String getAssignmentFormatString() {
-        ColumnAST col = (ColumnAST) trg;
-        if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.LRFIELD) {
-            FieldReferenceAST fr = (FieldReferenceAST) src;
-            // Break out base on source and target data types.
-            return dteEquivalentBasedOnTypes();
-        } else if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.LOOKUPFIELDREF) {
-            LookupFieldRefAST lfr = (LookupFieldRefAST) src;
-            LRField fld = lfr.getRef();
-            // This will be dependent on the type of the field, for now we will assume all
-            // fields are strings and use the String
-            // We need the key length since the record start after the key in the join
-            // buffer?
-            LRField redField = Repository.getREDfieldFrom(lfr.getLookup(), fld);
-            if(redField == null) {
-                logger.atSevere().log("Unable to find reference field for lookup field reference %s", fld.getName());
-                return "/* Unable to find reference field for lookup field reference " + fld.getName() + " */";
-            }
-            String joinBufString = "joinBuffer" + lfr.getNewJoinId();
-            String joinLogicFormat = "        if(" + joinBufString + " != null) {\n        %s\n        } else {\n        %s\n        }";
-            String name = lfr.getLookup().getName() + "_" + redField.getName();
-            String body = dtlEquivalentBasedOnTypes(joinBufString, redField , name);
-            String elseBody = getElseBody(col); 
-            return String.format(joinLogicFormat, body, elseBody);
-        } else if (trg.getType() == Type.DT_COLUMN && src.getType() == Type.STRINGATOM) {
-            StringAtomAST sa = (StringAtomAST) src;
-            String targString = sa.getValue();
-            if (targString.equals("")) {
-                targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", " ");
-            } else {
-                targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", sa.getValue());
-            }
-            return String.format("        target.put(\"%s\".getBytes());", targString);
-        } else {
-            return "/* Assignment type not yet implemented " + trg.getType() + " = " + src.getType() + " */";
+
+        /*
+        switch on target type DT CT SK 
+        Then for each swtich on source type LR, LKLR, Const, Arithmetic
+         */
+        switch (trg.getType()) {
+            case DT_COLUMN:
+                return getDtAssignment();
+            case CT_COLUMN:
+                //Not going to support these for the moment
+                return "CT Columns not supported";
+            case SK_COLUMN:
+                //An SK only applies for format views. Again not supported at the moment
+                return "SK Columns not supported";
+            default:
+                return "Unknown Assignment target " + trg.getType();
         }
+    }
+
+    private String getDtAssignment() {
+        switch(src.getType()) {
+            case LRFIELD:
+                return dteEquivalentBasedOnTypes();
+            case LOOKUPFIELDREF:
+                return dtlEquivalentBasedOnTypes();
+            case STRINGATOM:
+                return dtcString();
+            case NUMATOM:
+                return "";
+            default:
+                return "";
+        }
+    }
+
+    private String dtcString() {
+        ColumnAST col = (ColumnAST) trg;
+        StringAtomAST sa = (StringAtomAST) src;
+        String targString = sa.getValue();
+        if (targString.equals("")) {
+            targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", " ");
+        } else {
+            targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", sa.getValue());
+        }
+        return String.format("        target.put(\"%s\".getBytes());", targString);
+    }
+
+    private String dtlEquivalentBasedOnTypes() {
+        ColumnAST col = (ColumnAST) trg;
+        LookupFieldRefAST lfr = (LookupFieldRefAST) src;
+        LRField fld = lfr.getRef();
+        // This will be dependent on the type of the field, for now we will assume all
+        // fields are strings and use the String
+        // We need the key length since the record start after the key in the join
+        // buffer?
+        LRField redField = Repository.getREDfieldFrom(lfr.getLookup(), fld);
+        if (redField == null) {
+            logger.atSevere().log("Unable to find reference field for lookup field reference %s", fld.getName());
+            return "/* Unable to find reference field for lookup field reference " + fld.getName() + " */";
+        }
+        String joinBufString = "joinBuffer" + lfr.getNewJoinId();
+        String joinLogicFormat = "        if(" + joinBufString
+                + " != null) {\n        %s\n        } else {\n        %s\n        }";
+        String name = lfr.getLookup().getName() + "_" + redField.getName();
+        String body = dtlEquivalentBasedOnTypes(joinBufString, redField, name);
+        String elseBody = getElseBody(col);
+        return String.format(joinLogicFormat, body, elseBody);
     }
 
     private String getElseBody(ColumnAST col) {
@@ -103,8 +135,13 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
 
     private String dteEquivalentBasedOnTypes() {
         FieldReferenceAST fr = (FieldReferenceAST) src;
+        ColumnAST col = (ColumnAST) trg;
+        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
+        ComponentFieldHolder srcfh = sourceFieldHolders.get(fr.getRef().getName());
         //return assignBasedOnTypes(fr.getRef().getDatatype(), "src", fr.getRef().getStartPosition() - 1, fr.getRef().getLength());
-        return assignBasedOnTypes(fr.getRef(), "src", fr.getRef().getName());
+        return String.format("                %s(%s, target);", cfh.getAssignmentTarget(), srcfh.getAssignmentSource(col.getViewColumn().getFieldLength()));
+
+        //return assignBasedOnTypes(fr.getRef(), "src", fr.getRef().getName());
     }
 
     private String dtlEquivalentBasedOnTypes(String joinbuffer, LRField redField, String name) {
@@ -218,8 +255,9 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 } else {
                     holders = lookupFieldHolders;
                 }
+                ViewColumn vc = col.getViewColumn();
                 sb.append(String.format("        COL_%d.putString(String.format(\"%%%d.%df\", %s.get%s(%s)), target);", 
-                col.getViewColumn().getColumnNumber(), col.getViewColumn().getFieldLength(), col.getViewColumn().getDecimalCount(), fieldName, holders.get(fieldName).getAccessor(), source));
+                    vc.getColumnNumber(), vc.getFieldLength(), vc.getDecimalCount(), fieldName, holders.get(fieldName).getAccessor(), source));
                 break;
             }
             case PSORT:
