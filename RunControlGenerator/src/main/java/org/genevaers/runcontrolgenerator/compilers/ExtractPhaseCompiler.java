@@ -131,7 +131,6 @@ public class ExtractPhaseCompiler {
 		vsnode.addChildIfNotNull(vcsn);
 		compileColumn(vcsn);		
 		vcsn.checkAssigned();
-		vcsn.checkSktDataTypes();
 		writeXLTDotIfEnabled();
 	}
 
