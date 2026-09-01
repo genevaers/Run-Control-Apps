@@ -36,6 +36,8 @@ import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
 import org.genevaers.genevaio.ltfile.writer.LTCSVWriter;
 import org.genevaers.genevaio.report.LogicTableTextWriter;
+import org.genevaers.genevaio.report.VDPComparisonSummaryWriter;
+import org.genevaers.genevaio.report.VDPReportWriter;
 import org.genevaers.genevaio.report.VDPTextWriter;
 import org.genevaers.repository.Repository;
 import org.genevaers.runcontrolanalyser.ltcoverage.LTCoverageAnalyser;
@@ -211,6 +213,8 @@ public class AnalyserDriver {
 			case "TXT":
 				VDPTextWriter vdptw = new VDPTextWriter();
 				vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
+				VDPReportWriter  vdptnw = new VDPReportWriter ();
+				vdptnw.writeFromRecordNodes(recordsRoot, "VPDRPTNEW.txt", generation);
 				break;
 			case "CSV":
 				break;
@@ -219,8 +223,8 @@ public class AnalyserDriver {
 				vdprw.setIgnores();
 				vdprw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName());					
 				break;
-		
 			default:
+				logger.atSevere().log("Invalid or no VDP report format specified.");
 				break;
 		}
 	}
@@ -310,6 +314,11 @@ public class AnalyserDriver {
 			case "TEXT":
 			VDPTextWriter vdptw = new VDPTextWriter();
 			vdptw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName(), generation);
+			// Generate CSUMRPT summary
+			VDPComparisonSummaryWriter csumWriter = new VDPComparisonSummaryWriter(
+						GersConfigration.VDP_DDNAME.toString(),
+						GersConfigration.VDPOLD_DDNAME.toString());
+			csumWriter.writeFromVDPFiles(vdp1p.toString(), vdp2p.toString(), "CSUMRPT.txt");
 			numVDPDiffs = vdptw.getNumDiffs();
 			break;
 			case "HTML":

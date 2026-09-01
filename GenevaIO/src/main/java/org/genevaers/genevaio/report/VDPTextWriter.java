@@ -517,7 +517,7 @@ public class VDPTextWriter extends TextRecordWriter {
 					} else if(n.getParent().getParent().getName().equals("Columns")) {
 						RecordNode rec =  (RecordNode) n.getParent();
 						NumericFieldNode v =  (NumericFieldNode) rec.getChildrenByName("viewId");
-						if(v.getValue() > 900000  && n.getName().equals("signedInd")) {
+						if(v !=null &&v.getValue() > 900000  && n.getName().equals("signedInd")) {
 							n.setState(ComparisonState.IGNORED);
 						}
 					} else {

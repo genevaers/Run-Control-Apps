@@ -36,6 +36,7 @@ import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
+import org.genevaers.repository.components.OutputFile;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.UserExit;
 import org.genevaers.repository.components.ViewDefinition;

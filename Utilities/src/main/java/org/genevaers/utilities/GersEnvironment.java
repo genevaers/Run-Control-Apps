@@ -81,6 +81,7 @@ public class GersEnvironment {
 		getEnvVarOrDefault("GERS_MSG_CLASS", "H");
 		getEnvVarOrDefault("GERS_JAVA_HOME", "/Java/J17.0_64");
 		getEnvVarOrDefault("GERS_JVM_PROC_LIB", "AJV.V11R0M0.PROCLIB");
+		getEnvVarOrDefault("GERS_JVM_PROC", "JVMPRC21");
 		getEnvVarOrDefault("GERS_JZOS_LOAD_LIB", "AJV.V11R0M0.SIEALNKE");
 		getEnvVarOrDefault("GERS_DB2_SUBSYSTEM", "DM12");
 		getEnvVarOrDefault("GERS_DB2_LOAD_LIB", "DSN.V12R1M0.SDSNLOAD");
@@ -91,7 +92,7 @@ public class GersEnvironment {
 		getEnvVarOrDefault("GERS_GIT_REPO_DIR", "");
 		getEnvVarOrDefault("GERS_RCA_JAR_DIR", "");
 		getEnvVarOrDefault("RUNOS", "ZOS");
-		getEnvVarOrDefault("TSO_SERVER", "sp13.svl.ibm.com");
+		getEnvVarOrDefault("TSO_SERVER", "");
 		getEnvVarOrDefault("OUTDIR", "out");
 		getEnvVarOrDefault("GENERATE_COVERAGE", "N");
 		getEnvVarOrDefault("GENERATE_VDPFLOW", "N");
