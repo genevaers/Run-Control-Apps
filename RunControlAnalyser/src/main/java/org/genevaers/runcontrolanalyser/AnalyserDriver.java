@@ -211,10 +211,10 @@ public class AnalyserDriver {
 		switch (GersConfigration.getReportFormat()) {
 			case "TEXT":
 			case "TXT":
-				VDPTextWriter vdptw = new VDPTextWriter();
-				vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
+				// VDPTextWriter vdptw = new VDPTextWriter();
+				// vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
 				VDPReportWriter  vdptnw = new VDPReportWriter ();
-				vdptnw.writeFromRecordNodes(recordsRoot, "VPDRPTNEW.txt", generation);
+				vdptnw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
 				break;
 			case "CSV":
 				break;
