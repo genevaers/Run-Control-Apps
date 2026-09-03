@@ -103,7 +103,7 @@ public class GersConfigration {
     public static final String XLT_REPORT_DDNAME = "XLTRPT";
     public static final String JLT_REPORT_DDNAME = "JLTRPT";
     public static final String VDP_REPORT_DDNAME = "VDPRPT";
-    public static final String VDP_REPORT_NEW_DDNAME = "VDPRPTNEW";
+    public static final String VDP_REPORT_NEW_DDNAME = "VDPRNEW";
     public static final String REPORT_DDNAME = "RCARPT";
 
     public static final String RCA_RUNNAME = "gvbrca";
