@@ -87,6 +87,7 @@ public class GersConfigration {
     public static final String XLT_REPORT = "XLT_REPORT";
     public static final String JLT_REPORT = "JLT_REPORT";
     public static final String VDP_REPORT = "VDP_REPORT";
+    public static final String VDP_REPORT_NEW = "VDP_REPORT_NEW";
     public static final String RCA_REPORT = "RCA_REPORT";
     public static final String REPORT_FORMAT = "REPORT_FORMAT";
     
@@ -102,6 +103,7 @@ public class GersConfigration {
     public static final String XLT_REPORT_DDNAME = "XLTRPT";
     public static final String JLT_REPORT_DDNAME = "JLTRPT";
     public static final String VDP_REPORT_DDNAME = "VDPRPT";
+    public static final String VDP_REPORT_NEW_DDNAME = "VDPRPTNEW";
     public static final String REPORT_DDNAME = "RCARPT";
 
     public static final String RCA_RUNNAME = "gvbrca";
@@ -148,6 +150,7 @@ public class GersConfigration {
         parmToValue.put(XLT_REPORT, new ConfigEntry("N", false));
         parmToValue.put(JLT_REPORT, new ConfigEntry("N", false));
         parmToValue.put(VDP_REPORT, new ConfigEntry("N", false));
+        parmToValue.put(VDP_REPORT_NEW, new ConfigEntry("N", false));
         parmToValue.put(WRITE_VDPXML, new ConfigEntry("N", false));
         parmToValue.put(COMPARE, new ConfigEntry("N", false));
         parmToValue.put(RCA_REPORT, new ConfigEntry("N", true));
@@ -276,6 +279,10 @@ public class GersConfigration {
 
     public static boolean isVdpReport() {
         return parmToValue.get(VDP_REPORT).getValue().equalsIgnoreCase("Y");
+    }
+
+    public static boolean isVdpReportNew() {
+        return parmToValue.get(VDP_REPORT_NEW).getValue().equalsIgnoreCase("Y");
     }
 
     public static boolean isRcaReport() {
@@ -418,6 +425,10 @@ public class GersConfigration {
     
     public static String getVDPReportName() {
         return isZos() ? VDP_REPORT_DDNAME : getCWDPrefix() + VDP_REPORT_DDNAME + "." +  parmToValue.get(REPORT_FORMAT).getValue().toLowerCase();
+    }
+
+    public static String getVDPReportNewName() {
+        return isZos() ? VDP_REPORT_NEW_DDNAME : getCWDPrefix() + VDP_REPORT_NEW_DDNAME + "." +  parmToValue.get(REPORT_FORMAT).getValue().toLowerCase();
     }
     
     public static String getRelativeXLTReport() {

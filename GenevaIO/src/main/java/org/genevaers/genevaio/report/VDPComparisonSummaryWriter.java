@@ -1308,7 +1308,7 @@ public class VDPComparisonSummaryWriter {
      * Write report header
      */
     private void writeHeader(Writer writer) throws IOException {
-        writer.write("1VDP Record Summary Report\n");
+        writer.write("VDP Comparison Summary Report\n");
         writer.write(" -------------------------\n");
         writer.write("  \n");
         writer.write(String.format(" VDP Run Date           %s    %s\n", vdp1Date, vdp2Date));

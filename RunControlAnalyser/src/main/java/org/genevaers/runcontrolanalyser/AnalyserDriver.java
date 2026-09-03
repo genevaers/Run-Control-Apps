@@ -80,7 +80,7 @@ public class AnalyserDriver {
 			if (GersConfigration.isJltReport()) {
 				generateJltPrint(root);
 			}
-			if (GersConfigration.isVdpReport()) {
+			if (GersConfigration.isVdpReport() || GersConfigration.isVdpReportNew()) {
 				Repository.clearAndInitialise();
 				generateVdpPrint(root);
 			}
@@ -107,7 +107,7 @@ public class AnalyserDriver {
 		Path xlt1 = root.resolve(GersConfigration.XLT_DDNAME);
 		Path xlt2 = root.resolve(GersConfigration.XLTOLD_DDNAME);
 		try {
-			if (GersConfigration.isVdpReport()) {
+			if (GersConfigration.isVdpReport() || GersConfigration.isVdpReportNew()) {
 				generateVDPDiffReport(root, vdp1, vdp2);
 			}
 			if (GersConfigration.isXltReport()) {
@@ -211,10 +211,14 @@ public class AnalyserDriver {
 		switch (GersConfigration.getReportFormat()) {
 			case "TEXT":
 			case "TXT":
-				// VDPTextWriter vdptw = new VDPTextWriter();
-				// vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
-				VDPReportWriter  vdptnw = new VDPReportWriter ();
-				vdptnw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
+				if(GersConfigration.isVdpReport()) {
+					VDPTextWriter vdptw = new VDPTextWriter();
+					vdptw.writeFromRecordNodes(recordsRoot, vdpReportDdname, generation);
+				}
+				if(GersConfigration.isVdpReportNew()) {
+					VDPReportWriter  vdptnw = new VDPReportWriter ();
+					vdptnw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportNewName(), generation);
+				}
 				break;
 			case "CSV":
 				break;
@@ -312,14 +316,18 @@ public class AnalyserDriver {
 		switch(GersConfigration.getReportFormat()) {
 			case "TXT":
 			case "TEXT":
-			VDPTextWriter vdptw = new VDPTextWriter();
-			vdptw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName(), generation);
-			// Generate CSUMRPT summary
-			VDPComparisonSummaryWriter csumWriter = new VDPComparisonSummaryWriter(
-						GersConfigration.VDP_DDNAME.toString(),
-						GersConfigration.VDPOLD_DDNAME.toString());
-			csumWriter.writeFromVDPFiles(vdp1p.toString(), vdp2p.toString(), "CSUMRPT.txt");
-			numVDPDiffs = vdptw.getNumDiffs();
+			if(GersConfigration.isVdpReport()) {
+				VDPTextWriter vdptw = new VDPTextWriter();
+				vdptw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName(), generation);
+				numVDPDiffs = vdptw.getNumDiffs();
+			}
+			if(GersConfigration.isVdpReportNew()) {
+				// Generate CSUMRPT summary
+				VDPComparisonSummaryWriter csumWriter = new VDPComparisonSummaryWriter(
+							GersConfigration.VDP_DDNAME.toString(),
+							GersConfigration.VDPOLD_DDNAME.toString());
+				csumWriter.writeFromVDPFiles(vdp1p.toString(), vdp2p.toString(), GersConfigration.getVDPReportNewName());
+			}
 			break;
 			case "HTML":
 			vdprw.writeFromRecordNodes(recordsRoot, GersConfigration.getVDPReportName());
