@@ -1,11 +1,7 @@
 package org.genevaers.compilers.extract.JavaEmitter.generators;
 
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
-import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.enums.DataType;
-
-import java.util.Map;
-import java.util.function.Function;
 
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory;
@@ -13,7 +9,6 @@ import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.compilers.extract.astnodes.NumAtomAST;
-import org.genevaers.compilers.extract.astnodes.TypedASTNode;
 
 public class ExprComparisonGenerator extends ExtractRecordGenerator {
 
@@ -165,14 +160,6 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
             return "Bad Comparison";
         }
         
-     }
-
-     private String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
-         switch(comparingHolder.getAccessor()) {
-             case "BigDecimal":  return String.format("new BigDecimal(String.valueOf(%s))", valueExpr);
-             case "BigInteger":  return String.format("BigInteger.valueOf(%s)", valueExpr);
-             default:            return valueExpr;
-         }
      }
 
      private String flipOperator(String op) {

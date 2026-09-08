@@ -1,5 +1,6 @@
 package org.genevaers.compilers.extract.JavaEmitter.generators;
 
+import org.genevaers.compilers.extract.astnodes.CalculationAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
@@ -82,9 +83,25 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 return dtcString();
             case NUMATOM:
                 return "";
+            case CALCULATION:
+                return dtCalculationAssignment();
             default:
                 return "";
         }
+    }
+
+    private String dtCalculationAssignment() {
+        ColumnAST col = (ColumnAST) trg;
+        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
+        CalculationGenerator calcgen = new CalculationGenerator((CalculationAST) src);
+        String calcExpr = calcgen.getCode(src);
+        int len = col.getViewColumn().getFieldLength();
+        int dec = col.getViewColumn().getDecimalCount();
+        String fmtSpec = dec > 0
+                ? String.format("%%%d.%df", len, dec)
+                : String.format("%%%ds",    len);
+        return String.format("                %s(String.format(\"%s\", %s), target);",
+                cfh.getAssignmentTarget(), fmtSpec, calcExpr);
     }
 
     private String dtcString() {

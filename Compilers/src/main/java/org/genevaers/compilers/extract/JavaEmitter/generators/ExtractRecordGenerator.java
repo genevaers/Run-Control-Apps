@@ -16,6 +16,7 @@ import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.Colum
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.FieldHolder;
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
+import org.genevaers.compilers.extract.astnodes.CalculationAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
@@ -207,6 +208,16 @@ public abstract class ExtractRecordGenerator {
         //             break;
                 case EXPRCOMP:
                     return new ExprComparisonGenerator((ExprComparisonAST) node);
+                case CALCULATION:
+                    return new CalculationGenerator((CalculationAST) node);
+                case ADDITION:
+                    return new CalculationGenerator((CalculationAST) node.getParent());
+                case SUBTRACTION:
+                    return new CalculationGenerator((CalculationAST) node.getParent());
+                case MULTIPLICATION:
+                    return new CalculationGenerator((CalculationAST) node.getParent());
+                case DIVISION:
+                    return new CalculationGenerator((CalculationAST) node.getParent());
         //         case RUNDATE:
         //             dotRundate(node);
         //             break;
@@ -215,15 +226,6 @@ public abstract class ExtractRecordGenerator {
         //             break;
         //         case SORTTITLE:
         //             doSortTitle(node);
-        //             break;
-        //         case CALCULATION:
-        //         case RECORD_COUNT:
-        //         case ADDITION:
-        //         case SUBTRACTION:
-        //         case SETTER:
-        //         case MULTIPLICATION:
-        //         case DIVISION:
-        //             doCalculation(node);
         //             break;
         //         case EOS:
         //             doEOS(node);
@@ -355,5 +357,12 @@ public abstract class ExtractRecordGenerator {
         return constName;
     }
 
+    protected static String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
+        switch(comparingHolder.getAccessor()) {
+            case "BigDecimal": return String.format("BigDecimal.valueOf(%s)", valueExpr);
+            case "BigInteger": return String.format("BigInteger.valueOf(%s)", valueExpr);
+            default:           return valueExpr;
+        }
+    }
 
 }
