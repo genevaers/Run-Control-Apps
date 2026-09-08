@@ -22,7 +22,6 @@ import java.beans.PropertyDescriptor;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -32,6 +31,7 @@ import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.*;
 import org.genevaers.repository.data.ComponentCollection;
 import org.genevaers.genevaio.vdpfile.VDPFileReader;
+import org.genevaers.utilities.GersFile;
 import java.lang.reflect.Method;
 
 import com.google.common.flogger.FluentLogger;
@@ -1286,8 +1286,12 @@ public class VDPComparisonSummaryWriter {
      * Write the comparison report in CSUMRPT format
      */
     private void writeReport(String outputPath) throws IOException {
-        Path path = Paths.get(outputPath);
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+        Writer output = new GersFile().getWriter(outputPath);
+        if (output == null) {
+            throw new IOException("Unable to open report output " + outputPath);
+        }
+        try (Writer reportOutput = output;
+             BufferedWriter writer = new BufferedWriter(reportOutput)) {
             writeHeader(writer);
             writeSummaryCounts(writer);
             writeExtractPhaseDDList(writer);
