@@ -54,8 +54,15 @@ public class PackedFieldHolder extends FieldHolder {
     public String getAssignmentSource(int len) {
         //Issue here is that the format length is that of the target colum not the source field!!!
         //Pass targ length in?
-        //Handle at assignment level? 
-        return String.format("String.format(\"%%%dd\", %s.get%s(src))",len, field.getName(), getAccessor());
+        //Handle at assignment level?
+        switch(getAccessor()) {
+            case "BigDecimal":
+                return String.format("String.format(\"%%%d.%df\", %s.get%s(src))", len, field.getNumDecimalPlaces(), field.getName(), getAccessor());
+            case "BigInteger":
+                return String.format("String.format(\"%%%ds\", %s.get%s(src).toString())", len, field.getName(), getAccessor());
+            default:
+                return String.format("String.format(\"%%%dd\", %s.get%s(src))", len, field.getName(), getAccessor());
+        }
     }
 
     @Override

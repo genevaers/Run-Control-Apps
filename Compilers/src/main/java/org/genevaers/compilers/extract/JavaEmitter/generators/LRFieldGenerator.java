@@ -52,14 +52,7 @@ public class LRFieldGenerator extends ExtractRecordGenerator {
             case MASKED:
                 break;
             case PACKED:
-                //PRICE.getBigDecimal(src).compareTo(BigDecimal_100)
-                //if bigDecimal
-                if(sourceFieldHolders.get(fld.getName()).getAccessor().startsWith("Big")) {
-                    return String.format("%s.get%s(src).compareTo", fld.getName(),  sourceFieldHolders.get(fld.getName()).getAccessor());
-                } else {
-                    return String.format("%s.get%s(src)", fld.getName(),  sourceFieldHolders.get(fld.getName()).getAccessor());
-                }
-                //return fld.getName() + ".get" + sourceFieldHolders.get(fld.getName()).getAccessor() +"()";
+                return sourceFieldHolders.get(fld.getName()).getValueFrom("src");
             case PSORT:
                 break;
             case ZONED:

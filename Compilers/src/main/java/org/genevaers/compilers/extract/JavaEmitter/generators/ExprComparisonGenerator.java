@@ -135,15 +135,54 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
             if(lhs.getType() == ASTFactory.Type.LRFIELD) {
                 FieldReferenceAST lfr = (FieldReferenceAST)lhs;
                 ComponentFieldHolder lhsfh = sourceFieldHolders.get(lfr.getRef().getName());
+
                 if(lhsfh.useCompareTo()) {
-                    return String.format("%s.compareTo(%s) %s 0", lhsfh.getValueFrom("src"), rhscg.getCode(rhs), opFormat);
-                } else {
-                    return String.format("%s %s %s", lhsfh.getValueFrom("src"), opFormat, rhscg.getCode(rhs));
+                    // LHS is BigDecimal/BigInteger — use lhs.compareTo(rhs) OP 0
+                    // RHS must be wrapped to match LHS type if it does not already useCompareTo
+                    String rhsExpr = rhscg.getCode(rhs);
+                    if(rhs.getType() == ASTFactory.Type.LRFIELD) {
+                        FieldReferenceAST rfr = (FieldReferenceAST)rhs;
+                        ComponentFieldHolder rhsfh = sourceFieldHolders.get(rfr.getRef().getName());
+                        if(!rhsfh.useCompareTo()) {
+                            rhsExpr = wrapForCompareTo(lhsfh, rhsfh.getValueFrom("src"));
+                        }
+                    }
+                    return String.format("%s.compareTo(%s) %s 0", lhsfh.getValueFrom("src"), rhsExpr, opFormat);
+                } else if(rhs.getType() == ASTFactory.Type.LRFIELD) {
+                    FieldReferenceAST rfr = (FieldReferenceAST)rhs;
+                    ComponentFieldHolder rhsfh = sourceFieldHolders.get(rfr.getRef().getName());
+                    if(rhsfh.useCompareTo()) {
+                        // Only RHS is BigDecimal/BigInteger — flip: rhs.compareTo(lhs) FLIPPED_OP 0
+                        // LHS must be wrapped to match RHS type
+                        String lhsExpr = wrapForCompareTo(rhsfh, lhsfh.getValueFrom("src"));
+                        return String.format("%s.compareTo(%s) %s 0", rhsfh.getValueFrom("src"), lhsExpr, flipOperator(opFormat));
+                    }
                 }
+
+                // Neither side needs compareTo — plain infix
+                return String.format("%s %s %s", lhsfh.getValueFrom("src"), opFormat, rhscg.getCode(rhs));
             }
             return "Bad Comparison";
         }
         
+     }
+
+     private String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
+         switch(comparingHolder.getAccessor()) {
+             case "BigDecimal":  return String.format("new BigDecimal(String.valueOf(%s))", valueExpr);
+             case "BigInteger":  return String.format("BigInteger.valueOf(%s)", valueExpr);
+             default:            return valueExpr;
+         }
+     }
+
+     private String flipOperator(String op) {
+         switch(op) {
+             case ">":  return "<";
+             case "<":  return ">";
+             case ">=": return "<=";
+             case "<=": return ">=";
+             default:   return op;
+         }
      }
     
 }
