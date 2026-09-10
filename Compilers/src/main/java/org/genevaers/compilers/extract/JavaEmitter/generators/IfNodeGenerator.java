@@ -35,11 +35,32 @@ public class IfNodeGenerator extends ExtractRecordGenerator {
 
      @Override
      public String getCode(ExtractBaseAST node) {
-        return "IF Code TBD";
+        ExtractBaseAST pred  = (ExtractBaseAST) node.getChild(0);
+        ExtractBaseAST then  = (ExtractBaseAST) node.getChild(1);
+        ExtractRecordGenerator predGen  = getcodeGenerator(pred);
+        ExtractRecordGenerator thenGen  = getcodeGenerator(then);
+        ExtractRecordGenerator elseGen  = null;
+        ExtractBaseAST elseNode = null;
+        if(node.getNumberOfChildren() == 3) {
+            elseNode = (ExtractBaseAST) node.getChild(2);
+            elseGen  = getcodeGenerator(elseNode);
+        }
+        return buildIfFormatString(predGen, pred, thenGen, then, elseGen, elseNode);
      }
 
      private String getIfFormatString() {
+        return buildIfFormatString(predicateGen, predicate, thenBodyGenerator, thenBody, elseBodyGenerator, elseBody);
+     }
+
+     private String buildIfFormatString(ExtractRecordGenerator predGen, ExtractBaseAST pred,
+                                        ExtractRecordGenerator thenGen, ExtractBaseAST then,
+                                        ExtractRecordGenerator elseGen, ExtractBaseAST elseNode) {
+        if(elseGen == null) {
+            // No ELSE clause — emit a warning comment so the intent is visible in generated code
+            String ifFormat = "        if(%s) {\n    %s\n        } else {\n            // WARNING: no ELSE clause in source logic\n        }";
+            return String.format(ifFormat, predGen.getCode(pred), thenGen.getCode(then));
+        }
         String ifFormat = "        if(%s) {\n    %s\n        } else {\n    %s\n        }";
-        return String.format(ifFormat, predicateGen.getCode(predicate), thenBodyGenerator.getCode(thenBody), elseBodyGenerator.getCode(elseBody));
+        return String.format(ifFormat, predGen.getCode(pred), thenGen.getCode(then), elseGen.getCode(elseNode));
     }
 }

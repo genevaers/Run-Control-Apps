@@ -18,6 +18,7 @@ import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.Field
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
 import org.genevaers.compilers.extract.astnodes.BooleanOrAST;
 import org.genevaers.compilers.extract.astnodes.CalculationAST;
+import org.genevaers.compilers.extract.astnodes.StringComparisonAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
@@ -212,6 +213,8 @@ public abstract class ExtractRecordGenerator {
         //             break;
                 case EXPRCOMP:
                     return new ExprComparisonGenerator((ExprComparisonAST) node);
+                case STRINGCOMP:
+                    return new StringComparisonGenerator((StringComparisonAST) node);
                 case CALCULATION:
                     return new CalculationGenerator((CalculationAST) node);
                 case ADDITION:
@@ -283,6 +286,9 @@ public abstract class ExtractRecordGenerator {
                 case EXPRCOMP:
                     ExprComparisonGenerator compgen = new ExprComparisonGenerator((ExprComparisonAST) node);
                     return compgen.getCode(node);
+                case STRINGCOMP:
+                    StringComparisonGenerator strcmpgen = new StringComparisonGenerator((StringComparisonAST) node);
+                    return strcmpgen.getCode(node);
                 default:
                     logger.atInfo().log("No code generated for node type %s", node.getType());
             }

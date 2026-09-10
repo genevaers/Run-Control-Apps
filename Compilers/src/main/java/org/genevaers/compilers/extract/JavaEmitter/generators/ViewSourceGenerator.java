@@ -205,17 +205,17 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
     //If we use the parent(s) we need to not overwrite the hidden... key is we want to find looksup that are always used.
     private void logJoins() {
         logger.atInfo().log("Filter JOINS");
-        filterLookupIds.entrySet().stream().forEach(e -> {
+        filterLookupIds.entrySet().forEach(e -> {
             LookupInfo li = e.getValue();
             logger.atInfo().log("Found a JOIN %s[%d] at level %d hidden=%s", li.getLookupName(), li.getLookupId(), li.getLevel(), li.isHidden());
         });
         logger.atInfo().log("Column logic JOINS");
-        columnLookupIds.entrySet().stream().forEach(e -> {
+        columnLookupIds.entrySet().forEach(e -> {
             LookupInfo li = e.getValue();
             logger.atInfo().log("Found a JOIN %s[%d] at level %d hidden=%s", li.getLookupName(), li.getLookupId(), li.getLevel(), li.isHidden());
         });
         logger.atInfo().log("Hidden JOINS");
-        hiddenLookupIds.entrySet().stream().forEach(e -> {
+        hiddenLookupIds.entrySet().forEach(e -> {
             LookupInfo li = e.getValue();
             logger.atInfo().log("Found a JOIN %s[%d] at level %d hidden=%s", li.getLookupName(), li.getLookupId(), li.getLevel(), li.isHidden());
         });

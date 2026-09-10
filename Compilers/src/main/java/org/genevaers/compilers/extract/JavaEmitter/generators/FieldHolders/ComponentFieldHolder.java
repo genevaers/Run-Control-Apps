@@ -38,7 +38,10 @@ public class ComponentFieldHolder {
     }
 
     public String getValueFrom(String src) {
-        return getName() + ".get" + accessor + "(" + src + ")";
+        // If the accessor is already a full method name (e.g. "getString", "getBigInteger")
+        // use it directly; otherwise prepend "get" for bare type names (e.g. "BigDecimal").
+        String method = accessor.startsWith("get") ? accessor : "get" + accessor;
+        return getName() + "." + method + "(" + src + ")";
     }
 
     public String getName() {
