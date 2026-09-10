@@ -16,6 +16,7 @@ import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.Colum
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.FieldHolder;
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
+import org.genevaers.compilers.extract.astnodes.BooleanOrAST;
 import org.genevaers.compilers.extract.astnodes.CalculationAST;
 import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExprComparisonAST;
@@ -174,6 +175,8 @@ public abstract class ExtractRecordGenerator {
                     return new SelectIfGenerator((SelectIfAST) node);
                 case BOOLAND:
                     return new BooleanAndGenerator((BooleanAndAST)node);
+                case BOOLOR:
+                    return new BooleanOrGenerator((BooleanOrAST)node);
                 case LRFIELD:
                     return new LRFieldGenerator((FieldReferenceAST) node);
         //         case SKIPIF:
@@ -271,6 +274,9 @@ public abstract class ExtractRecordGenerator {
                 case BOOLAND:
                     BooleanAndGenerator bandgen = new BooleanAndGenerator((BooleanAndAST)node);
                     return bandgen.getCode(node);
+                case BOOLOR:
+                    BooleanOrGenerator borgen = new BooleanOrGenerator((BooleanOrAST)node);
+                    return borgen.getCode(node);
                 case COLUMNASSIGNMENT:
                     ColumnAssignmentGenerator cagen = new ColumnAssignmentGenerator((ColumnAssignmentASTNode)node);
                     return cagen.getCode(node);
