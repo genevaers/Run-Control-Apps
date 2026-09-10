@@ -81,12 +81,20 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
              }
              ComponentFieldHolder cfh = sourceFieldHolders.get(name);
              String othertype = cfh.getAccessor();
-             // final BigDecimal MIN_BALANCE = new BigDecimal("100.00");
              NumAtomAST na = (NumAtomAST) t;
              if (cfh.useCompareTo()) {
-                 String constName = String.format("%s_%d", othertype, na.getValue());
-                 constantDeclarations.computeIfAbsent(constName, s -> String.format("final %s %s = new %s(\"%d\");",
-                         othertype, constName, othertype, na.getValue()));
+                 // Build a safe constant name: replace '.' and '-' so it is a valid Java identifier
+                 String safeValue = na.getValueString().replace("-", "neg").replace(".", "_");
+                 String constName = String.format("%s_%s", othertype, safeValue);
+                 if (na.isFloatingPoint()) {
+                     // Use string-constructor form to preserve exact decimal value
+                     constantDeclarations.computeIfAbsent(constName, s -> String.format("final %s %s = new %s(\"%s\");",
+                             othertype, constName, othertype, na.getValueString()));
+                 } else {
+                     // Integer value — valueOf(long) is efficient and cache-friendly
+                     constantDeclarations.computeIfAbsent(constName, s -> String.format("final %s %s = %s.valueOf(%s);",
+                             othertype, constName, othertype, na.getValueString()));
+                 }
                  cg.addConstName(constName);
              }
          }

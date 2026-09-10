@@ -30,6 +30,7 @@ import org.genevaers.compilers.extract.astnodes.PFAstNode;
 import org.genevaers.compilers.extract.astnodes.SelectIfAST;
 import org.genevaers.compilers.extract.astnodes.StatementList;
 import org.genevaers.compilers.extract.astnodes.StringAtomAST;
+import org.genevaers.compilers.extract.astnodes.WriteASTNode;
 import org.genevaers.compilers.extract.astnodes.ViewColumnSourceAstNode;
 import org.genevaers.compilers.extract.astnodes.ViewSourceAstNode;
 import org.genevaers.genevaio.ltfile.LTRecord;
@@ -243,6 +244,10 @@ public abstract class ExtractRecordGenerator {
                     return new ExtractFilterGenerator((ExtractFilterAST) node);
                 case STATEMENTLIST:
                     return new StatementListGenerator((StatementList) node);
+                case WRITE:
+                    return new WriteStatementGenerator((WriteASTNode) node);
+                case EXTRACTOUTPUT:
+                    return new ExtractOutputGenerator(node);
         //         case ALL:
         //             doAll(node);
         //             break;
@@ -300,8 +305,16 @@ public abstract class ExtractRecordGenerator {
         return outputLength;
     }
 
+    public static void setOutputLength(int length) {
+        outputLength = length;
+    }
+
     public static int getLrLength() {
         return lrLength;
+    }
+
+    public static void setLrLength(int length) {
+        lrLength = length;
     }
 
     public static  Collection<LookupInfo> getJoins() {
@@ -343,6 +356,10 @@ public abstract class ExtractRecordGenerator {
         lkFields.add(defs);
     }
 
+    protected static void resetLookupFieldHolders() {
+        lookupFieldHolders = new LinkedHashMap<>();
+    }
+
     public static List<String> getConstantDefinitions() {
         List<String> defs = new ArrayList<>();
         constantDeclarations.values().stream().forEach(c -> defs.add(c));
@@ -357,12 +374,34 @@ public abstract class ExtractRecordGenerator {
         return constName;
     }
 
+    /**
+     * Wrap a plain value expression so it matches the type required by a
+     * BigDecimal or BigInteger method-chain call.
+     *
+     * For numeric literal strings (raw output of NumAtomGenerator) the wrap
+     * must account for whether the literal is a float or an integer:
+     *   - Float literals (contain '.') need  new BigDecimal("3.14")
+     *     because BigDecimal.valueOf(double) loses precision.
+     *   - Integer literals and field accessor calls use the efficient
+     *     valueOf(long) form.
+     */
     protected static String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
         switch(comparingHolder.getAccessor()) {
-            case "BigDecimal": return String.format("BigDecimal.valueOf(%s)", valueExpr);
-            case "BigInteger": return String.format("BigInteger.valueOf(%s)", valueExpr);
-            default:           return valueExpr;
+            case "BigDecimal":
+                if (isFloatLiteral(valueExpr)) {
+                    return String.format("new BigDecimal(\"%s\")", valueExpr);
+                }
+                return String.format("BigDecimal.valueOf(%s)", valueExpr);
+            case "BigInteger":
+                return String.format("BigInteger.valueOf(%s)", valueExpr);
+            default:
+                return valueExpr;
         }
+    }
+
+    /** True if the expression is a raw floating-point literal string (e.g. "3.14"). */
+    private static boolean isFloatLiteral(String expr) {
+        return expr.contains(".") && expr.matches("-?\\d+\\.\\d+");
     }
 
 }

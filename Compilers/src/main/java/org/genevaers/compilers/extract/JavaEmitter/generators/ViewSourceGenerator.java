@@ -50,18 +50,16 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         logJoins();
         generateSourceLRFields(vst);
         generateViewColumnFields(vst);
-        generateLookupFields(vst);
-        generateFromChildNodes(vst);
-        outputLength = vst.getAreaValues().getDtLen();
-        lrLength = Repository.getLRLength(vst.getViewSource().getSourceLRID());
+        generateLookupFields();
+        setOutputLength(vst.getAreaValues().getDtLen());
+        setLrLength(Repository.getLRLength(vst.getViewSource().getSourceLRID()));
         logger.atInfo().log("View source output length %d", outputLength);
-        //HACK!!!!
-        columnRecs.add(String.format("            outWriter.getRecordToFill().bytes.position(%d);\n" + //
-                        "            outWriter.writeAndClearTheRecord();\n", outputLength));
+        // Walk child nodes — the EXTRACTOUTPUT/WRITE nodes generate the write statement
+        generateFromChildNodes(vst);
      }
 
-    private void generateLookupFields(ViewSourceAstNode vst) {
-        columnLookupIds.entrySet().stream().forEach(e -> addLookupFieldHolder(e));
+    private void generateLookupFields() {
+        columnLookupIds.entrySet().forEach(this::addLookupFieldHolder);
     }
 
     private void  addLookupFieldHolder(Entry<Integer, LookupInfo> e) {
@@ -75,7 +73,9 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         FieldPositionComparator fpc = new FieldPositionComparator();
         Collections.sort(fieldsByPosition, fpc);
 
-        lookupFieldHolders = new LinkedHashMap<>();
+        //The lookupFieldHolders are unique to a view source
+        //So in the case of many view sources we need to reset this.
+        resetLookupFieldHolders();
         Iterator<LRField> fbpi = fieldsByPosition.iterator();
         int startPos;
         int nextPos = 1;
