@@ -29,7 +29,13 @@ public class FieldHolder extends ComponentFieldHolder{
     public String getName() {
         return field.getName();
     }
-    
+
+    @Override
+    public String getAssignmentSource(int len) {
+        // Unsupported type — return empty so callers can detect and emit a comment.
+        return "";
+    }
+
     @Override
     public String getValueFrom(String src) {
         // If the accessor is already a full method name (e.g. "getString") use it

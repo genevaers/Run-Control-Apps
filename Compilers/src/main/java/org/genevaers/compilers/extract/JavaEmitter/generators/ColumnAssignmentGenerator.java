@@ -63,13 +63,11 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case DT_COLUMN:
                 return getDtAssignment();
             case CT_COLUMN:
-                //Not going to support these for the moment
-                return "CT Columns not supported";
+                return "// WARNING: CT columns not supported in Java emitter";
             case SK_COLUMN:
-                //An SK only applies for format views. Again not supported at the moment
-                return "SK Columns not supported";
+                return "// WARNING: SK columns not supported in Java emitter";
             default:
-                return "Unknown Assignment target " + trg.getType();
+                return "// WARNING: unknown assignment target type " + trg.getType();
         }
     }
 
@@ -86,7 +84,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case CALCULATION:
                 return dtCalculationAssignment();
             default:
-                return "";
+                return "// WARNING: unsupported source type " + src.getType() + " in column assignment";
         }
     }
 
@@ -107,13 +105,13 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     private String dtcString() {
         ColumnAST col = (ColumnAST) trg;
         StringAtomAST sa = (StringAtomAST) src;
-        String targString = sa.getValue();
-        if (targString.equals("")) {
-            targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", " ");
-        } else {
-            targString = String.format("%-" + col.getViewColumn().getFieldLength() + "s", sa.getValue());
-        }
-        return String.format("        target.put(\"%s\".getBytes());", targString);
+        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
+        int fieldLen = col.getViewColumn().getFieldLength();
+        String rawValue = sa.getValue();
+        String padded = rawValue.isEmpty()
+            ? String.format("%-" + fieldLen + "s", " ")
+            : String.format("%-" + fieldLen + "s", rawValue);
+        return String.format("                %s(\"%s\", target);", cfh.getAssignmentTarget(), padded);
     }
 
     private String dtlEquivalentBasedOnTypes() {
@@ -155,10 +153,15 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         ColumnAST col = (ColumnAST) trg;
         ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
         ComponentFieldHolder srcfh = sourceFieldHolders.get(fr.getRef().getName());
-        //return assignBasedOnTypes(fr.getRef().getDatatype(), "src", fr.getRef().getStartPosition() - 1, fr.getRef().getLength());
-        return String.format("                %s(%s, target);", cfh.getAssignmentTarget(), srcfh.getAssignmentSource(col.getViewColumn().getFieldLength()));
-
-        //return assignBasedOnTypes(fr.getRef(), "src", fr.getRef().getName());
+        if (srcfh == null) {
+            return String.format("// WARNING: no field holder for source field %s — skipped", fr.getRef().getName());
+        }
+        String assignmentSource = srcfh.getAssignmentSource(col.getViewColumn().getFieldLength());
+        if (assignmentSource == null || assignmentSource.isEmpty()) {
+            return String.format("// WARNING: field %s has unsupported data type %s — skipped",
+                fr.getRef().getName(), fr.getRef().getDatatype());
+        }
+        return String.format("                %s(%s, target);", cfh.getAssignmentTarget(), assignmentSource);
     }
 
     private String dtlEquivalentBasedOnTypes(String joinbuffer, LRField redField, String name) {

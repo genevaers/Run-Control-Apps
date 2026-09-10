@@ -20,60 +20,35 @@ public class ComponentFieldHolderFactory {
     }
 
     private static FieldHolder getComponentField(String name, LRField fld, DataType dataType, short length, boolean signed, int numDecimals) {
-        FieldHolder cfh = null;
         switch(dataType) {
-            case ALPHA:
-                break;
             case ALPHANUMERIC: {
-                //To cater for redefines we will need to set the offset directly - or correct for redefines
-                //Detect redefines as we iterate through the fields?
-                cfh = new StringFieldHolder(fld);
+                FieldHolder cfh = new StringFieldHolder(fld);
                 cfh.setAccessor("getString");
                 cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d)", name, length));
-                break;
-            }
-            case BCD:
-                break;
-            case BINARY:
-                return new BinaryFieldHolder(fld);
-            case BSORT:
-                break;
-            case CONSTDATE:
-                break;
-            case CONSTNUM:
-                break;
-            case CONSTSTRING:
-                break;
-            case EDITED: {
-                cfh = new StringFieldHolder(fld);
-                cfh.setAccessor("getString");
-                cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d); //For Edited Numeric", name, length));
-                break;
-            }
-            case FLOAT:
-                break;
-            case GENEVANUMBER:
-                break;
-            case INVALID:
-                break;
-            case MASKED:
-                break;
-            case PACKED: {
-                return new PackedFieldHolder(name, fld);
-            }
-            case PSORT:
-                break;
-            case ZONED:
-                break;
-            default: {
-                cfh = new FieldHolder(fld);
-                cfh.setAccessor("Default");
-                cfh.setDefinition(String.format("//private static final TBD %s = factory.getStringField(%d)", name, length));
                 return cfh;
             }
-            
+            case EDITED: {
+                FieldHolder cfh = new StringFieldHolder(fld);
+                cfh.setAccessor("getString");
+                cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d); //For Edited Numeric", name, length));
+                return cfh;
+            }
+            case BINARY:
+                return new BinaryFieldHolder(fld);
+            case PACKED:
+                return new PackedFieldHolder(name, fld);
+            case ZONED:
+                return new ZonedFieldHolder(name, fld);
+            default: {
+                // Unsupported or unrecognised data type — return a sentinel holder that
+                // emits a comment in the generated source so the problem is visible.
+                FieldHolder cfh = new FieldHolder(fld);
+                cfh.setAccessor("getString");
+                cfh.setDefinition(String.format(
+                    "// WARNING: field %s has unsupported data type %s — skipped", name, dataType));
+                return cfh;
+            }
         }
-        return cfh;
     }
     
 }
