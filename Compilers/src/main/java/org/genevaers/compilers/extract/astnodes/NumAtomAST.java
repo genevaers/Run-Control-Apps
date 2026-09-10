@@ -86,6 +86,10 @@ public class NumAtomAST extends FormattedASTNode  implements GenevaERSValue, Ass
         return Math.round(value);
     }
 
+    public boolean isFloatingPoint() {
+        return numStr != null && numStr.contains(".");
+    }
+
     @Override
     public String getValueString() {
         return numStr;
