@@ -56,7 +56,7 @@ public class LRFieldGenerator extends ExtractRecordGenerator {
             case PSORT:
                 break;
             case ZONED:
-                break;
+                return sourceFieldHolders.get(fld.getName()).getValueFrom("src");
             default:
                 break;
 

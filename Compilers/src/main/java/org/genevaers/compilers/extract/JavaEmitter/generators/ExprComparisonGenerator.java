@@ -59,27 +59,46 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
         return sb.toString();
      }
 
+     private ComponentFieldHolder fieldHolder(ExtractBaseAST operand) {
+         if (operand.getType() == ASTFactory.Type.LRFIELD) {
+             FieldReferenceAST fr = (FieldReferenceAST) operand;
+             return sourceFieldHolders.get(fr.getRef().getName());
+         }
+         return null;
+     }
+
+     private ComponentFieldHolder pickDominant(ComponentFieldHolder a, ComponentFieldHolder b) {
+         if (a != null && "BigDecimal".equals(a.getAccessor())) return a;
+         if (b != null && "BigDecimal".equals(b.getAccessor())) return b;
+         if (a != null && "BigInteger".equals(a.getAccessor())) return a;
+         if (b != null && "BigInteger".equals(b.getAccessor())) return b;
+         return null;
+     }
+
+     private ComponentFieldHolder findFieldHolder(ExtractBaseAST node) {
+         if (node.getType() == ASTFactory.Type.LRFIELD) {
+             FieldReferenceAST fr = (FieldReferenceAST) node;
+             return sourceFieldHolders.get(fr.getRef().getName());
+         } else if (node.getType() == ASTFactory.Type.CALCULATION) {
+             ExtractBaseAST setterNode = (ExtractBaseAST) node.getChild(0);
+             ExtractBaseAST lhsOp = (ExtractBaseAST) setterNode.getChild(0);
+             ExtractBaseAST opNode = (ExtractBaseAST) node.getChild(1);
+             ExtractBaseAST rhsOp = (ExtractBaseAST) opNode.getChild(0);
+             return pickDominant(findFieldHolder(lhsOp), findFieldHolder(rhsOp));
+         }
+         return null;
+     }
+
      private String getConstDeclaration(ExtractBaseAST t, ExtractBaseAST otherside, ExtractRecordGenerator cg) {
          String decl = null;
 
          if (t.getType() == ASTFactory.Type.STRINGATOM) {
 
          } else if (t.getType() == ASTFactory.Type.NUMATOM) {
-             DataType dt = DataType.INVALID;
-             String name = null;
-             // declaration type dependenent on other side type
-             switch (otherside.getType()) {
-                 case LRFIELD:
-                     FieldReferenceAST lrfr = (FieldReferenceAST) otherside;
-                     dt = lrfr.getRef().getDatatype();
-                     name = lrfr.getRef().getName();
-                     break;
-                 case LOOKUPFIELDREF:
-                     break;
-                 default:
-                     break;
+             ComponentFieldHolder cfh = findFieldHolder(otherside);
+             if (cfh == null) {
+                 return decl;
              }
-             ComponentFieldHolder cfh = sourceFieldHolders.get(name);
              String othertype = cfh.getAccessor();
              NumAtomAST na = (NumAtomAST) t;
              if (cfh.useCompareTo()) {
@@ -135,37 +154,27 @@ public class ExprComparisonGenerator extends ExtractRecordGenerator {
         if(stringComparison) {
             return String.format("%s%s%s) ", String.format(lhsFormat, lhscg.getCode(lhs)), opFormat, String.format(rhsFormat, rhscg.getCode(rhs)));
         } else {
-            if(lhs.getType() == ASTFactory.Type.LRFIELD) {
-                FieldReferenceAST lfr = (FieldReferenceAST)lhs;
-                ComponentFieldHolder lhsfh = sourceFieldHolders.get(lfr.getRef().getName());
+            ComponentFieldHolder lhsfh = findFieldHolder(lhs);
+            ComponentFieldHolder rhsfh = findFieldHolder(rhs);
+            boolean lhsUseCompare = lhsfh != null && lhsfh.useCompareTo();
+            boolean rhsUseCompare = rhsfh != null && rhsfh.useCompareTo();
 
-                if(lhsfh.useCompareTo()) {
-                    // LHS is BigDecimal/BigInteger — use lhs.compareTo(rhs) OP 0
-                    // RHS must be wrapped to match LHS type if it does not already useCompareTo
-                    String rhsExpr = rhscg.getCode(rhs);
-                    if(rhs.getType() == ASTFactory.Type.LRFIELD) {
-                        FieldReferenceAST rfr = (FieldReferenceAST)rhs;
-                        ComponentFieldHolder rhsfh = sourceFieldHolders.get(rfr.getRef().getName());
-                        if(!rhsfh.useCompareTo()) {
-                            rhsExpr = wrapForCompareTo(lhsfh, rhsfh.getValueFrom("src"));
-                        }
-                    }
-                    return String.format("%s.compareTo(%s) %s 0", lhsfh.getValueFrom("src"), rhsExpr, opFormat);
-                } else if(rhs.getType() == ASTFactory.Type.LRFIELD) {
-                    FieldReferenceAST rfr = (FieldReferenceAST)rhs;
-                    ComponentFieldHolder rhsfh = sourceFieldHolders.get(rfr.getRef().getName());
-                    if(rhsfh.useCompareTo()) {
-                        // Only RHS is BigDecimal/BigInteger — flip: rhs.compareTo(lhs) FLIPPED_OP 0
-                        // LHS must be wrapped to match RHS type
-                        String lhsExpr = wrapForCompareTo(rhsfh, lhsfh.getValueFrom("src"));
-                        return String.format("%s.compareTo(%s) %s 0", rhsfh.getValueFrom("src"), lhsExpr, flipOperator(opFormat));
-                    }
+            String lhsExpr = lhscg.getCode(lhs);
+            String rhsExpr = rhscg.getCode(rhs);
+
+            if (lhsUseCompare) {
+                if (!rhsUseCompare && rhscg.getConstName() == null) {
+                    rhsExpr = wrapForCompareTo(lhsfh, rhsExpr);
                 }
-
-                // Neither side needs compareTo — plain infix
-                return String.format("%s %s %s", lhsfh.getValueFrom("src"), opFormat, rhscg.getCode(rhs));
+                return String.format("%s.compareTo(%s) %s 0", lhsExpr, rhsExpr, opFormat);
+            } else if (rhsUseCompare) {
+                if (lhscg.getConstName() == null) {
+                    lhsExpr = wrapForCompareTo(rhsfh, lhsExpr);
+                }
+                return String.format("%s.compareTo(%s) %s 0", rhsExpr, lhsExpr, flipOperator(opFormat));
+            } else {
+                return String.format("%s %s %s", lhsExpr, opFormat, rhsExpr);
             }
-            return "Bad Comparison";
         }
         
      }
