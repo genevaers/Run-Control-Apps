@@ -611,8 +611,8 @@ public class VDPComparisonSummaryWriter {
                     continue;
                 }
                 writer.write(String.format("   ID        %d\n", pfId));
-                writer.write(String.format(" -  VDP1     %s\n", name1));
-                writer.write(String.format(" -  VDP2     %s\n", name2));
+                writer.write(String.format(" -  VDPNEW     %s\n", name1));
+                writer.write(String.format(" -  VDPOLD     %s\n", name2));
             }
         }
         writer.write("\n");
@@ -632,8 +632,8 @@ public class VDPComparisonSummaryWriter {
             writer.write(String.format("   View ID %26d\n", vld.viewId));
             writer.write(String.format("   View Name %19s\n", (vld.name1 != null && !vld.name1.isEmpty()) ? vld.name1 : vld.name2));
             if (!Objects.equals(vld.name1, vld.name2)) {
-                writer.write(String.format(" -  VDP1 %25s\n", (vld.name1 != null && !vld.name1.isEmpty()) ? vld.name1 : "missing"));
-                writer.write(String.format(" -  VDP2 %25s\n", (vld.name2 != null && !vld.name2.isEmpty()) ? vld.name2 : "missing"));
+                writer.write(String.format(" -  VDPNEW %25s\n", (vld.name1 != null && !vld.name1.isEmpty()) ? vld.name1 : "missing"));
+                writer.write(String.format(" -  VDPOLD %25s\n", (vld.name2 != null && !vld.name2.isEmpty()) ? vld.name2 : "missing"));
             }
             if (!vld.columnDiffs.isEmpty()) {
                 writer.write("   Column Properties\n");
@@ -650,8 +650,8 @@ public class VDPComparisonSummaryWriter {
                         String v1 = (pd.vdp1Value != null && !pd.vdp1Value.isEmpty()) ? pd.vdp1Value : "missing";
                         String v2 = (pd.vdp2Value != null && !pd.vdp2Value.isEmpty()) ? pd.vdp2Value : "missing";
                         writer.write(String.format("       %-24s\n", pd.label));
-                        writer.write(String.format(" -      VDP1 %20s\n", v1));
-                        writer.write(String.format(" -      VDP2 %20s\n", v2));
+                        writer.write(String.format(" -      VDPNEW %20s\n", v1));
+                        writer.write(String.format(" -      VDPOLD %20s\n", v2));
                     }
                 }
             }
@@ -661,9 +661,9 @@ public class VDPComparisonSummaryWriter {
                     writer.write(String.format("     Column Number %d\n", cld.columnNumber));
                     writer.write(String.format("       Column Source Properties %d\n", cld.sourceNumber));
                     writer.write("         Column Logic Text\n");
-                    writer.write(" -        VDP1                 \n");
+                    writer.write(" -        VDPNEW                 \n");
                     writeLogicText(writer, cld.logic1);
-                    writer.write(" -        VDP2                 \n");
+                    writer.write(" -        VDPOLD                 \n");
                     writeLogicText(writer, cld.logic2);
                 }
             }
@@ -702,8 +702,8 @@ public class VDPComparisonSummaryWriter {
             writer.write(String.format("   Name %24s\n", (ld.name1 != null && !ld.name1.isEmpty()) ? ld.name1 : ld.name2));
             writer.write(String.format("   Mapped To %20s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : ""));
             if (!Objects.equals(ld.name1, ld.name2) || !Objects.equals(ld.mappedTo1, ld.mappedTo2)) {
-                writer.write(String.format(" -  VDP1 %25s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : "missing"));
-                writer.write(String.format(" -  VDP2 %25s\n", (ld.mappedTo2 != null && ld.mappedTo2 > 0) ? String.valueOf(ld.mappedTo2) : "missing"));
+                writer.write(String.format(" -  VDPNEW %25s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : "missing"));
+                writer.write(String.format(" -  VDPOLD %25s\n", (ld.mappedTo2 != null && ld.mappedTo2 > 0) ? String.valueOf(ld.mappedTo2) : "missing"));
             }
             writer.write("   Lookup Steps\n");
             for (LookupStepDiff lsd : ld.steps) {
@@ -711,15 +711,15 @@ public class VDPComparisonSummaryWriter {
                 writer.write(String.format("   ID %26d\n", ld.id));
                 writer.write(String.format("   Name %24s\n", (ld.name1 != null && !ld.name1.isEmpty()) ? ld.name1 : ld.name2));
                 writer.write(String.format("   Mapped To %20s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : ""));
-                writer.write(String.format(" -  VDP1 %25s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : "missing"));
-                writer.write(String.format(" -  VDP2 %25s\n", (ld.mappedTo2 != null && ld.mappedTo2 > 0) ? String.valueOf(ld.mappedTo2) : "missing"));
+                writer.write(String.format(" -  VDPNEW %25s\n", (ld.mappedTo1 != null && ld.mappedTo1 > 0) ? String.valueOf(ld.mappedTo1) : "missing"));
+                writer.write(String.format(" -  VDPOLD %25s\n", (ld.mappedTo2 != null && ld.mappedTo2 > 0) ? String.valueOf(ld.mappedTo2) : "missing"));
                 writer.write(String.format("   Step Number %d\n", lsd.stepNumber));
                 writer.write("     Source Field Properties\n");
                 for (KeyPropDiff kpd : lsd.keyProps) {
                     writer.write(String.format("       Source Field Seq Num %d\n", kpd.seqNum));
                     writer.write(String.format("         %-25s\n", kpd.propLabel));
-                    writer.write(String.format(" -        VDP1                 %s\n", (kpd.vdp1Value != null && !kpd.vdp1Value.isEmpty()) ? kpd.vdp1Value : "missing"));
-                    writer.write(String.format(" -        VDP2                 %s\n", (kpd.vdp2Value != null && !kpd.vdp2Value.isEmpty()) ? kpd.vdp2Value : "missing"));
+                    writer.write(String.format(" -        VDPNEW                 %s\n", (kpd.vdp1Value != null && !kpd.vdp1Value.isEmpty()) ? kpd.vdp1Value : "missing"));
+                    writer.write(String.format(" -        VDPOLD                 %s\n", (kpd.vdp2Value != null && !kpd.vdp2Value.isEmpty()) ? kpd.vdp2Value : "missing"));
                 }
             }
         }
@@ -764,15 +764,15 @@ public class VDPComparisonSummaryWriter {
             boolean hasLookupExit2 = lrd.lookupExit2 != null && lrd.lookupExit2 > 0;
             if (hasLookupExit1 || hasLookupExit2) {
                 writer.write("   Lookup Exit                  \n");
-                writer.write(String.format(" -  VDP1 %25s\n", describeComparisonStatus(hasLookupExit1, hasLookupExit2, !Objects.equals(lrd.lookupExit1, lrd.lookupExit2))));
-                writer.write(String.format(" -  VDP2 %25s\n", describeComparisonStatus(hasLookupExit2, hasLookupExit1, !Objects.equals(lrd.lookupExit1, lrd.lookupExit2))));
+                writer.write(String.format(" -  VDPNEW %25s\n", describeComparisonStatus(hasLookupExit1, hasLookupExit2, !Objects.equals(lrd.lookupExit1, lrd.lookupExit2))));
+                writer.write(String.format(" -  VDPOLD %25s\n", describeComparisonStatus(hasLookupExit2, hasLookupExit1, !Objects.equals(lrd.lookupExit1, lrd.lookupExit2))));
             }
             boolean hasLookupExitParams1 = !lrd.lookupExitParams1.isEmpty();
             boolean hasLookupExitParams2 = !lrd.lookupExitParams2.isEmpty();
             if (hasLookupExitParams1 || hasLookupExitParams2) {
                 writer.write("   Lookup Exit Parms           \n");
-                writer.write(String.format(" -  VDP1 %25s\n", describeComparisonStatus(hasLookupExitParams1, hasLookupExitParams2, !Objects.equals(lrd.lookupExitParams1, lrd.lookupExitParams2))));
-                writer.write(String.format(" -  VDP2 %25s\n", describeComparisonStatus(hasLookupExitParams2, hasLookupExitParams1, !Objects.equals(lrd.lookupExitParams1, lrd.lookupExitParams2))));
+                writer.write(String.format(" -  VDPNEW %25s\n", describeComparisonStatus(hasLookupExitParams1, hasLookupExitParams2, !Objects.equals(lrd.lookupExitParams1, lrd.lookupExitParams2))));
+                writer.write(String.format(" -  VDPOLD %25s\n", describeComparisonStatus(hasLookupExitParams2, hasLookupExitParams1, !Objects.equals(lrd.lookupExitParams1, lrd.lookupExitParams2))));
             }
             if (!lrd.fields.isEmpty()) {
                 writer.write("   LR Fields\n");
@@ -783,13 +783,13 @@ public class VDPComparisonSummaryWriter {
                     }
                     writer.write(String.format("     ID %24d\n", fd.id));
                     if (fd.missing1 || fd.missing2) {
-                        writer.write(String.format(" -    VDP1 %22s\n", fd.missing1 ? "missing" : "exists"));
-                        writer.write(String.format(" -    VDP2 %22s\n", fd.missing2 ? "missing" : "exists"));
+                        writer.write(String.format(" -    VDPNEW %22s\n", fd.missing1 ? "missing" : "exists"));
+                        writer.write(String.format(" -    VDPOLD %22s\n", fd.missing2 ? "missing" : "exists"));
                     } else {
                         writer.write(String.format("     Name %22s\n", fd.name));
                         for (PropertyDiff pd : fd.props) {
                             writer.write(String.format("     %-24s%20s\n", pd.label, pd.vdp1Value));
-                            writer.write(String.format(" -    VDP2 %22s\n", pd.vdp2Value));
+                            writer.write(String.format(" -    VDPOLD %22s\n", pd.vdp2Value));
                         }
                     }
                     writer.write("     \n");
@@ -1324,7 +1324,7 @@ public class VDPComparisonSummaryWriter {
      */
     private void writeSummaryCounts(Writer writer) throws IOException {
         writer.write(" -------------------------------------------------------------------------------\n");
-        writer.write(" Component Type        VDP1 Count  VDP2 Count\n");
+        writer.write(" Component Type        VDPNEW Count  VDPOLD Count\n");
         writer.write(" -------------------------------------------------------------------------------\n");
         
         for (String componentType : vdp1Counts.keySet()) {
@@ -1356,8 +1356,8 @@ public class VDPComparisonSummaryWriter {
         writer.write(" *---------------------------------------------------------------------\n");
         for (ComponentDifference diff : exitDiffs) {
             writer.write(String.format("   ID %26d\n", diff.id));
-            writer.write(String.format(" -  VDP1                       %s\n", diff.vdp1Status));
-            writer.write(String.format(" -  VDP2                       %s\n", diff.vdp2Status));
+            writer.write(String.format(" -  VDPNEW                       %s\n", diff.vdp1Status));
+            writer.write(String.format(" -  VDPOLD                       %s\n", diff.vdp2Status));
             writer.write(" *---------------------------------------------------------------------\n");
         }
         writer.write("  \n");
@@ -1408,8 +1408,8 @@ public class VDPComparisonSummaryWriter {
                     continue;
                 }
                 writer.write(String.format("     %-25s\n", dd));
-                writer.write(String.format(" -    VDP1 %25s\n", status1));
-                writer.write(String.format(" -    VDP2 %25s\n", status2));
+                writer.write(String.format(" -    VDPNEW %25s\n", status1));
+                writer.write(String.format(" -    VDPOLD %25s\n", status2));
             }
         }
 
@@ -1424,8 +1424,8 @@ public class VDPComparisonSummaryWriter {
                     continue;
                 }
                 writer.write(String.format("     %-25s\n", dd));
-                writer.write(String.format(" -    VDP1 %25s\n", status1));
-                writer.write(String.format(" -    VDP2 %25s\n", status2));
+                writer.write(String.format(" -    VDPNEW %25s\n", status1));
+                writer.write(String.format(" -    VDPOLD %25s\n", status2));
             }
         }
         writer.write("\n");
@@ -1450,20 +1450,20 @@ public class VDPComparisonSummaryWriter {
         onlyIn2.removeAll(set1);
 
         if (onlyIn1.isEmpty() && onlyIn2.isEmpty()) {
-            writer.write(String.format(" %s DD names match between VDP1 and VDP2.\n", phaseLabel));
+            writer.write(String.format(" %s DD names match between VDPNEW and VDPOLD.\n", phaseLabel));
             writer.write("  \n");
             return;
         }
 
         if (!onlyIn1.isEmpty()) {
-            writer.write(String.format(" %s names only in VDP1:\n", phaseLabel));
+            writer.write(String.format(" %s names only in VDPNEW:\n", phaseLabel));
             for (String ddName : onlyIn1) {
                 writer.write(String.format("   %s\n", ddName));
             }
             writer.write("  \n");
         }
         if (!onlyIn2.isEmpty()) {
-            writer.write(String.format(" %s names only in VDP2:\n", phaseLabel));
+            writer.write(String.format(" %s names only in VDPOLD:\n", phaseLabel));
             for (String ddName : onlyIn2) {
                 writer.write(String.format("   %s\n", ddName));
             }
@@ -1489,7 +1489,7 @@ public class VDPComparisonSummaryWriter {
         }
         
         writer.write(" -------------------------------------------------------------------------------\n");
-        writer.write(" Component Type            ID  VDP1                VDP2\n");
+        writer.write(" Component Type            ID  VDPNEW                VDPOLD\n");
         writer.write(" -------------------------------------------------------------------------------\n");
         
         for (ComponentDifference diff : otherDiffs) {
