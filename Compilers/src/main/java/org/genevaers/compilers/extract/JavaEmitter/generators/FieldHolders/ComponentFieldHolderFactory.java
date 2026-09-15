@@ -33,6 +33,8 @@ public class ComponentFieldHolderFactory {
                 cfh.setDefinition(String.format("private static final StringField %s = factory.getStringField(%d); //For Edited Numeric", name, length));
                 return cfh;
             }
+            case BCD:
+                return new BCDFieldHolder(name, fld);
             case BINARY:
                 return new BinaryFieldHolder(fld);
             case PACKED:

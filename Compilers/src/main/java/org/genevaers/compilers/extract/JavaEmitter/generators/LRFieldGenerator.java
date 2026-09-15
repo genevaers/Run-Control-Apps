@@ -30,7 +30,7 @@ public class LRFieldGenerator extends ExtractRecordGenerator {
             case ALPHANUMERIC:
                 break;
             case BCD:
-                break;
+                return sourceFieldHolders.get(fld.getName()).getValueFrom("src");
             case BINARY:
                 return sourceFieldHolders.get(fld.getName()).getValueFrom("src");
             case BSORT:
