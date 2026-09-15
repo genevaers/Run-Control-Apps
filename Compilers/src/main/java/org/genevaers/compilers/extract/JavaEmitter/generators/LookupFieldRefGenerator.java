@@ -1,10 +1,10 @@
 package org.genevaers.compilers.extract.JavaEmitter.generators;
 
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
-import org.genevaers.repository.components.LogicalRecord;
 
 public class LookupFieldRefGenerator extends ExtractRecordGenerator {
 
@@ -22,10 +22,26 @@ public class LookupFieldRefGenerator extends ExtractRecordGenerator {
      public String getCode(ExtractBaseAST node) {
         LookupFieldRefAST fn = (LookupFieldRefAST) node;
         LRField fld = fn.getRef();
-        //This will be dependent on the type of the field, for now we will assume all fields are strings and use the String
-        //We need the key length since the record start after the key in the join buffer?
-        LogicalRecord refLR = Repository.getLogicalRecords().get(9000000 + fn.getNewJoinId());
-        LRField reffld = refLR.findFromFieldsByName(fld.getName());
-        return String.format("new String(joinBuffer.bytes.array(), %d , %d)", reffld.getStartPosition()-1, reffld.getLength());
+        String joinBufName = "joinBuffer" + fn.getNewJoinId();
+        // Look up the typed field holder registered in lookupFieldHolders so that
+        // the correct accessor (getLong, getBigInteger, getBigDecimal, etc.) is used.
+        // The holder key is "<lookupName>_<fieldName>" as built by ViewSourceGenerator.
+        String holderKey = fn.getLookup().getName() + "_" + fld.getName();
+        ComponentFieldHolder holder = lookupFieldHolders.get(holderKey);
+        if (holder != null) {
+            // Build the accessor call using holderKey as the Java field name.
+            // We cannot use holder.getValueFrom() because FieldHolder.getName() returns
+            // the bare LRField name, not the lookup-prefixed holder name (holderKey).
+            String method = holder.getAccessor().startsWith("get")
+                    ? holder.getAccessor()
+                    : "get" + holder.getAccessor();
+            return holderKey + "." + method + "(" + joinBufName + ")";
+        }
+        // Fallback: treat as a raw string slice (String fields or unknown types)
+        LRField redField = Repository.getREDfieldFrom(fn.getLookup(), fld);
+        if (redField != null) {
+            return String.format("new String(%s.array(), %d, %d)", joinBufName, redField.getStartPosition() - 1, redField.getLength());
+        }
+        return String.format("new String(%s.array(), %d, %d)", joinBufName, fld.getStartPosition() - 1, fld.getLength());
      }
 }

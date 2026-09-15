@@ -14,8 +14,12 @@ import org.genevaers.repository.components.enums.DataType;
 
 import com.google.common.flogger.FluentLogger;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
@@ -98,8 +102,41 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         String fmtSpec = dec > 0
                 ? String.format("%%%d.%df", len, dec)
                 : String.format("%%%ds",    len);
-        return String.format("                %s(String.format(\"%s\", %s), target);",
+        String assignment = String.format("                %s(String.format(\"%s\", %s), target);",
                 cfh.getAssignmentTarget(), fmtSpec, calcExpr);
+
+        // If the calculation references any lookup field, wrap the assignment in a
+        // null-check guard for every distinct joinBuffer involved.
+        Set<String> joinBuffers = collectJoinBufferNames(src);
+        if (!joinBuffers.isEmpty()) {
+            String condition = String.join(" != null && ", joinBuffers) + " != null";
+            String elseBody = getElseBody(col);
+            return String.format("        if(%s) {\n        %s\n        } else {\n        %s\n        }",
+                    condition, assignment, elseBody);
+        }
+        return assignment;
+    }
+
+    /**
+     * Walk the calculation AST tree and collect the joinBuffer variable name for
+     * every LOOKUPFIELDREF operand found (breadth-first, insertion-ordered).
+     */
+    private Set<String> collectJoinBufferNames(ExtractBaseAST node) {
+        Set<String> buffers = new LinkedHashSet<>();
+        collectJoinBufferNamesRecursive(node, buffers);
+        return buffers;
+    }
+
+    private void collectJoinBufferNamesRecursive(ExtractBaseAST node, Set<String> buffers) {
+        if (node == null) return;
+        if (node.getType() == Type.LOOKUPFIELDREF) {
+            LookupFieldRefAST lfr = (LookupFieldRefAST) node;
+            buffers.add("joinBuffer" + lfr.getNewJoinId());
+        }
+        Iterator<ASTBase> ci = node.getChildIterator();
+        while (ci.hasNext()) {
+            collectJoinBufferNamesRecursive((ExtractBaseAST) ci.next(), buffers);
+        }
     }
 
     private String dtcString() {

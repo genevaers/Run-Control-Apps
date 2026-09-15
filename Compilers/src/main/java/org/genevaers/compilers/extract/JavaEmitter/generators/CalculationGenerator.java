@@ -5,6 +5,7 @@ import org.genevaers.compilers.extract.astnodes.ASTFactory;
 import org.genevaers.compilers.extract.astnodes.CalculationAST;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
+import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 
 /**
  * Generates a Java arithmetic expression from a CALCULATION AST node.
@@ -65,8 +66,15 @@ public class CalculationGenerator extends ExtractRecordGenerator {
                 rhsExpr = wrapForCompareTo(lhsFH, rhsExpr);
             } else if (!lhsBig && rhsBig) {
                 lhsExpr = wrapForCompareTo(rhsFH, lhsExpr);
+            } else {
+                // Both sides are "big" but may be different types (e.g. BigDecimal vs BigInteger).
+                // The dominant type wins; wrap the other side up to that type.
+                if (lhsFH != dominantFH) {
+                    lhsExpr = wrapForCompareTo(dominantFH, lhsExpr);
+                } else if (rhsFH != dominantFH) {
+                    rhsExpr = wrapForCompareTo(dominantFH, rhsExpr);
+                }
             }
-            // both big: both expressions are already the right type, no wrap needed
             return String.format("%s.%s(%s)", lhsExpr, methodName(opNode), rhsExpr);
         } else {
             // both primitives (int / long) — plain infix
@@ -93,8 +101,12 @@ public class CalculationGenerator extends ExtractRecordGenerator {
             FieldReferenceAST fr = (FieldReferenceAST) operand;
             return sourceFieldHolders.get(fr.getRef().getName());
         }
-        // CALCULATION, NUMATOM, LOOKUPFIELDREF etc. — treated as primitive for
-        // promotion purposes unless we can inspect them further in the future.
+        if (operand.getType() == ASTFactory.Type.LOOKUPFIELDREF) {
+            LookupFieldRefAST lfr = (LookupFieldRefAST) operand;
+            String holderKey = lfr.getLookup().getName() + "_" + lfr.getRef().getName();
+            return lookupFieldHolders.get(holderKey);
+        }
+        // CALCULATION, NUMATOM etc. — treated as primitive for promotion purposes.
         return null;
     }
 

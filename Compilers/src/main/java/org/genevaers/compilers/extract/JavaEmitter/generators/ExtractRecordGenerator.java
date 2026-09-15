@@ -394,14 +394,18 @@ public abstract class ExtractRecordGenerator {
      * must account for whether the literal is a float or an integer:
      *   - Float literals (contain '.') need  new BigDecimal("3.14")
      *     because BigDecimal.valueOf(double) loses precision.
-     *   - Integer literals and field accessor calls use the efficient
-     *     valueOf(long) form.
+     *   - BigInteger expressions (getBigInteger / BigInteger.valueOf) need
+     *     new BigDecimal(expr) — there is no BigDecimal.valueOf(BigInteger) overload.
+     *   - Integer / long expressions use the efficient valueOf(long) form.
      */
     protected static String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
         switch(comparingHolder.getAccessor()) {
             case "BigDecimal":
                 if (isFloatLiteral(valueExpr)) {
                     return String.format("new BigDecimal(\"%s\")", valueExpr);
+                }
+                if (isBigIntegerExpr(valueExpr)) {
+                    return String.format("new BigDecimal(%s)", valueExpr);
                 }
                 return String.format("BigDecimal.valueOf(%s)", valueExpr);
             case "BigInteger":
@@ -414,6 +418,16 @@ public abstract class ExtractRecordGenerator {
     /** True if the expression is a raw floating-point literal string (e.g. "3.14"). */
     private static boolean isFloatLiteral(String expr) {
         return expr.contains(".") && expr.matches("-?\\d+\\.\\d+");
+    }
+
+    /**
+     * True if the expression already evaluates to a BigInteger — i.e. it came from
+     * a getBigInteger() accessor call or a BigInteger.valueOf() wrap.
+     * BigDecimal has no valueOf(BigInteger) overload, so these must be wrapped with
+     * new BigDecimal(expr) instead of BigDecimal.valueOf(expr).
+     */
+    private static boolean isBigIntegerExpr(String expr) {
+        return expr.contains(".getBigInteger(") || expr.startsWith("BigInteger.valueOf(");
     }
 
 }
