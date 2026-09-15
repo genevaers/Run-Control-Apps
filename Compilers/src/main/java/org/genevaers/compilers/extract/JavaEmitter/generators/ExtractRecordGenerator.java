@@ -3,11 +3,13 @@ package org.genevaers.compilers.extract.JavaEmitter.generators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.genevaers.compilers.base.ASTBase;
@@ -70,6 +72,13 @@ public abstract class ExtractRecordGenerator {
     protected static Map<Integer, LookupInfo> filterLookupIds = new TreeMap<>();
     protected static Map<Integer, LookupInfo> hiddenLookupIds = new TreeMap<>();
     protected static Map<Integer, LookupInfo> columnLookupIds = new TreeMap<>();
+
+    /**
+     * Set of joinBuffer variable names (e.g. "joinBuffer2") that are guaranteed
+     * non-null by the predicate of the immediately enclosing if-statement.
+     * Populated by ExprComparisonGenerator, cleared by IfNodeGenerator on scope exit.
+     */
+    protected static Set<String> guardedJoinBuffers = new HashSet<>();
 
     private static boolean selectionFilterFound;
 
@@ -428,6 +437,22 @@ public abstract class ExtractRecordGenerator {
      */
     private static boolean isBigIntegerExpr(String expr) {
         return expr.contains(".getBigInteger(") || expr.startsWith("BigInteger.valueOf(");
+    }
+
+    /**
+     * Parse a guard string like "joinBuffer2 != null && " and record the variable
+     * names in guardedJoinBuffers so that nested generators can skip redundant checks.
+     * A guard string may contain multiple chained guards separated by " && ".
+     */
+    protected static void recordGuardedBuffers(String guardStr) {
+        // Each guard token looks like "joinBufferN != null"
+        for (String part : guardStr.split("&&")) {
+            String token = part.trim();
+            int spaceIdx = token.indexOf(' ');
+            if (spaceIdx > 0) {
+                guardedJoinBuffers.add(token.substring(0, spaceIdx));
+            }
+        }
     }
 
 }

@@ -55,12 +55,23 @@ public class IfNodeGenerator extends ExtractRecordGenerator {
      private String buildIfFormatString(ExtractRecordGenerator predGen, ExtractBaseAST pred,
                                         ExtractRecordGenerator thenGen, ExtractBaseAST then,
                                         ExtractRecordGenerator elseGen, ExtractBaseAST elseNode) {
-        if(elseGen == null) {
-            // No ELSE clause — emit a warning comment so the intent is visible in generated code
+        // The predicate is generated first; ExprComparisonGenerator will populate
+        // guardedJoinBuffers for any lookup-field null checks it emits.
+        String predCode = predGen.getCode(pred);
+        String thenCode = thenGen.getCode(then);
+        String elseCode = null;
+        if (elseGen != null) {
+            elseCode = elseGen.getCode(elseNode);
+        }
+        // Scope exit: clear guarded buffers so they don't suppress checks in
+        // subsequent sibling if-statements.
+        guardedJoinBuffers.clear();
+
+        if (elseCode == null) {
             String ifFormat = "        if(%s) {\n    %s\n        } else {\n            // WARNING: no ELSE clause in source logic\n        }";
-            return String.format(ifFormat, predGen.getCode(pred), thenGen.getCode(then));
+            return String.format(ifFormat, predCode, thenCode);
         }
         String ifFormat = "        if(%s) {\n    %s\n        } else {\n    %s\n        }";
-        return String.format(ifFormat, predGen.getCode(pred), thenGen.getCode(then), elseGen.getCode(elseNode));
+        return String.format(ifFormat, predCode, thenCode, elseCode);
     }
 }

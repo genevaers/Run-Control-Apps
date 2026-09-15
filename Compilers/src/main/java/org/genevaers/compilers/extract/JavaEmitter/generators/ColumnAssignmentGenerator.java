@@ -6,6 +6,7 @@ import org.genevaers.compilers.extract.astnodes.ColumnAssignmentASTNode;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
+import org.genevaers.compilers.extract.astnodes.NumAtomAST;
 import org.genevaers.compilers.extract.astnodes.StringAtomAST;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
@@ -84,7 +85,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             case STRINGATOM:
                 return dtcString();
             case NUMATOM:
-                return "";
+                return dtcNumeric();
             case CALCULATION:
                 return dtCalculationAssignment();
             default:
@@ -106,8 +107,10 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 cfh.getAssignmentTarget(), fmtSpec, calcExpr);
 
         // If the calculation references any lookup field, wrap the assignment in a
-        // null-check guard for every distinct joinBuffer involved.
+        // null-check guard — but only for buffers not already guarded by the enclosing
+        // if-predicate (tracked in guardedJoinBuffers).
         Set<String> joinBuffers = collectJoinBufferNames(src);
+        joinBuffers.removeAll(guardedJoinBuffers);
         if (!joinBuffers.isEmpty()) {
             String condition = String.join(" != null && ", joinBuffers) + " != null";
             String elseBody = getElseBody(col);
@@ -149,6 +152,19 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
             ? String.format("%-" + fieldLen + "s", " ")
             : String.format("%-" + fieldLen + "s", rawValue);
         return String.format("                %s(\"%s\", target);", cfh.getAssignmentTarget(), padded);
+    }
+
+    private String dtcNumeric() {
+        ColumnAST col = (ColumnAST) trg;
+        NumAtomAST na = (NumAtomAST) src;
+        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
+        int len = col.getViewColumn().getFieldLength();
+        int dec = col.getViewColumn().getDecimalCount();
+        String fmtSpec = dec > 0
+                ? String.format("%%%d.%df", len, dec)
+                : String.format("%%%dd", len);
+        return String.format("                %s(String.format(\"%s\", %s), target);",
+                cfh.getAssignmentTarget(), fmtSpec, na.getValueString());
     }
 
     private String dtlEquivalentBasedOnTypes() {
