@@ -260,6 +260,9 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 if (rawExpr.matches("-?[0-9]+")) {
                     return rawExpr + "L";
                 }
+                if (isBigDecimalExpr(rawExpr) || isBigIntegerExpr(rawExpr)) {
+                    return rawExpr + ".longValue()";
+                }
                 return rawExpr;
             case "putBigInteger":
                 if (rawExpr.matches("-?[0-9]+")) {

@@ -403,6 +403,8 @@ public abstract class ExtractRecordGenerator {
      * must account for whether the literal is a float or an integer:
      *   - Float literals (contain '.') need  new BigDecimal("3.14")
      *     because BigDecimal.valueOf(double) loses precision.
+     *   - BigDecimal expressions (getBigDecimal) already return BigDecimal —
+     *     no wrapping needed; BigDecimal.valueOf(BigDecimal) does not compile.
      *   - BigInteger expressions (getBigInteger / BigInteger.valueOf) need
      *     new BigDecimal(expr) — there is no BigDecimal.valueOf(BigInteger) overload.
      *   - Integer / long expressions use the efficient valueOf(long) form.
@@ -412,6 +414,9 @@ public abstract class ExtractRecordGenerator {
             case "BigDecimal":
                 if (isFloatLiteral(valueExpr)) {
                     return String.format("new BigDecimal(\"%s\")", valueExpr);
+                }
+                if (isBigDecimalExpr(valueExpr)) {
+                    return valueExpr;
                 }
                 if (isBigIntegerExpr(valueExpr)) {
                     return String.format("new BigDecimal(%s)", valueExpr);
@@ -430,12 +435,21 @@ public abstract class ExtractRecordGenerator {
     }
 
     /**
+     * True if the expression already evaluates to a BigDecimal — i.e. it came from
+     * a getBigDecimal() accessor call or a new BigDecimal() construction.
+     * BigDecimal.valueOf(BigDecimal) does not exist, so these must pass through as-is.
+     */
+    protected static boolean isBigDecimalExpr(String expr) {
+        return expr.contains(".getBigDecimal(") || expr.startsWith("new BigDecimal(");
+    }
+
+    /**
      * True if the expression already evaluates to a BigInteger — i.e. it came from
      * a getBigInteger() accessor call or a BigInteger.valueOf() wrap.
      * BigDecimal has no valueOf(BigInteger) overload, so these must be wrapped with
      * new BigDecimal(expr) instead of BigDecimal.valueOf(expr).
      */
-    private static boolean isBigIntegerExpr(String expr) {
+    protected static boolean isBigIntegerExpr(String expr) {
         return expr.contains(".getBigInteger(") || expr.startsWith("BigInteger.valueOf(");
     }
 
