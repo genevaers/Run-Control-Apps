@@ -401,28 +401,53 @@ public abstract class ExtractRecordGenerator {
      *
      * For numeric literal strings (raw output of NumAtomGenerator) the wrap
      * must account for whether the literal is a float or an integer:
-     *   - Float literals (contain '.') need  new BigDecimal("3.14")
-     *     because BigDecimal.valueOf(double) loses precision.
+     *   - Float literals (contain '.') need a static final constant declared as
+     *     new BigDecimal("3.14") to avoid repeated object construction per record.
+     *   - Integer literals need a static final constant declared as
+     *     BigDecimal.valueOf(NL) / BigInteger.valueOf(NL) (the explicit 'L' suffix
+     *     ensures valueOf(long) is selected — there is no valueOf(int) overload and
+     *     z/OS javac does not auto-promote int→long).
      *   - BigDecimal expressions (getBigDecimal) already return BigDecimal —
      *     no wrapping needed; BigDecimal.valueOf(BigDecimal) does not compile.
      *   - BigInteger expressions (getBigInteger / BigInteger.valueOf) need
      *     new BigDecimal(expr) — there is no BigDecimal.valueOf(BigInteger) overload.
-     *   - Integer / long expressions use the efficient valueOf(long) form.
+     *   - Other (field accessor) expressions are used inline; they already return the
+     *     correct primitive long and cannot be cached as constants.
      */
     protected static String wrapForCompareTo(ComponentFieldHolder comparingHolder, String valueExpr) {
         switch(comparingHolder.getAccessor()) {
             case "BigDecimal":
-                if (isFloatLiteral(valueExpr)) {
-                    return String.format("new BigDecimal(\"%s\")", valueExpr);
-                }
                 if (isBigDecimalExpr(valueExpr)) {
                     return valueExpr;
                 }
                 if (isBigIntegerExpr(valueExpr)) {
                     return String.format("new BigDecimal(%s)", valueExpr);
                 }
+                if (isFloatLiteral(valueExpr)) {
+                    // Cache as a static final to avoid repeated BigDecimal construction per record.
+                    String constName = "BD_" + valueExpr.replace('.', '_').replace('-', 'N');
+                    constantDeclarations.computeIfAbsent(constName, k ->
+                            String.format("private static final BigDecimal %s = new BigDecimal(\"%s\")", k, valueExpr));
+                    return constName;
+                }
+                if (isIntLiteral(valueExpr)) {
+                    // Cache as a static final. Explicit 'L' suffix → valueOf(long), unambiguous on z/OS.
+                    String constName = "BD_" + valueExpr.replace('-', 'N');
+                    constantDeclarations.computeIfAbsent(constName, k ->
+                            String.format("private static final BigDecimal %s = BigDecimal.valueOf(%sL)", k, valueExpr));
+                    return constName;
+                }
+                // Non-literal accessor expression (e.g. field.getInt(src)) — inline only.
                 return String.format("BigDecimal.valueOf(%s)", valueExpr);
             case "BigInteger":
+                if (isIntLiteral(valueExpr)) {
+                    // Cache as a static final. Explicit 'L' suffix → valueOf(long), unambiguous on z/OS.
+                    String constName = "BI_" + valueExpr.replace('-', 'N');
+                    constantDeclarations.computeIfAbsent(constName, k ->
+                            String.format("private static final BigInteger %s = BigInteger.valueOf(%sL)", k, valueExpr));
+                    return constName;
+                }
+                // Non-literal accessor expression — inline only.
                 return String.format("BigInteger.valueOf(%s)", valueExpr);
             default:
                 return valueExpr;
@@ -432,6 +457,11 @@ public abstract class ExtractRecordGenerator {
     /** True if the expression is a raw floating-point literal string (e.g. "3.14"). */
     private static boolean isFloatLiteral(String expr) {
         return expr.contains(".") && expr.matches("-?\\d+\\.\\d+");
+    }
+
+    /** True if the expression is a raw integer literal string (e.g. "100", "-42"). */
+    private static boolean isIntLiteral(String expr) {
+        return expr.matches("-?\\d+");
     }
 
     /**
