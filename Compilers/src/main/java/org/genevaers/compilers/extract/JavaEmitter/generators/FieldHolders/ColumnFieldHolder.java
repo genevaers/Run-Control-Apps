@@ -55,27 +55,31 @@ public class ColumnFieldHolder extends ComponentFieldHolder {
                 break;
             }
             case ZONED: {
-                // ZONED output columns: write using ExternalDecimal* field types,
-                // mirroring the same length/decimal branching used by ZonedFieldHolder.
+                // ZONED output columns: write using ExternalDecimal* field types.
+                // Use the full overloads with signExternal=false, signTrailing=true so that
+                // the sign is embedded in the trailing digit's zone nibble — the standard
+                // EBCDIC zoned decimal format on z/OS (0xC = positive, 0xD = negative).
+                // The short convenience overloads default to signExternal=true (leading
+                // separate sign), which omits the sign nibble from the trailing byte.
                 if (dec != 0) {
                     setAccessor("putBigDecimal");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsBigDecimalField %s = factory.getExternalDecimalAsBigDecimalField(%d, %d, %b)",
+                        "private static final ExternalDecimalAsBigDecimalField %s = factory.getExternalDecimalAsBigDecimalField(%d, %d, %b, false, true, false)",
                         colName, len, dec, signed));
                 } else if (len <= 9) {
                     setAccessor("putInt");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsIntField %s = factory.getExternalDecimalAsIntField(%d, %b)",
+                        "private static final ExternalDecimalAsIntField %s = factory.getExternalDecimalAsIntField(%d, %b, false, true, false)",
                         colName, len, signed));
                 } else if (len <= 18) {
                     setAccessor("putLong");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsLongField %s = factory.getExternalDecimalAsLongField(%d, %b)",
+                        "private static final ExternalDecimalAsLongField %s = factory.getExternalDecimalAsLongField(%d, %b, false, true, false)",
                         colName, len, signed));
                 } else {
                     setAccessor("putBigInteger");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsBigIntegerField %s = factory.getExternalDecimalAsBigIntegerField(%d, %b)",
+                        "private static final ExternalDecimalAsBigIntegerField %s = factory.getExternalDecimalAsBigIntegerField(%d, 0, %b, false, true, false)",
                         colName, len, signed));
                 }
                 break;
