@@ -55,10 +55,29 @@ public class ColumnFieldHolder extends ComponentFieldHolder {
                 break;
             }
             case ZONED: {
-                // ZONED output columns: write as formatted string.
-                setAccessor("putString");
-                setDefinition(String.format(
-                    "private static final StringField %s = factory.getStringField(%d)", colName, len));
+                // ZONED output columns: write using ExternalDecimal* field types,
+                // mirroring the same length/decimal branching used by ZonedFieldHolder.
+                if (dec != 0) {
+                    setAccessor("putBigDecimal");
+                    setDefinition(String.format(
+                        "private static final ExternalDecimalAsBigDecimalField %s = factory.getExternalDecimalAsBigDecimalField(%d, %d, %b)",
+                        colName, len, dec, signed));
+                } else if (len <= 9) {
+                    setAccessor("putInt");
+                    setDefinition(String.format(
+                        "private static final ExternalDecimalAsIntField %s = factory.getExternalDecimalAsIntField(%d, %b)",
+                        colName, len, signed));
+                } else if (len <= 18) {
+                    setAccessor("putLong");
+                    setDefinition(String.format(
+                        "private static final ExternalDecimalAsLongField %s = factory.getExternalDecimalAsLongField(%d, %b)",
+                        colName, len, signed));
+                } else {
+                    setAccessor("putBigInteger");
+                    setDefinition(String.format(
+                        "private static final ExternalDecimalAsBigIntegerField %s = factory.getExternalDecimalAsBigIntegerField(%d, %b)",
+                        colName, len, signed));
+                }
                 break;
             }
             case BINARY: {
