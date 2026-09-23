@@ -64,22 +64,22 @@ public class ColumnFieldHolder extends ComponentFieldHolder {
                 if (dec != 0) {
                     setAccessor("putBigDecimal");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsBigDecimalField %s = factory.getExternalDecimalAsBigDecimalField(%d, %d, %b, false, true, false)",
+                        "private static final ExternalDecimalAsBigDecimalField %s = factory.getExternalDecimalAsBigDecimalField(%d, %d, %b, true, false, false)",
                         colName, len, dec, signed));
                 } else if (len <= 9) {
                     setAccessor("putInt");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsIntField %s = factory.getExternalDecimalAsIntField(%d, %b, false, true, false)",
+                        "private static final ExternalDecimalAsIntField %s = factory.getExternalDecimalAsIntField(%d, %b, true, false, false)",
                         colName, len, signed));
                 } else if (len <= 18) {
                     setAccessor("putLong");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsLongField %s = factory.getExternalDecimalAsLongField(%d, %b, false, true, false)",
+                        "private static final ExternalDecimalAsLongField %s = factory.getExternalDecimalAsLongField(%d, %b, true, false, false)",
                         colName, len, signed));
                 } else {
                     setAccessor("putBigInteger");
                     setDefinition(String.format(
-                        "private static final ExternalDecimalAsBigIntegerField %s = factory.getExternalDecimalAsBigIntegerField(%d, 0, %b, false, true, false)",
+                        "private static final ExternalDecimalAsBigIntegerField %s = factory.getExternalDecimalAsBigIntegerField(%d, 0, %b, true, false, false)",
                         colName, len, signed));
                 }
                 break;
