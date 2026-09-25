@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.genevaers.engine.extractor.Extract;
 import org.genevaers.engine.extractor.PECode;
 import org.genevaers.engine.lookups.Join;
@@ -28,8 +31,6 @@ public class PERun {
     private List<String> inputDDnames = new ArrayList<>(); // Find and keep VDP Records?
     private List<String> outputDDnames = new ArrayList<>(); // Find and keep VDP Records?
 
-
-    private File inputFile;
 
     private RecordFileReader rr;
 
@@ -131,28 +132,55 @@ public class PERun {
 
     private void readWrite() {
         try {
-            extractor = new PECode(); 
+            extractor = new PECode();
             setupReferences();
             setupIO();
-            openInput(Paths.get(inputDDnames.get(0)));
-            openOutput(outputDDnames.get(0));
-            readInput();
+            ASCIItext = false;
+            GersConfigration.setZosCodePage("IBM-1047");
+
+            // One shared writer for all threads
+            RecordFileWriter sharedWriter = RecordFileReaderWriter.getWriter();
+            sharedWriter.writeRecordsTo(new File(outputDDnames.get(0)));
+            sharedWriter.setReclen(extractor.getOutputLen());
+            FileRecord sharedOutputRecord = sharedWriter.getRecordToFill();
+            sharedOutputRecord.length = (short) extractor.getOutputLen();
+
+            ExecutorService executor = Executors.newFixedThreadPool(inputDDnames.size());
+            List<Future<?>> futures = new ArrayList<>();
+
+            for (int i = 0; i < inputDDnames.size(); i++) {
+                final int fileIndex = i;
+                futures.add(executor.submit(() -> {
+                    try {
+                        RecordFileReader threadReader = RecordFileReaderWriter.getReader();
+                        threadReader.readRecordsFrom(Paths.get(inputDDnames.get(fileIndex)).toFile());
+                        threadReader.setRecLen(extractor.getLrLen());
+                        int recnum = 0;
+                        FileRecord rec = threadReader.readRecord();
+                        while (threadReader.isAtFileEnd() == false) {
+                            recnum++;
+                            synchronized (sharedWriter) {
+                                extractor.processRecord(rec.bytes.array(), sharedOutputRecord.bytes.array(), sharedWriter, recnum);
+                            }
+                            rec.bytes.clear();
+                            rec = threadReader.readRecord();
+                        }
+                        logger.atInfo().log("Thread %d read %d records from %s", fileIndex, recnum, inputDDnames.get(fileIndex));
+                        threadReader.close();
+                    } catch (Exception e) {
+                        logger.atSevere().log("Error processing input file %s: %s", inputDDnames.get(fileIndex), e.getMessage());
+                    }
+                }));
+            }
+
+            executor.shutdown();
+            for (Future<?> f : futures) {
+                f.get();
+            }
+            sharedWriter.close();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        closeOutput();
-        closeInput();
-
-    }
-
-    private void closeOutput() {
-        outWriter.close();
-    }
-
-    private void closeInput() {
-        // Anything we need to do before closing?
-        rr.close();
     }
 
     private void setupIO() {
@@ -165,38 +193,9 @@ public class PERun {
     }
 
     public void openInput(Path ipp) {
-        inputFile = ipp.toFile();
         ASCIItext = false;
         GersConfigration.setZosCodePage("IBM-1047");
     }
-
-    private void readInput() throws Exception {
-        int recnum = 0;
-        rr = RecordFileReaderWriter.getReader();
-        rr.readRecordsFrom(inputFile);
-        rr.setRecLen(extractor.getLrLen());
-        FileRecord rec = rr.readRecord();
-        while (rr.isAtFileEnd() == false) {
-            recnum++;
-            processRecord(rec, recnum);
-            rec.bytes.clear();
-            rec = rr.readRecord();
-        }
-        // addVDPRecordToRepo(rec);
-        logger.atInfo().log("Read %d records", recnum);
-        rr.close();
-    }
-
-    private void processRecord(FileRecord rec, int recnum) throws Exception {
-//        logger.atFine().log("Do something with the record");
-        //The extractor is going to need to know about the joins
-        //A join should really be based on ByteBuffers, maybe the key is a byte array?
-        //Make a class that represents a Join and we can them map them
-        //Then a join statement means get the join...
-        //If lookup not already performed buuild the key and get the buffer
-        //A DTL etc then uses the buffer rather than the source record
-        extractor.processRecord(rec.bytes.array(), outputRecord.bytes.array(), outWriter, recnum);
-     }
 
     private Extract getExtractor() {
         try {
