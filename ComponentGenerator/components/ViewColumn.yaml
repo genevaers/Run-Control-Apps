@@ -49,6 +49,8 @@ members:
 - name: fieldLength
   type: short
   display_name: "Length"
+- name: ordinalPosition
+  type: short
 - name: decimalCount
   type: short
   display_name: "Decimal Places"

@@ -415,6 +415,7 @@ public class VDPComparisonSummaryWriter {
 
     private static boolean isColumnProperty(String name, Class<?> type) {
         return !name.equals("componentId") && !name.equals("viewId") && !name.equals("columnNumber")
+                && !name.equals("ordinalPosition")
                 && (type.isPrimitive() || type.isEnum() || type == String.class
                     || Number.class.isAssignableFrom(type) || type == Boolean.class || type == Character.class);
     }
@@ -777,6 +778,7 @@ public class VDPComparisonSummaryWriter {
 
     private static boolean isLRFieldProperty(String name, Class<?> type) {
         return !name.equals("componentId") && !name.equals("lrID") && !name.equals("name")
+                && !name.equals("ordinalPosition")
                 && (type.isPrimitive() || type.isEnum() || type == String.class
                     || Number.class.isAssignableFrom(type) || type == Boolean.class || type == Character.class);
     }
