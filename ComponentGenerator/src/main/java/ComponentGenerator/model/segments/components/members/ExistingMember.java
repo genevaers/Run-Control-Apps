@@ -26,7 +26,7 @@ public class ExistingMember extends Member {
 
     @Override
     public String getType() {
-        return existingJavaType;
+        return "existing";
     }
     
     public String getExistingJavaType() {

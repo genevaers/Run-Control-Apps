@@ -16,11 +16,13 @@ members:
 - name: hidden
   type: boolean
   vdp_source: HiddenInd
+  display_name: "Visible"
 - name: padding1
   type: string
 - name: subtotalType
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.SubtotalType
+  display_name: "Subtotal Type"
 - name: spacesBeforeColumn
   type: short
 - name: extractPointFileNbr
@@ -46,12 +48,13 @@ members:
   type: short
 - name: fieldLength
   type: short
-- name: ordinalPosition
-  type: short
+  display_name: "Length"
 - name: decimalCount
   type: short
+  display_name: "Decimal Places"
 - name: rounding
   type: short
+  display_name: "Scaling Factor"
 - name: dateCode
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode
@@ -64,6 +67,7 @@ members:
   type: string
 - name: reportMask
   type: string
+  display_name: "Numeric Mask"
 - name: subtotalPrefix
   type: string
 - name: subtotalMask
@@ -72,6 +76,7 @@ members:
   type: string
 - name: headerJustifyId
   type: enum
+  display_name: "Header Alignment"
   existing_java_type: org.genevaers.repository.components.enums.JustifyId
 - name: headerLine1
   type: string

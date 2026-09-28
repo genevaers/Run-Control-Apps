@@ -43,16 +43,20 @@ members:
 - name: sortKeySigned
   type: boolean
   vdp_source: SkSignedInd
+  display_name: "Signed"
 - name: skStartPosition
   type: short
 - name: skFieldLength
   type: short
+  display_name: "Length"
 - name: skOrdinalPosition
   type: short
 - name: skDecimalCount
   type: short
+  display_name: "Decimal Places"
 - name: skRounding
   type: short
+  display_name: "Scaling Factor"
 - name: sortKeyDateTimeFormat
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode
@@ -72,12 +76,15 @@ members:
   type: short
 - name: sktFieldLength
   type: short
+  display_name: "Length"
 - name: sktOrdinalPosition
   type: short
 - name: sktDecimalCount
   type: short
+  display_name: "Decimal Places"
 - name: sktRounding
   type: short
+  display_name: "Scaling Factor"
 - name: sktDateCode
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode

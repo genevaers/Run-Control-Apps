@@ -46,6 +46,7 @@ public class ComponentGenerator extends GeneratorBase{
 			Map<String, Object> nodeMap = new HashMap<>();
 			nodeMap.put("component", compentry.getComponent());
             writeJavaObject(compentry.getName(), nodeMap);
+			writeBeanInfo(compentry.getName(), nodeMap);
             //writeDocumentation(compentry.getName(), nodeMap);
         }
 		logger.atConfig().log("-----------------------------");
@@ -78,6 +79,11 @@ public class ComponentGenerator extends GeneratorBase{
     private void writeJavaObject(String compName, Map<String, Object> nodeMap) {
 		Path to = getPathToWriteJavaObjecPath(compName);
 		writeModelWithTemplateToPath(nodeMap, "compJavaObject.ftl", to);
+    }
+
+    private void writeBeanInfo(String compName, Map<String, Object> nodeMap) {
+		Path to = getPathToWriteJavaObjecPath(compName + "BeanInfo");
+		writeModelWithTemplateToPath(nodeMap, "compBeanInfo.ftl", to);
     }
 
     private Path getPathToWriteJavaObjecPath(String compName) {

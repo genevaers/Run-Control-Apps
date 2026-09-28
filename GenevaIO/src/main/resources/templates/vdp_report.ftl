@@ -263,12 +263,12 @@ View Properties Report
          Date/Time Format      ${column.dateTimeFormat}
          Length                ${column.length?c}
          Data Alignment        ${column.dataAlignment}
-         Visible Flag          ${column.visibleFlag?c}
+         Visible               ${column.visibleFlag?c}
          Spaces before column  ${column.spacesBeforeColumn?c}
          Header Alignment      ${column.headerAlignment}
          Decimal Places        ${column.decimalPlaces?c}
          Scaling Factor        ${column.scalingFactor?c}
-         Signed Flag           ${column.signedFlag?c}
+         Signed                ${column.signedFlag?c}
          Numeric Mask          ${column.numericMask}
          Format Phase Calc     ${column.formatPhaseCalc}
 <#if column.columnSources??>

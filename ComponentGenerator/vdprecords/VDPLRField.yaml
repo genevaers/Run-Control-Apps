@@ -49,6 +49,7 @@ fields:
 - name: rounding
   type: short
   component_field: rounding
+  display_name: "Scaling Factor"
 - name: field_content_id
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.DateCode

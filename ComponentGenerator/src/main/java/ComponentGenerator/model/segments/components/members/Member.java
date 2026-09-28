@@ -47,6 +47,7 @@ public abstract class Member implements MemberGenerator {
 
     protected String name;
     private String vdpSource;
+    private String displayName;
 
     public String getName() {
         return name;
@@ -62,6 +63,14 @@ public abstract class Member implements MemberGenerator {
 
     public void setVdpSource(String vdpSource) {
         this.vdpSource = vdpSource;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**

@@ -111,6 +111,6 @@ public class MapMember extends Member {
 
     @Override
     public String getType() {
-        return "Map of " + valuesType;
+        return "map";
     }
 }

@@ -2,6 +2,10 @@
 <#assign importList = [] />
 package org.genevaers.repository.components;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 <#--- Get a list of unique enum entries to be imported --->
 <#list component.members as member>
     <#if member.importString ?? && ! importList?seq_contains(member.importString)>
@@ -20,6 +24,22 @@ ${i}
  */
 public class ${component.componentName} extends ComponentNode
 {
+    private static final Map<String, String> DISPLAY_NAMES;
+
+    static {
+        Map<String, String> map = new HashMap<>();
+<#list component.members as member>
+<#if member.displayName??>
+        map.put("${member.name}", "${member.displayName}");
+</#if>
+</#list>
+        DISPLAY_NAMES = Collections.unmodifiableMap(map);
+    }
+
+    public static Map<String, String> getDisplayNames() {
+        return DISPLAY_NAMES;
+    }
+
 <#list component.members as member>
 ${member.fieldEntry}
 </#list>
