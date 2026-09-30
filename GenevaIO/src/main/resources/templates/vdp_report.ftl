@@ -165,7 +165,6 @@ Logical Record Report
      Decimal Places            ${field.numDecimalPlaces?c}
      Primary Key Sequence #    
      Effective Date            
-     Ordinal Position          ${field.ordinalPosition?c}
      Ordinal Offset            ${field.ordinalOffset?c}
      Scaling                   ${field.rounding?c}
      Date/Time Format          ${field.dateTimeFormat}
@@ -252,7 +251,6 @@ View Properties Report
      Column Data
        Column ID               ${column.columnId?c}
        Name                    ${column.name}
-       Ordinal Position        ${column.ordinalPosition?c}
        Extract Area            ${column.extractArea}
        Column Output Properties
          Heading 1             ${column.heading1}
