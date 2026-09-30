@@ -78,7 +78,7 @@ public class PhysicalFileRecordParser extends BaseParser {
 				pf.setRecordDelimiter(RecordDelimiter.CR);
 				pf.setTextDelimiter(TextDelimiter.INVALID);
 				pf.setDatabaseRowFormat(DbmsRowFmtOptId.NONE);
-				pf.setRecfm(FileRecfm.VB);
+				pf.setRecfm(FileRecfm.FB);
 				pf.setName(text);
 				pf.setFileType(FileType.DISK); //default
 				pf.setAccessMethod(AccessMethod.SEQUENTIAL); //default
