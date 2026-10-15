@@ -7,6 +7,7 @@ import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.FieldReferenceAST;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.compilers.extract.astnodes.NumAtomAST;
+import org.genevaers.compilers.extract.astnodes.SKColumnAST;
 import org.genevaers.compilers.extract.astnodes.StringAtomAST;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.LRField;
@@ -27,6 +28,7 @@ import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 
 public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    private static final String ASSIGN_FMT = "                %s(%s, target);";
 
     private ColumnAssignmentASTNode ca;
     private ExtractRecordGenerator srcgen;
@@ -45,7 +47,14 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         srcgen = getcodeGenerator(src);
         trggen = getcodeGenerator(trg);
         // Make the format string dependent on the operator and types.
-        columnRecs.add(getAssignmentFormatString());
+        String assignment = getAssignmentFormatString();
+        if (trg.getType() == Type.SK_COLUMN) {
+            SKColumnAST skCol = (SKColumnAST) trg;
+            skColumnRecs.merge(skCol.getViewSortKeySequenceNumber(), assignment,
+                    (comment, stmt) -> comment + "\n" + stmt);
+        } else {
+            columnRecs.add(assignment);
+        }
     }
 
     @Override
@@ -54,54 +63,74 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         trg = (ExtractBaseAST) node.getChild(1);
         srcgen = getcodeGenerator(src);
         trggen = getcodeGenerator(trg);
-        // Make the format string dependent on the operator and types.
         return getAssignmentFormatString();
     }
 
     private String getAssignmentFormatString() {
 
         /*
-        switch on target type DT CT SK 
-        Then for each swtich on source type LR, LKLR, Const, Arithmetic
+        switch on target type DT CT SK
+        Then for each switch on source type LR, LKLR, Const, Arithmetic
          */
+
+        // If we have a view with SK and or CT columns then we could change the target offsets
+        // Header - the magic 12 bytes
+        //SK area
+        //CT area is at the end?
         switch (trg.getType()) {
             case DT_COLUMN:
-                return getDtAssignment();
+            case SK_COLUMN:
+                return getColumnAssignment();
             case CT_COLUMN:
                 return "// WARNING: CT columns not supported in Java emitter";
-            case SK_COLUMN:
-                return "// WARNING: SK columns not supported in Java emitter";
             default:
                 return "// WARNING: unknown assignment target type " + trg.getType();
         }
     }
 
-    private String getDtAssignment() {
-        switch(src.getType()) {
+    /**
+     * Resolve the target field holder for the current target node.
+     * For DT_COLUMN this is a ColumnFieldHolder keyed by "COL_N";
+     * for SK_COLUMN this is a SKColumnFieldHolder keyed by sequence number.
+     */
+    private ComponentFieldHolder getTargetFieldHolder() {
+        if (trg.getType() == Type.SK_COLUMN) {
+            SKColumnAST skCol = (SKColumnAST) trg;
+            return skColumnFieldHolders.get(skCol.getViewSortKeySequenceNumber());
+        }
+        ColumnAST col = (ColumnAST) trg;
+        return columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
+    }
+
+    private String getColumnAssignment() {
+        ComponentFieldHolder tfh = getTargetFieldHolder();
+        if (tfh == null) {
+            return "// WARNING: no field holder for target " + trg.getType();
+        }
+        switch (src.getType()) {
             case LRFIELD:
-                return dteEquivalentBasedOnTypes();
+                return dteEquivalentBasedOnTypes(tfh);
             case LOOKUPFIELDREF:
-                return dtlEquivalentBasedOnTypes();
+                return dtlEquivalentBasedOnTypes(tfh);
             case STRINGATOM:
-                return dtcString();
+                return dtcString(tfh);
             case NUMATOM:
-                return dtcNumeric();
+                return dtcNumeric(tfh);
             case CALCULATION:
-                return dtCalculationAssignment();
+                return dtCalculationAssignment(tfh);
             default:
                 return "// WARNING: unsupported source type " + src.getType() + " in column assignment";
         }
     }
 
-    private String dtCalculationAssignment() {
+    private String dtCalculationAssignment(ComponentFieldHolder cfh) {
         ColumnAST col = (ColumnAST) trg;
-        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
         CalculationGenerator calcgen = new CalculationGenerator((CalculationAST) src);
         String calcExpr = calcgen.getCode(src);
         int len = col.getViewColumn().getFieldLength();
         int dec = col.getViewColumn().getDecimalCount();
         String valueArg = buildAssignmentValue(cfh, calcExpr, len, dec);
-        String assignment = String.format("                %s(%s, target);",
+        String assignment = String.format(ASSIGN_FMT,
                 cfh.getAssignmentTarget(), valueArg);
 
         // If the calculation references any lookup field, wrap the assignment in a
@@ -112,7 +141,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         if (!joinBuffers.isEmpty()) {
             String condition = String.join(" != null && ", joinBuffers) + " != null";
             String elseBody = getElseBody(col);
-            return String.format("        if(%s) {\n        %s\n        } else {\n        %s\n        }",
+            return String.format("        if(%s) {%n        %s%n        } else {%n        %s%n        }",
                     condition, assignment, elseBody);
         }
         return assignment;
@@ -140,10 +169,9 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         }
     }
 
-    private String dtcString() {
+    private String dtcString(ComponentFieldHolder cfh) {
         ColumnAST col = (ColumnAST) trg;
         StringAtomAST sa = (StringAtomAST) src;
-        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
         int fieldLen = col.getViewColumn().getFieldLength();
         String rawValue = sa.getValue();
         String padded = rawValue.isEmpty()
@@ -152,18 +180,17 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         return String.format("                %s(\"%s\", target);", cfh.getAssignmentTarget(), padded);
     }
 
-    private String dtcNumeric() {
+    private String dtcNumeric(ComponentFieldHolder cfh) {
         ColumnAST col = (ColumnAST) trg;
         NumAtomAST na = (NumAtomAST) src;
-        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
         int len = col.getViewColumn().getFieldLength();
         int dec = col.getViewColumn().getDecimalCount();
         String valueArg = buildAssignmentValue(cfh, na.getValueString(), len, dec);
-        return String.format("                %s(%s, target);",
+        return String.format(ASSIGN_FMT,
                 cfh.getAssignmentTarget(), valueArg);
     }
 
-    private String dtlEquivalentBasedOnTypes() {
+    private String dtlEquivalentBasedOnTypes(ComponentFieldHolder tfh) {
         ColumnAST col = (ColumnAST) trg;
         LookupFieldRefAST lfr = (LookupFieldRefAST) src;
         LRField fld = lfr.getRef();
@@ -178,7 +205,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         }
         String joinBufString = "joinBuffer" + lfr.getNewJoinId();
         String joinLogicFormat = "        if(" + joinBufString
-                + " != null) {\n        %s\n        } else {\n        %s\n        }";
+                + " != null) {%n        %s%n        } else {%n        %s%n        }";
         String name = lfr.getLookup().getName() + "_" + redField.getName();
         String body = dtlEquivalentBasedOnTypes(joinBufString, redField, name);
         String elseBody = getElseBody(col);
@@ -203,10 +230,9 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
         }
     }
 
-    private String dteEquivalentBasedOnTypes() {
+    private String dteEquivalentBasedOnTypes(ComponentFieldHolder cfh) {
         FieldReferenceAST fr = (FieldReferenceAST) src;
         ColumnAST col = (ColumnAST) trg;
-        ColumnFieldHolder cfh = columnFieldHolders.get("COL_" + col.getViewColumn().getColumnNumber());
         ComponentFieldHolder srcfh = sourceFieldHolders.get(fr.getRef().getName());
         if (srcfh == null) {
             return String.format("// WARNING: no field holder for source field %s — skipped", fr.getRef().getName());
@@ -227,7 +253,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                     fr.getRef().getName(), fr.getRef().getDatatype());
             }
         }
-        return String.format("                %s(%s, target);", cfh.getAssignmentTarget(), valueArg);
+        return String.format(ASSIGN_FMT, cfh.getAssignmentTarget(), valueArg);
     }
 
     /**
@@ -236,7 +262,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
      * the raw numeric expression is passed directly.
      * For string output columns (putString) the value is wrapped in String.format().
      */
-    private String buildAssignmentValue(ColumnFieldHolder cfh, String rawExpr, int len, int dec) {
+    private String buildAssignmentValue(ComponentFieldHolder cfh, String rawExpr, int len, int dec) {
         if (cfh == null) {
             // Fallback: can't determine column type, use formatted string
             String fmtSpec = dec > 0
@@ -376,7 +402,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                 String rawValueExpr = String.format("%s.get%s(%s)", name, srcGetter, source);
                 if (!colAccessor.equals("putString")) {
                     // Packed column target: pass raw value directly
-                    return String.format("                %s(%s, target);", colFH.getAssignmentTarget(), rawValueExpr);
+                    return String.format(ASSIGN_FMT, colFH.getAssignmentTarget(), rawValueExpr);
                 } else {
                     // String column target: format the numeric value
                     int len = col.getViewColumn().getFieldLength();
@@ -414,7 +440,7 @@ public class ColumnAssignmentGenerator extends ExtractRecordGenerator {
                     if (srcFH != null && colFH != null) {
                         String rawRead = String.format("%s.get%s(%s)", name, srcFH.getAccessor(), source);
                         String valueArg = convertNumericValue(rawRead, srcFH.getAccessor(), colAccessor);
-                        return String.format("                %s(%s, target);", colFH.getAssignmentTarget(), valueArg);
+                        return String.format(ASSIGN_FMT, colFH.getAssignmentTarget(), valueArg);
                     }
                     break;
                 }

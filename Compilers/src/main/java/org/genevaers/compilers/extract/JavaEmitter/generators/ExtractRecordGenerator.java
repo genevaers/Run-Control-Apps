@@ -14,9 +14,11 @@ import java.util.TreeMap;
 
 import org.genevaers.compilers.base.ASTBase;
 import org.genevaers.compilers.extract.JavaEmitter.ExtractorEntry;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.CTColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.FieldHolder;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.SKColumnFieldHolder;
 import org.genevaers.compilers.extract.astnodes.BooleanAndAST;
 import org.genevaers.compilers.extract.astnodes.BooleanOrAST;
 import org.genevaers.compilers.extract.astnodes.CalculationAST;
@@ -57,14 +59,20 @@ public abstract class ExtractRecordGenerator {
 
     protected static Map<String, ComponentFieldHolder> sourceFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ColumnFieldHolder> columnFieldHolders = new LinkedHashMap<>();
+    protected static Map<String, CTColumnFieldHolder> ctColumnFieldHolders = new LinkedHashMap<>();
     protected static Map<String, ComponentFieldHolder> lookupFieldHolders = new LinkedHashMap<>();
     protected static Map<String, Map<String, ComponentFieldHolder>> lookupHoldersByName = new LinkedHashMap<>();
     protected static Map<String, String> constantDeclarations = new LinkedHashMap<>();
     protected static List<String> filterRecs = new ArrayList<>();
     protected static List<String> columnRecs = new ArrayList<>();
+    protected static TreeMap<Integer, String> skColumnRecs = new TreeMap<>();
+    protected static TreeMap<Integer, SKColumnFieldHolder> skColumnFieldHolders = new TreeMap<>();
     protected static List<String> inputDDnames = new ArrayList<>();
     protected static int outputLength;
     protected static int lrLength;
+    protected static int skLen;
+    protected static int dtLen;
+    protected static int ctCount;
     protected static int endScopeRow;
     protected static int lookupFieldLength;
 
@@ -318,6 +326,22 @@ public abstract class ExtractRecordGenerator {
         return columnRecs;
     }
 
+    public static List<String> getSkColumnRecs() {
+        return new ArrayList<>(skColumnRecs.values());
+    }
+
+    public static List<String> getSkColumnFieldDefinitions() {
+        List<String> defs = new ArrayList<>();
+        skColumnFieldHolders.values().forEach(c -> defs.add(c.getDefinition()));
+        return defs;
+    }
+
+    public static List<String> getCtColumnFieldDefinitions() {
+        List<String> defs = new ArrayList<>();
+        ctColumnFieldHolders.values().stream().forEach(c -> defs.add(c.getDefinition()));
+        return defs;
+    }
+
     public static List<String> getInputDDnames() {
         return inputDDnames;
     }
@@ -336,6 +360,30 @@ public abstract class ExtractRecordGenerator {
 
     public static void setLrLength(int length) {
         lrLength = length;
+    }
+
+    public static int getSkLen() {
+        return skLen;
+    }
+
+    public static void setSkLen(int length) {
+        skLen = length;
+    }
+
+    public static int getDtLen() {
+        return dtLen;
+    }
+
+    public static void setDtLen(int length) {
+        dtLen = length;
+    }
+
+    public static int getCtCount() {
+        return ctCount;
+    }
+
+    public static void setCtCount(int count) {
+        ctCount = count;
     }
 
     public static  Collection<LookupInfo> getJoins() {

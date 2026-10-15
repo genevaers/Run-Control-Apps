@@ -37,6 +37,10 @@ public class ComponentFieldHolder {
         return "default src";
     }
 
+    public String getAssignmentTarget() {
+        return getName() + "." + accessor;
+    }
+
     public String getValueFrom(String src) {
         // If the accessor is already a full method name (e.g. "getString", "getBigInteger")
         // use it directly; otherwise prepend "get" for bare type names (e.g. "BigDecimal").

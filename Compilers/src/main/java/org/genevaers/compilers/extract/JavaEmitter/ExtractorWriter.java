@@ -39,41 +39,61 @@ import freemarker.template.TemplateExceptionHandler;
 
 public class ExtractorWriter {
 
-	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     private final static String EXTRACTOR_TEMPLATE = "FreeMarkerTemplates/ExtractJava.ftl";
 
-	private static  Configuration cfg;
+    private static  Configuration cfg;
 
     //private static Collection<JoinGenerator> joins;
     protected static Collection<LookupInfo> joins;
 
-	public static void write(List<String> srcdefs, List<String> coldefs, List<List<String>> lkdefs ,List<String> constants, 
-        List<String> filterRecs, List<String> columnRecs, List<String> inputdds, int outLen, int lrLen){
-		configureFreeMarker();
+    public static void write(List<String> srcdefs, List<String> coldefs, List<String> ctdefs, List<List<String>> lkdefs,
+            List<String> constants,
+            List<String> filterRecs, List<String> columnRecs, List<String> skdefs, List<String> skColumnRecs,
+            List<String> inputdds, int outLen, int lrLen, int skLen, int dtLen, int ctCount) {
+        configureFreeMarker();
         Template template;
+        
+        //We want the output to be in sections 
+        // Header - if there are SKs
+        // SK columns
+        // DT Columns
+        // CT Columns
+        //
+        // So if there are sks prepend them to the columnRecs
+        if (!skdefs.isEmpty()) {
+            skColumnRecs.addAll(columnRecs);
+            columnRecs = skColumnRecs;
+        }
         try {
-            //ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            // ClassLoader loader = Thread.currentThread().getContextClassLoader();
             template = cfg.getTemplate(EXTRACTOR_TEMPLATE);
             Map<String, Object> nodeMap = new HashMap<>();
             nodeMap.put("srcdefs", srcdefs);
             nodeMap.put("coldefs", coldefs);
+            nodeMap.put("ctdefs", ctdefs);
             nodeMap.put("lkdefs", lkdefs);
             nodeMap.put("constants", constants);
             nodeMap.put("filterRecs", filterRecs);
             nodeMap.put("columnRecs", columnRecs);
+            nodeMap.put("skdefs", skdefs);
+            //nodeMap.put("skColumnRecs", skColumnRecs);
             nodeMap.put("inputdds", inputdds);
             nodeMap.put("outLen", outLen);
             nodeMap.put("lrLen", lrLen);
+            nodeMap.put("skLen", skLen);
+            nodeMap.put("dtLen", dtLen);
+            nodeMap.put("ctCount", ctCount);
             nodeMap.put("joins", joins);
             generateTemplatedOutput(template, nodeMap, "PECode.java");
             logger.atInfo().log("Extract Java Generated");
         } catch (IOException e) {
-            logger.atSevere().log("Extract Java error %s",e.getMessage());
+            logger.atSevere().log("Extract Java error %s", e.getMessage());
         }
-	}
+    }
 
-	private static  void generateTemplatedOutput(Template template, Map<String, Object> nodeMap, String reportFileName) {
+    private static  void generateTemplatedOutput(Template template, Map<String, Object> nodeMap, String reportFileName) {
         //Generate the output file into the generated source area of the Performance Engine
         if (GersConfigration.isZos()) {
             reportFileName = "PEJAVA";
@@ -84,19 +104,19 @@ public class ExtractorWriter {
             reportFileName = genSrcDir + System.getProperty("file.separator") + reportFileName;
         }
         try(Writer fw = new GersFile().getWriter(reportFileName)) {
-	    	template.process(nodeMap, fw);
-		} catch (IOException | TemplateException e) {
-			logger.atSevere().log("Template generation failed %e", e.getMessage());;
-		}
+            template.process(nodeMap, fw);
+        } catch (IOException | TemplateException e) {
+            logger.atSevere().log("Template generation failed %e", e.getMessage());;
+        }
     }
 
 
     private  static void configureFreeMarker() {
-		cfg = new Configuration(Configuration.VERSION_2_3_31);
+        cfg = new Configuration(Configuration.VERSION_2_3_31);
         cfg.setClassForTemplateLoading(ExtractorWriter.class, "/");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-	}
+    }
 
 
     public static void addJoinInitialisation() {

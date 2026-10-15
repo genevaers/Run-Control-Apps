@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.genevaers.compilers.base.ASTBase;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.CTColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ColumnFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolder;
 import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.ComponentFieldHolderFactory;
+import org.genevaers.compilers.extract.JavaEmitter.generators.FieldHolders.SKColumnFieldHolder;
 import org.genevaers.compilers.extract.astnodes.ASTFactory.Type;
 import org.genevaers.compilers.extract.astnodes.ExtractBaseAST;
 import org.genevaers.compilers.extract.astnodes.LookupFieldRefAST;
 import org.genevaers.compilers.extract.astnodes.LookupPathAST;
 import org.genevaers.compilers.extract.astnodes.ViewSourceAstNode;
 import org.genevaers.repository.Repository;
-import org.genevaers.repository.components.ComponentNode;
 import org.genevaers.repository.components.FieldPositionComparator;
 import org.genevaers.repository.components.LRField;
 import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.ViewColumn;
 import org.genevaers.repository.components.ViewNode;
+import org.genevaers.repository.components.ViewSortKey;
 import org.genevaers.repository.components.ViewSource;
-import org.genevaers.repository.components.enums.DataType;
-import org.genevaers.repository.jltviews.JLTView;
 
 import com.google.common.flogger.FluentLogger;
 
@@ -35,7 +35,6 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     private ViewSourceAstNode vst;
     private Map<Integer, LookupInfo> currenLookupIds = filterLookupIds;
-    private boolean inColumn = false;
 
     public ViewSourceGenerator(ViewSourceAstNode vsAST) {
         this.vst = vsAST;
@@ -51,7 +50,11 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         generateSourceLRFields(vst);
         generateViewColumnFields(vst);
         generateLookupFields();
-        setOutputLength(vst.getAreaValues().getDtLen());
+        setSkLen(vst.getAreaValues().getSkLen());
+        setDtLen(vst.getAreaValues().getDtLen());
+        setCtCount(vst.getAreaValues().getCtLen());
+        int headerLen = (vst.getAreaValues().getSkLen() > 0) ? 12 : 0;
+        setOutputLength(headerLen + vst.getAreaValues().getSkLen() + vst.getAreaValues().getDtLen());
         setLrLength(Repository.getLRLength(vst.getViewSource().getSourceLRID()));
         logger.atInfo().log("View source output length %d", outputLength);
         // Walk child nodes — the EXTRACTOUTPUT/WRITE nodes generate the write statement
@@ -169,10 +172,30 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
     private void generateViewColumnFields(ViewSourceAstNode vst) {
         ViewNode view = Repository.getViews().get(vst.getViewSource().getViewId());
         Iterator<ViewColumn> ci = view.getColumnIterator();
-        while(ci.hasNext()) {
+        while (ci.hasNext()) {
             ViewColumn col = ci.next();
-            ColumnFieldHolder cfh = ComponentFieldHolderFactory.getColumnFieldHolder(col);
-            columnFieldHolders.put(cfh.getName(), cfh);
+            switch (col.getExtractArea()) {
+                case SORTKEY: {
+                    ViewSortKey vsk = view.getViewSortKeyFromColumnId(col.getComponentId());
+                    if (vsk != null) {
+                        SKColumnFieldHolder sfh = new SKColumnFieldHolder(col, vsk);
+                        skColumnFieldHolders.put(sfh.getSequenceNumber(), sfh);
+                    }
+                    break;
+                }
+                case AREACALC: {
+                    CTColumnFieldHolder cfh = new CTColumnFieldHolder(col);
+                    ctColumnFieldHolders.put(cfh.getName(), cfh);
+                    break;
+                }
+                case AREADATA: {
+                    ColumnFieldHolder cfh = ComponentFieldHolderFactory.getColumnFieldHolder(col);
+                    columnFieldHolders.put(cfh.getName(), cfh);
+                    break;
+                }
+                default:
+                    break;
+            }
         }
     }
 

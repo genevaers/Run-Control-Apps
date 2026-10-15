@@ -57,9 +57,42 @@ public class PECode extends Extract {
         factory.setOffset(0);
     }
 
-//Column Fields
+<#if skdefs?has_content>
+//Target record layout: skLen=${skLen} dtLen=${dtLen} ctCols=${ctCount}
+//  [0..11]             = header (skLen:2, dtLen:2, ctCols:2, reserved:6)
+//  [12..${12 + skLen - 1}]         = SK area
+//  [${12 + skLen}..${12 + skLen + dtLen - 1}]  = DT area
+//  (CT area follows if ctCols > 0)
+
+//SK Column Fields
+    static {
+        factory.setOffset(12);
+    }
+<#list skdefs as skdef>
+    ${skdef};
+</#list>
+
+//DT Column Fields
+    static {
+        factory.setOffset(${12 + skLen});
+    }
 <#list coldefs as coldef>
     ${coldef};
+</#list>
+
+<#else>
+//Column Fields
+    static {
+        factory.setOffset(0);
+    }
+<#list coldefs as coldef>
+    ${coldef};
+</#list>
+</#if>
+
+//CT Column Fields
+<#list ctdefs as ctdef>
+    ${ctdef};
 </#list>
 
 //Lookup Fields
@@ -113,6 +146,9 @@ ${rec}
         DirectColumn.setSource(src);
         DirectColumn.setTarget(target);
         Join jn;
+<#--  <#list skColumnRecs as rec>
+${rec}
+</#list>  -->
 <#list columnRecs as rec>
 ${rec}
 </#list>

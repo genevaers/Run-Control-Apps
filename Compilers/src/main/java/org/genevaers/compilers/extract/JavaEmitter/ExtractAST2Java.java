@@ -58,13 +58,19 @@ public class ExtractAST2Java {
             ExtractorWriter.addJoinInitialisation();
             ExtractorWriter.write(  ExtractRecordGenerator.getSourceFieldDefinitons(),
                                     ExtractRecordGenerator.getColumnFieldDefinitons(),
+                                    ExtractRecordGenerator.getCtColumnFieldDefinitions(),
                                     ExtractRecordGenerator.getLookupFieldDefinitons(),
                                     ExtractRecordGenerator.getConstantDefinitions(),
-                                    ExtractRecordGenerator.getFilterRecs(), 
-                                    ExtractRecordGenerator.getColumnRecs(), 
-                                    ExtractRecordGenerator.getInputDDnames(), 
-                                    ExtractRecordGenerator.getOutputLength(), 
-                                    ExtractRecordGenerator.getLrLength());
+                                    ExtractRecordGenerator.getFilterRecs(),
+                                    ExtractRecordGenerator.getColumnRecs(),
+                                    ExtractRecordGenerator.getSkColumnFieldDefinitions(),
+                                    ExtractRecordGenerator.getSkColumnRecs(),
+                                    ExtractRecordGenerator.getInputDDnames(),
+                                    ExtractRecordGenerator.getOutputLength(),
+                                    ExtractRecordGenerator.getLrLength(),
+                                    ExtractRecordGenerator.getSkLen(),
+                                    ExtractRecordGenerator.getDtLen(),
+                                    ExtractRecordGenerator.getCtCount());
         } catch (IOException e) {
             logger.atSevere().log("ExtractAST2Java write failed %s\n", e.getMessage());
         }

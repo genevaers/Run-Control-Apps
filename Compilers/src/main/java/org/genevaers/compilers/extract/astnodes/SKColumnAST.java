@@ -95,6 +95,10 @@ public class SKColumnAST extends ColumnAST {
     public String getMessageName() {
         return "Sort Key" + vsk.getSequenceNumber();
     }
+
+    public int getViewSortKeySequenceNumber() {
+        return vsk.getSequenceNumber();
+    }
     
     @Override
     public int getMaxNumberOfDigits() {
