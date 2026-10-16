@@ -58,8 +58,8 @@ public class PECode extends Extract {
     }
 
 <#if skdefs?has_content>
-//Target record layout: skLen=${skLen} dtLen=${dtLen} ctCols=${ctCount}
-//  [0..11]             = header (skLen:2, dtLen:2, ctCols:2, reserved:6)
+//Target record layout: skLen=${skLen} dtLen=${dtLen} ctCols=${ctCount} viewNumber=${viewNumber}
+//  [0..11]             = header (skLen:2, sktLen:2, dtLen:2, ctCols:2, viewNumber:4)
 //  [12..${12 + skLen - 1}]         = SK area
 //  [${12 + skLen}..${12 + skLen + dtLen - 1}]  = DT area
 //  (CT area follows if ctCols > 0)
@@ -128,6 +128,18 @@ public class PECode extends Extract {
 </#if>
     }
 
+<#if skdefs?has_content>
+    @Override
+    public void initTarget(byte[] target) {
+        // Write header once: skLen, dtLen, ctCols, viewNumber at offsets 0, 2, 4, 6
+        ByteBuffer.wrap(target).putShort(0, (short) ${skLen})
+                               .putShort(2, (short) 0)
+                               .putShort(4, (short) ${dtLen})
+                               .putShort(6, (short) ${ctCount})
+                               .putInt(8, ${viewNumber?c});
+    }
+
+</#if>
     public void processRecord(byte[] src, byte[] target, RecordFileWriter outWriter, int numrecords) {
         Join jn;
 <#if filterRecs?size gt 4>

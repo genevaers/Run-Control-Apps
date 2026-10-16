@@ -144,6 +144,7 @@ public class PERun {
             sharedWriter.setReclen(extractor.getOutputLen());
             FileRecord sharedOutputRecord = sharedWriter.getRecordToFill();
             sharedOutputRecord.length = (short) extractor.getOutputLen();
+            extractor.initTarget(sharedOutputRecord.bytes.array());
 
             ExecutorService executor = Executors.newFixedThreadPool(inputDDnames.size());
             List<Future<?>> futures = new ArrayList<>();

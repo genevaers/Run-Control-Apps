@@ -53,6 +53,7 @@ public class ViewSourceGenerator extends ExtractRecordGenerator {
         setSkLen(vst.getAreaValues().getSkLen());
         setDtLen(vst.getAreaValues().getDtLen());
         setCtCount(vst.getAreaValues().getCtLen());
+        setViewNumber(vst.getViewSource().getViewId());
         int headerLen = (vst.getAreaValues().getSkLen() > 0) ? 12 : 0;
         setOutputLength(headerLen + vst.getAreaValues().getSkLen() + vst.getAreaValues().getDtLen());
         setLrLength(Repository.getLRLength(vst.getViewSource().getSourceLRID()));

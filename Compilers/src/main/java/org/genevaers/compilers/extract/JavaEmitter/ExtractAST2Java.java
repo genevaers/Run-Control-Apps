@@ -70,7 +70,8 @@ public class ExtractAST2Java {
                                     ExtractRecordGenerator.getLrLength(),
                                     ExtractRecordGenerator.getSkLen(),
                                     ExtractRecordGenerator.getDtLen(),
-                                    ExtractRecordGenerator.getCtCount());
+                                    ExtractRecordGenerator.getCtCount(),
+                                    ExtractRecordGenerator.getViewNumber());
         } catch (IOException e) {
             logger.atSevere().log("ExtractAST2Java write failed %s\n", e.getMessage());
         }

@@ -73,6 +73,7 @@ public abstract class ExtractRecordGenerator {
     protected static int skLen;
     protected static int dtLen;
     protected static int ctCount;
+    protected static int viewNumber;
     protected static int endScopeRow;
     protected static int lookupFieldLength;
 
@@ -384,6 +385,14 @@ public abstract class ExtractRecordGenerator {
 
     public static void setCtCount(int count) {
         ctCount = count;
+    }
+
+    public static int getViewNumber() {
+        return viewNumber;
+    }
+
+    public static void setViewNumber(int id) {
+        viewNumber = id;
     }
 
     public static  Collection<LookupInfo> getJoins() {

@@ -51,7 +51,7 @@ public class ExtractorWriter {
     public static void write(List<String> srcdefs, List<String> coldefs, List<String> ctdefs, List<List<String>> lkdefs,
             List<String> constants,
             List<String> filterRecs, List<String> columnRecs, List<String> skdefs, List<String> skColumnRecs,
-            List<String> inputdds, int outLen, int lrLen, int skLen, int dtLen, int ctCount) {
+            List<String> inputdds, int outLen, int lrLen, int skLen, int dtLen, int ctCount, int viewNumber) {
         configureFreeMarker();
         Template template;
         
@@ -85,6 +85,7 @@ public class ExtractorWriter {
             nodeMap.put("skLen", skLen);
             nodeMap.put("dtLen", dtLen);
             nodeMap.put("ctCount", ctCount);
+            nodeMap.put("viewNumber", viewNumber);
             nodeMap.put("joins", joins);
             generateTemplatedOutput(template, nodeMap, "PECode.java");
             logger.atInfo().log("Extract Java Generated");
