@@ -35,6 +35,8 @@ import com.google.common.flogger.FluentLogger;
 
 public class CoverageFile {
 
+	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+
 	private JsonFactory jFactory;
 	private ObjectMapper mapper;
 	private File covFile;
