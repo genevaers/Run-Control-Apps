@@ -10,19 +10,23 @@ import java.util.TreeSet;
 
 import org.genevaers.utilities.GersConfigration;
 
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.flogger.FluentLogger;
 
 public class YAMLizer {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-    private static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());;
-	private static String environmentName;
+    private static ObjectMapper yamlMapper;
 	
     protected static Set<Integer> requiredLFs = new TreeSet<>();
     protected static Set<Integer> requiredPFs = new TreeSet<>();
@@ -31,26 +35,30 @@ public class YAMLizer {
 
     public static LogicalRecordYAMLBean readYamlLR(Path input) {
     	LogicalRecordYAMLBean txfr = null;
-        yamlMapper.findAndRegisterModules();
-        yamlMapper.setSerializationInclusion(Include.NON_NULL);
+        yamlMapper = JsonMapper.builder()
+                .findAndAddModules()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .build();
         logger.atInfo().log("Read %s", input);
         // cache.contains ? cache.get : read from disk
         try {
         		return yamlMapper.readValue(input.toFile(), LogicalRecordYAMLBean.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.atSevere().log("read yaml failed for type %s", e.getMessage());
         };
         return txfr;
     }
 
 	public static YAMLLookupTransfer readYamlLookup(Path input) {
-        yamlMapper.findAndRegisterModules();
-        yamlMapper.setSerializationInclusion(Include.NON_NULL);
+        yamlMapper = JsonMapper.builder()
+                .findAndAddModules()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .build();
         logger.atInfo().log("Read %s", input);
         // cache.contains ? cache.get : read from disk
         try {
         	return yamlMapper.readValue(input.toFile(), YAMLLookupTransfer.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.atSevere().log("read yaml failed for type %s ", e.getMessage());
         };
         return null;
