@@ -24,15 +24,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.ObjectNode;
+import com.google.common.flogger.FluentLogger;
 
 public class CoverageFile {
 
@@ -57,15 +56,14 @@ public class CoverageFile {
 	public boolean read() {
 		boolean readOkay = false;
 		if (covFile.exists()) {
-			try (JsonParser jParser = jFactory.createParser(covFile)) {
-				jParser.setCodec(mapper);
-				rootNode = (ObjectNode) jParser.readValueAsTree();
+			try {
+				rootNode = (ObjectNode) mapper.readTree(covFile);
 				if (rootNode != null) {
 					funcCodesArray = (ArrayNode) rootNode.findValue("funcCodes");
 					readOkay = true;
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (JacksonIOException e) {
+				logger.atSevere().withCause(e);
 			}
 		}
 		return readOkay;
@@ -173,15 +171,14 @@ public class CoverageFile {
 	public void accumulateTo(File accFile) {
 		accumulationFile = accFile;
 		if (accumulationFile.exists()) {
-			try (JsonParser jParser = jFactory.createParser(accumulationFile)) {
-				jParser.setCodec(mapper);
-				accumulationRootNode = (ObjectNode) jParser.readValueAsTree();
+			try {
+				accumulationRootNode = (ObjectNode) mapper.readTree(accumulationFile);
 				if (rootNode != null) {
 					accumulationFuncCodesArray = (ArrayNode) accumulationRootNode.findValue("funcCodes");
 				}
 				accumulating = true;
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (JacksonIOException e) {
+				logger.atSevere().log("Exception occurred in Json parser \n%s", e.getMessage());
 			}
 		} else {
 			// we just need to save the current JSON tree
@@ -194,20 +191,16 @@ public class CoverageFile {
 	}
 
 	public void close() {
-		try (JsonGenerator generator = jFactory.createGenerator(new FileWriter(accumulationFile))){
-			if (accumulationFile != null) {
-				mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-					generator.setCodec(mapper);
-					generator.useDefaultPrettyPrinter();
-					if(accumulating) {
-						generator.writeTree(accumulationRootNode);
-					} else {
-						generator.writeTree(rootNode);
-					}
+		if (accumulationFile != null) {
+			try {
+				if(accumulating) {
+					mapper.writerWithDefaultPrettyPrinter().writeValue(accumulationFile, accumulationRootNode);
+				} else {
+					mapper.writerWithDefaultPrettyPrinter().writeValue(accumulationFile, rootNode);
 				}
+			} catch (JacksonIOException e) {
+				logger.atSevere().log("Exception occurred in Json generator \n%s", e.getMessage());
 			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+		}
 	}
 }

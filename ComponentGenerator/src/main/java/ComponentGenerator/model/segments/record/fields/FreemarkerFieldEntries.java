@@ -37,6 +37,7 @@ public class FreemarkerFieldEntries {
     private List<String> fillFromComponentEntries = new ArrayList<>();
     private List<String> fillTheWriteBufferEntries = new ArrayList<>();
     private List<String> dsectEntries = new ArrayList<>();
+    private List<String> displayNameEntries = new ArrayList<>();
 
     public List<String> getFieldEntries() {
         return fieldEntries;
@@ -118,6 +119,14 @@ public class FreemarkerFieldEntries {
         this.fieldNodeEntries = fieldNodeEntries;
     }
 
+    public List<String> getDisplayNameEntries() {
+        return displayNameEntries;
+    }
+
+    public void setDisplayNameEntries(List<String> displayNameEntries) {
+        this.displayNameEntries = displayNameEntries;
+    }
+
     public void addEntriesFrom(Record record, boolean arrayValue) {
 		addRecordEntries(record, false, arrayValue);
     }
@@ -192,6 +201,13 @@ public class FreemarkerFieldEntries {
         addFillFromComponentEntryIfNotNull(f.getFillFromComponentEntry());
         addFillWriteBufferEntryIfNotNull(f.getFillTheWriteBufferEntry());
         addDsectEntryIfNotNull(f, "");
+        addDisplayNameIfNotNull(f.getDisplayName());
+    }
+
+    private void addDisplayNameIfNotNull(String displayName) {
+        if (displayName != null) {
+            displayNameEntries.add(displayName);
+        }
     }
 
     private void addFieldNodes(String fieldNodeEntry) {

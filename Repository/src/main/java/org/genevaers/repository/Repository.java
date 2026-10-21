@@ -36,6 +36,7 @@ import org.genevaers.repository.components.LogicalRecord;
 import org.genevaers.repository.components.LookupPath;
 import org.genevaers.repository.components.LookupPathKey;
 import org.genevaers.repository.components.LookupPathStep;
+import org.genevaers.repository.components.OutputFile;
 import org.genevaers.repository.components.PhysicalFile;
 import org.genevaers.repository.components.UserExit;
 import org.genevaers.repository.components.ViewDefinition;
@@ -253,6 +254,7 @@ public class Repository {
     public static OptionalInt getMaxFileID() {
 		return lfs.getValues().stream().mapToInt(lf -> lf.getID()).max();
     }
+
 
 	public static void addPhysicalFile(PhysicalFile pf) {
 		// The Record ID is the LF number
@@ -473,7 +475,7 @@ public class Repository {
 
 	private static void fixupOutputFile(ViewNode view) {
 		if(view.getOutputFile().getOutputDDName().isEmpty() && view.getViewDefinition().getDefaultOutputFileId() > 0) {
-			PhysicalFile pf = pfs.get(view.getViewDefinition().getDefaultOutputFileId()); 
+			PhysicalFile pf = pfs.get(view.getViewDefinition().getDefaultOutputFileId());
 			if(pf != null) {
 				view.setOutputFileFrom(pf);
 			} else {

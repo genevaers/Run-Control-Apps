@@ -629,7 +629,7 @@ public class ExtractAST2Dot {
     private static void writeHeader() throws IOException {
         fw.write("digraph xml {\nrankdir=TB\n//Nodes\n");
         fw.write(
-                "graph [label=\" MR91 Logic Trees\", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22, concentrate=true];\n");
+                "graph [label=\" Logic Trees\", labelloc=t, labeljust=center, fontname=Helvetica, fontsize=22, concentrate=true];\n");
         fw.write("labeljust=center;\n");
     }
 

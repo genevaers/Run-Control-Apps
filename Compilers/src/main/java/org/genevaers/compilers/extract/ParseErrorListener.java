@@ -39,7 +39,15 @@ public class ParseErrorListener extends BaseErrorListener {
     {
         List<String> stack = ((Parser)recognizer).getRuleInvocationStack();
         Collections.reverse(stack);
-        String err = line + ":" + charPositionInLine + " " + msg;
+
+        if (msg.startsWith("no viable")) {
+            String badToken = (offendingSymbol instanceof org.antlr.v4.runtime.Token)
+                              ? ((org.antlr.v4.runtime.Token)offendingSymbol).getText()
+                              : String.valueOf(offendingSymbol);   
+                msg = "Invalid syntax. Symbol '" + badToken + "'";       
+        }
+
+        String err = "line " +line + ":" + "offset "+ charPositionInLine + " " + msg;
         errors.add(err);
     }
     

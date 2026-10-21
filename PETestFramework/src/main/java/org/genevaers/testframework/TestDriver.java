@@ -772,9 +772,12 @@ public class TestDriver {
 					} else {
 						System.out.println(Menu.GREEN + "PASS for " + outFilePath.toString() + Menu.RESET);
 					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                	if(test.getPassviews() != null) {
+						System.out.println("Set view result for test " + test.getFullName() + " to " + (!diffFound ? "PASS" : "FAIL"));
+						test.setViewResult(Integer.parseInt(of.getDdname().substring(1)), !diffFound);
+					}
+			  } catch (IOException e) {
+					logger.atSevere().log("Exception occurred in output files match \n%s", e.getMessage());
 				}
 			}
 		}
@@ -852,8 +855,21 @@ public class TestDriver {
 		CommandRunner cr = new CommandRunner();
 		try {
 			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
-			String rcaString = "java -jar " + winrcapps + "/rcapps-latest.jar";
-			cr.run(rcaString, loc.toFile());
+			if (winrcapps == null || winrcapps.trim().isEmpty()) {
+				logger.atSevere().log("Environment variable GERS_RCA_JAR_DIR is not set or empty");
+				return;
+			}
+			Path baseDir = Paths.get(winrcapps).toAbsolutePath().normalize();
+			Path jarPath = baseDir.resolve("rcapps-latest.jar").normalize();
+			if (!Files.exists(jarPath) || !Files.isRegularFile(jarPath)) {
+				logger.atSevere().log("RCA jar not found at expected location: %s", jarPath.toString());
+				return;
+			}
+			
+			ProcessBuilder procBuilder = new ProcessBuilder("java", "-jar", jarPath.toString());
+			procBuilder.directory(loc.toFile());
+			Process proc = procBuilder.start();
+			cr.run(proc);
 			logger.atInfo().log(cr.getCmdOutput().toString());
 		} catch (InterruptedException | IOException e) {
 			// TODO Auto-generated catch block

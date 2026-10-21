@@ -22,9 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.flogger.FluentLogger;
 
 import ComponentGenerator.model.segments.ModelSegment;
@@ -59,7 +60,7 @@ public class FunctionCodeSegment extends ModelSegment {
     }
 
     @Override
-    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, IOException {
+    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, JacksonIOException {
         FunctionCodeGenerator fcg = new FunctionCodeGenerator();
         fcg.setFreeMarkerCfg(cfg);
         for(FunctionCodeItem fc : getCodes()) { //there will be only one

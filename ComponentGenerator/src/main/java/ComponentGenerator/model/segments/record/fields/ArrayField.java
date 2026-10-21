@@ -152,7 +152,7 @@ public class ArrayField extends Field {
                 fieldNodeEntry.append(DBLINDENT + "    " + ccName+"Str" + ".append(" + ccName + ".get(i)+\",\");\n");
             }
             fieldNodeEntry.append(DBLINDENT + "}\n");
-            fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\"," + ccName+"Str.toString()), compare);");  
+            fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\"," + ccName+"Str.toString()), compare);");  
         }
         return fieldNodeEntry.toString();
     }
@@ -166,7 +166,7 @@ public class ArrayField extends Field {
         "        CalcStack cs = new CalcStack(newBuffer, columnId, columnId);\r\n" + //
         "        cs.buildEntriesArrayFromTheBuffer();\r\n" + //
         "");
-        fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(ccName, false) + "\"," + "cs.toString()), compare);");  
+        fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\"," + "cs.toString()), compare);");  
     }
 
     @Override

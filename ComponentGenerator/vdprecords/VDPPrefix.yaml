@@ -8,19 +8,26 @@ component_name: none
 fields:
 - name: rec_len
   type: short
+  display_name: "Record Length"
 - name: rdw_flags
   type: short
+  display_name: "RDW Flags"
 - name: view_id
   type: integer
+  display_name: "View ID"
 - name: input_file_id
   type: integer
+  display_name: "Input File ID"
 - name: column_id
   type: integer
+  display_name: "Column ID"
 - name: record_type
   type: short
+  display_name: "Record Type"
 - name: sequence_nbr
   type: short
   default: 1
+  display_name: "Sequence Number"
 - name: record_id
   type: integer
 

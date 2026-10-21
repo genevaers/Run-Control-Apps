@@ -21,11 +21,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLMapper;
+
 import com.google.common.flogger.FluentLogger;
 
 import ComponentGenerator.model.GenevaModel;
@@ -47,8 +49,9 @@ public class ModelGenerator {
 	private Configuration cfg;
 	private GenevaModel genevaModel;
 	private GenevaWholeModel wholeModel = new GenevaWholeModel();
-	private ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
+	private YAMLMapper mapper = YAMLMapper.builder(new YAMLFactory())
+    .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+    .build();
 	/**
 	 * Setup FreeMarker
 	 * and generate the Geneva model from the named file
@@ -59,7 +62,6 @@ public class ModelGenerator {
 		// Or iterate throught the YAML files defined in a config file
 		// this will give us more control
 		// command line can override the config file
-		mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 		configureFreeMarker();
 		generateSegmentsOfModel(modelConfig);
 		// writeReadMe();
@@ -88,7 +90,7 @@ public class ModelGenerator {
 			ggen.setFreeMarkerCfg(cfg);
 			ggen.writeOutputs(wholeModel);
 			// }
-		} catch (IOException e) {
+		} catch (JacksonIOException e) {
 			logger.atSevere().log("Unable to write Fullmodel.yaml: %s", e.getMessage());
 		}
 	}

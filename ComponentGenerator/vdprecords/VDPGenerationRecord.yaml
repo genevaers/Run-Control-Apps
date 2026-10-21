@@ -12,7 +12,7 @@ fields:
   type: mappingOnly
   existing_java_type: VDPPrefix
   type: mappingOnly
-- name: run_nbr
+- name: run_number
   type: integer
 - name: run_date
   type: string
@@ -23,6 +23,7 @@ fields:
   type: boolean
 - name: ascii_ind
   type: boolean
+  display_name: "Ascii Indicator"
 - name: version_info
   type: short
 - name: server_count

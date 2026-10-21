@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.flogger.FluentLogger;
 
 import freemarker.template.Configuration;
@@ -35,7 +36,7 @@ public class VDPRecordSegment extends RecordSegment {
     private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
     @Override
-    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, IOException {
+    public void writeOutputs(ObjectMapper mapper, Configuration cfg) throws StreamReadException, DatabindException, JacksonIOException {
 		VDPRecordGenerator vrg = new VDPRecordGenerator(); //make static functions?
 		vrg.setFreeMarkerCfg(cfg);
 		//Collect the Records

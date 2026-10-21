@@ -5,12 +5,14 @@ description: "New Pass2 suite"
 category: "PeTests/FormatReports"
 cq: ""
 note: ""
+haspassviews: true
 tests:
 - name: "NEWP2"
   header: "Pass 2"
   description: "Regression Suite Pass 2 Hard Copy"
   source: "WBXML"
   timeout: "120"
+  passviews: "pass02Views.yaml"
   xmlfiles:
   - name: "PASS02[133].xml"
   reffiles:

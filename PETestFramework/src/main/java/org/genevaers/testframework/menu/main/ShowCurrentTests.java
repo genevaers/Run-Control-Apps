@@ -53,7 +53,7 @@ public class ShowCurrentTests extends MenuItem {
         try {
             String baseDir = GersEnvironment.get("LOCALROOT");
             Path basePath = Paths.get(baseDir).toRealPath();
-			Path targetPath = basePath.resolve("/out/fmoverview.txt").normalize();
+			Path targetPath = basePath.resolve("./out/fmoverview.txt").normalize();
 
             if (!targetPath.startsWith(basePath)) {
                  throw new SecurityException("Path traversal attempt detected: " + targetPath);

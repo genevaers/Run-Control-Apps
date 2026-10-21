@@ -12,6 +12,7 @@ fields:
   type: mappingOnly
   existing_java_type: record_id
   component_field: componentId
+  display_name: "ID"
 - name: lr_name
   type: string
   maxlength: 48
@@ -27,9 +28,11 @@ fields:
 - name: primkey_index_id
   type: integer
   component_field: primaryKey
+  display_name: "Primary Key Index"
 - name: lr_type
   type: integer
   component_field: none
+  display_name: "LR Type"
 - name: lr_status
   type: enum
   existing_java_type: org.genevaers.repository.components.enums.LrStatus
@@ -37,10 +40,12 @@ fields:
 - name: exit_pgm_id
   type: integer #Lookup exit ID
   component_field: lookupExitID
+  display_name: "Lookup Exit ID"
 - name: exit_startup
   type: string
   maxlength: 48
   component_field: lookupExitParams
+  display_name: "Lookup Exit Parameters"
   # There is stuff that can be ignored
 - name: padding1
   type: string

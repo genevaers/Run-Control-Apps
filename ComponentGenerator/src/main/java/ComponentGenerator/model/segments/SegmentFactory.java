@@ -21,9 +21,10 @@ package ComponentGenerator.model.segments;
 import java.io.File;
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.flogger.FluentLogger;
 
 import ComponentGenerator.model.segments.components.ComponentSegment;
@@ -39,7 +40,7 @@ public class SegmentFactory {
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
     
 	public static ModelSegment getModelSegment(Segment s,  ObjectMapper mapper)
-			throws IOException, StreamReadException, DatabindException {
+			throws JacksonIOException, StreamReadException, DatabindException {
 		ModelSegment segModel = null;
 		if(s.getType().equalsIgnoreCase("record")) {
             if(s.getName().equalsIgnoreCase("VDPRecords")) {

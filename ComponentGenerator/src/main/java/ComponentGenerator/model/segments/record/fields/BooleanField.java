@@ -121,7 +121,7 @@ public class BooleanField extends Field {
         StringBuilder fieldNodeEntry = new StringBuilder();
         String ccName = NameUtils.getCamelCaseName(name, false);
         if (getRawComponentField() != null && getRawComponentField().equals("none") && prefix==false) {
-            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + ccName +"\"), compare);";  
+            return  DBLINDENT + "rn.add(new NoComponentNode(\"" + getDisplayName() +"\"), compare);";  
         } else {
             fieldNodeEntry.append(DBLINDENT + "String " + ccName + "val;\n");
             fieldNodeEntry.append(DBLINDENT + "if (" + ccName + ") {\n");
@@ -130,9 +130,9 @@ public class BooleanField extends Field {
             fieldNodeEntry.append(DBLINDENT + "     "+ ccName + "val = \"False\";\n");
             fieldNodeEntry.append(DBLINDENT + "}\n");
             if(arrayValue) {
-                fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\" + n, "+ ccName + "val ), compare);");  
+                fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\" + n, "+ ccName + "val ), compare);");  
             } else {
-                fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + NameUtils.getCamelCaseName(name, false) + "\", "+ ccName + "val ), compare);");  
+                fieldNodeEntry.append(DBLINDENT + "rn.add(new StringFieldNode(\"" + getDisplayName() + "\", "+ ccName + "val ), compare);");  
             }
             return fieldNodeEntry.toString();
         }

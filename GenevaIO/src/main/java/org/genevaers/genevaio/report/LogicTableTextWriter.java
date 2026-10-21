@@ -52,7 +52,7 @@ public class LogicTableTextWriter extends TextRecordWriter {
 	
 	private void addJLTIgnores(MetadataNode recordsRoot) {
 		FieldNodeBase gen = recordsRoot.getChildrenByName("LT_0");
-		if(((StringFieldNode)gen.getChildrenByName("extract")).getValue().equals("False")) {
+		if(((StringFieldNode)gen.getChildrenByName("Extract")).getValue().equals("False")) {
 			jlt = true;
 			ignoreTheseDiffs.put("viewId", true); 
 			ignoreTheseDiffs.put("columnId", true); 
