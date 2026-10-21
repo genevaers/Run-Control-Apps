@@ -43,7 +43,6 @@ import org.genevaers.genevaio.dbreader.LazyDBReader;
 import org.genevaers.genevaio.dbreader.WBConnection;
 import org.genevaers.genevaio.ltfile.LTLogger;
 import org.genevaers.genevaio.ltfile.LogicTable;
-import org.genevaers.genevaio.yamlreader.LazyYAMLReader;
 import org.genevaers.grammar.GenevaERSParser.GoalContext;
 import org.genevaers.repository.Repository;
 import org.genevaers.repository.components.ViewColumn;
@@ -100,14 +99,6 @@ public abstract class WorkbenchCompiler implements SyntaxChecker, DependencyAnal
 		((LazyDBReader) dataProvider).setParams(params);
 		BuildGenevaASTVisitor.setDataProvider(dataProvider);
     }
-
-	public static void useYAMLDatabase() {
-		if(dataProvider == null) {
-			dataProvider = new LazyYAMLReader();
-		}
-		logger.atInfo().log("Use YAML Dataprovider");
-		BuildGenevaASTVisitor.setDataProvider(dataProvider);
-	}
 
 	public static void setSchema(String schema) {
 		params.setSchema(schema);
