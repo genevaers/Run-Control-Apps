@@ -176,6 +176,7 @@ release.properties
 RunControlAnalyser/target/**
 
 PETestFramework/Config/**
+PETestFramework/baseline/**
 PETestFramework/jcl/**
 PETestFramework/out/**
 PETestFramework/target/**
