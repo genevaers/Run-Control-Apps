@@ -65,6 +65,7 @@ public class CommandLineHandler {
 		if(line.hasOption("menu")) {
 			PETestMenu.show(testDriver);
 		} else {
+			TestDriver.setSaveBaseline(line.hasOption("baseline"));
 			//Call the Runner that reads all of the specs
 			//and runs all of the tests
 			if(TestDriver.processSpecList()) {
@@ -101,6 +102,8 @@ public class CommandLineHandler {
 		Option menu = new Option( "menu", "run-menu",  false, "run from menu");
 		Option coverage = new Option( "coverage", "run-coverage",  false, "run function code coverage");
 
+		Option baseline = new Option( "baseline", "save-baseline", false, "local run: save the generated run control files as the baseline to compare against");
+		options.addOption( baseline );
 		options.addOption( help );
 		options.addOption(menu);
 		options.addOption(coverage);

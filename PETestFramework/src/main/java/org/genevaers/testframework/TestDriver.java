@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 import org.genevaers.genevaio.recordreader.BinRecordWriter;
 import org.genevaers.genevaio.recordreader.ZosHelper;
@@ -47,7 +48,6 @@ import org.genevaers.testframework.yamlreader.OutputFile;
 import org.genevaers.testframework.yamlreader.Replacement;
 import org.genevaers.testframework.yamlreader.Spec;
 import org.genevaers.testframework.yamlreader.XMLFile;
-import org.genevaers.utilities.CommandRunner;
 import org.genevaers.utilities.FileProcessor;
 import org.genevaers.utilities.GersCodePage;
 import org.genevaers.utilities.GersConfigration;
@@ -71,6 +71,10 @@ import freemarker.template.TemplateExceptionHandler;
 
 public class TestDriver {
 	private static final int JES_WARNING = 4;
+	private static final int RCA_TIMEDOUT = -2;
+	private static final long RCA_TIMEOUT_SECONDS = 600;
+	private static final String[] RUN_CONTROL_FILES = { "VDPNEW", "XLTNEW", "JLTNEW" };
+	private static boolean saveBaseline = false;
 
 	private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
@@ -119,7 +123,7 @@ public class TestDriver {
 
 	private static void putEventFiles() throws Exception {
 		String testHLQ = GersEnvironment.get("GERS_TEST_HLQ");
-		if(GersEnvironment.isWindows()) {
+		if(GersEnvironment.isLocal()) {
         	logger.atInfo().log("Local Windows testing");
 		} else {
 			String destHLQ = testHLQ + ".INPUT";
@@ -164,7 +168,7 @@ public class TestDriver {
 
 	private static boolean envVariablesAreValid() {
 		boolean valid = true;
-		if(GersEnvironment.isWindows() == false) {
+		if(GersEnvironment.isLocal() == false) {
 			if (GersEnvironment.get("GERS_TEST_HLQ").isEmpty()) {
 				logger.atSevere().log("GERS_TEST_HLQ is empty. We need an HLQ");
 				valid = false;
@@ -206,7 +210,7 @@ public class TestDriver {
 	}
 
 	private static void processYamlSpecFileList(File specFileList) {
-		TestRepository.buildTheRepo(specFileList, GersEnvironment.isWindows() ? WINDOWS_TEMPLATESET : null);
+		TestRepository.buildTheRepo(specFileList, GersEnvironment.isLocal() ? WINDOWS_TEMPLATESET : null);
 	}
 
 	private static void initFreeMarkerConfiguration() throws IOException {
@@ -237,7 +241,7 @@ public class TestDriver {
 		String testDataset = testHLQ + "." + testToRun.getDataSet();
 		TestDataGenerator.applyTemplatesToTest(testToRun);
 
-		if ( GersEnvironment.isWindows())  {
+		if ( GersEnvironment.isLocal())  {
 			runLocalTest(testToRun);
 			return;
 		}
@@ -288,23 +292,106 @@ public class TestDriver {
 		}
 		Path configFolder = Paths.get(GersEnvironment.get("LOCALROOT")).resolve("Config").resolve(testToRun.getFullName()).normalize();
 		Files.copy(configFolder.resolve(appname + "PARM"), localTest.resolve(appname + "PARM"), StandardCopyOption.REPLACE_EXISTING);
-		runWinRcaFrom(localTest);
-		processLocalResult(testToRun);
+		deleteStaleRunControlFiles(localTest);
+		int rc = runWinRcaFrom(localTest);
+		processLocalResult(testToRun, rc);
 	}
 
-	private static void processLocalResult(GersTest test) {
-		Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT));
-		Path outPath = rootPath.resolve("out");
-		// Look to see VDP and XLT generated -> Gennerated/Pass
-		Path resultFolder = outPath.resolve(test.getFullName());
+	private static void deleteStaleRunControlFiles(Path localTest) throws IOException {
+		for (String dd : RUN_CONTROL_FILES) {
+			Files.deleteIfExists(localTest.resolve(dd));
+			Files.deleteIfExists(localTest.resolve(dd + ".diff"));
+		}
+		Files.deleteIfExists(localTest.resolve("pass.html"));
+		Files.deleteIfExists(localTest.resolve("fail.html"));
+	}
+
+	public static void setSaveBaseline(boolean save) {
+		saveBaseline = save;
+	}
+
+	private static Path getBaselineRoot() {
+		String dir = System.getenv("GERS_BASELINE_DIR");
+		if (dir == null || dir.trim().isEmpty()) {
+			return Paths.get(GersEnvironment.get(LOCALROOT)).resolve("baseline").normalize();
+		}
+		return Paths.get(dir).toAbsolutePath().normalize();
+	}
+
+	/**
+		* A local run compares the run control files RCA has just generated with
+		* those saved from a previous verified run (the baseline). If the VDP, XLT
+		* and JLT are unchanged then the extract and format outputs the mainframe
+		* produced from them are unchanged too.
+		*/
+	private static String evaluateLocalRun(GersTest test, Path resultFolder, int rc) throws IOException {
+		if (rc == RCA_TIMEDOUT) {
+			return "fail RCA timed out";
+		}
+		if (rc < 0 || rc > JES_WARNING) {
+			return "fail RCA rc=" + rc;
+		}
 		Path vdp = resultFolder.resolve(GersConfigration.VDP_DDNAME).normalize();
 		Path xlt = resultFolder.resolve(GersConfigration.XLT_DDNAME).normalize();
-		logger.atInfo().log("Check existenc in " + resultFolder.toString());
-		if (vdp.toFile().exists() && xlt.toFile().exists()) {
-			test.getResult().setMessage("generated");
-		} else {
-			test.getResult().setMessage("no outputs");
+		if (!vdp.toFile().exists() || !xlt.toFile().exists()) {
+			return "fail no outputs";
 		}
+		Path baseline = getBaselineRoot().resolve(test.getFullName()).normalize();
+		if (saveBaseline) {
+			Files.createDirectories(baseline);
+			for (String dd : RUN_CONTROL_FILES) {
+				Path src = resultFolder.resolve(dd);
+				if (Files.exists(src)) {
+					Files.copy(src, baseline.resolve(dd), StandardCopyOption.REPLACE_EXISTING);
+				} else {
+					Files.deleteIfExists(baseline.resolve(dd));
+				}
+			}
+			return "pass baseline saved";
+		}
+		if (!Files.exists(baseline.resolve(GersConfigration.VDP_DDNAME))
+				|| !Files.exists(baseline.resolve(GersConfigration.XLT_DDNAME))) {
+			return "fail no baseline";
+		}
+		StringBuilder differing = new StringBuilder();
+		for (String dd : RUN_CONTROL_FILES) {
+			Path expected = baseline.resolve(dd);
+			Path actual = resultFolder.resolve(dd);
+			if (Files.exists(expected) != Files.exists(actual)) {
+				differing.append(' ').append(dd).append(Files.exists(actual) ? "(unexpected)" : "(missing)");
+			} else if (Files.exists(actual)) {
+				List<String> diffs = ControlFileComparer.compare(expected, actual);
+				if (!diffs.isEmpty()) {
+					differing.append(' ').append(dd);
+					Files.write(resultFolder.resolve(dd + ".diff"), diffs);
+				}
+			}
+		}
+		return differing.length() == 0 ? "pass run control files match baseline" : "fail compare" + differing;
+	}
+
+	// RCA works on the whole test, so every format view in it shares the test result
+	private static void setLocalViewResults(GersTest test) {
+		if (test.getPassviews() != null) {
+			boolean passed = test.getResult().getMessage().startsWith("pass");
+			for (OutputFile of : test.getFormatfiles()) {
+				test.setViewResult(Integer.parseInt(of.getDdname().substring(1)), passed);
+			}
+		}
+	}
+
+	private static void processLocalResult(GersTest test, int rc) {
+		Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT));
+		Path outPath = rootPath.resolve("out");
+		Path resultFolder = outPath.resolve(test.getFullName());
+		logger.atInfo().log("Check run control files in " + resultFolder.toString());
+		try {
+			test.getResult().setMessage(evaluateLocalRun(test, resultFolder, rc));
+		} catch (IOException e) {
+			logger.atSevere().withCause(e).log("Exception occurred comparing run control files");
+			test.getResult().setMessage("fail compare error");
+		}
+		setLocalViewResults(test);
 
 		Map<String, Object> nodeMap = new HashMap<>();
 		nodeMap.put("specName", test.getSpecPath());
@@ -315,7 +402,7 @@ public class TestDriver {
 			Path resultFilePath;
 			Path resultPath = outPath.resolve(test.getFullName()).normalize();
 			resultPath.toFile().mkdirs();
-			if (test.getResult().getMessage().startsWith("generated")) {
+			if (test.getResult().getMessage().startsWith("pass")) {
 				nodeMap.put("result", "SUCCESS");
 				logger.atInfo().log(Menu.GREEN + test.getResult().getMessage() + Menu.RESET);
 				resultFilePath = resultPath.resolve("pass.html").normalize();
@@ -511,7 +598,7 @@ public class TestDriver {
 
 	private static void submitJobsAndWaitForCompletion(GersTest testToRun) throws IOException {
 		Path firstJob = testJCLDirectory.resolve(testToRun.getName() + (testToRun.getDb2bind().equals("Y") ? "N" : "L"));
-		if (GersEnvironment.isWindows()) {
+		if (GersEnvironment.isLocal()) {
 			System.out.println("Submit " + firstJob.toString());
 		} else {
 			submitJobs(firstJob);
@@ -629,7 +716,7 @@ public class TestDriver {
 
 	private static void getOutputFile(String dataset, OutputFile f, String fileName, GersTest testToRun) {
 		Path outFile = getOutFilePathForTest(fileName, testToRun);
-		if (GersEnvironment.isWindows()) {
+		if (GersEnvironment.isLocal()) {
 			System.out.println("Get output file from " + dataset + " to " + outFile.toFile().toString() + " :" + f.getRecfm() + "," + f.getLrecl());
 		} else {
 			if (convertE2AAndCopyDataset2File(dataset, outFile.toFile(), f.getRecfm(), f.getLrecl()) == false) {
@@ -841,7 +928,7 @@ public class TestDriver {
       }
 
 	public static void generateCoverage() {
-		if(GersEnvironment.isWindows()) {
+		if(GersEnvironment.isLocal()) {
 			Path rootPath = Paths.get(GersEnvironment.get(LOCALROOT)).normalize();
 			Path outPath = rootPath.resolve("out").normalize();
 			generateCoverageRCAPARM(outPath);
@@ -851,29 +938,44 @@ public class TestDriver {
 		}
 	}
 
-	private static void runWinRcaFrom(Path loc) {
-		CommandRunner cr = new CommandRunner();
+	/**
+	 * Runs RCA in the given directory and waits for it to finish.
+	 * Console output goes to RCAOUT in that directory.
+	 *
+	 * @return the RCA exit code, RCA_TIMEDOUT if it ran too long or -1 if it could not be run
+	 */
+	private static int runWinRcaFrom(Path loc) {
 		try {
 			String winrcapps = GersEnvironment.get("GERS_RCA_JAR_DIR");
 			if (winrcapps == null || winrcapps.trim().isEmpty()) {
 				logger.atSevere().log("Environment variable GERS_RCA_JAR_DIR is not set or empty");
-				return;
+				return -1;
 			}
 			Path baseDir = Paths.get(winrcapps).toAbsolutePath().normalize();
 			Path jarPath = baseDir.resolve("rcapps-latest.jar").normalize();
 			if (!Files.exists(jarPath) || !Files.isRegularFile(jarPath)) {
 				logger.atSevere().log("RCA jar not found at expected location: %s", jarPath.toString());
-				return;
+				return -1;
 			}
-			
-			ProcessBuilder procBuilder = new ProcessBuilder("java", "-jar", jarPath.toString());
+			String java = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
+			ProcessBuilder procBuilder = new ProcessBuilder(java, "-jar", jarPath.toString());
 			procBuilder.directory(loc.toFile());
+			procBuilder.redirectErrorStream(true);
+			procBuilder.redirectOutput(loc.resolve("RCAOUT").toFile());
 			Process proc = procBuilder.start();
-			cr.run(proc);
-			logger.atInfo().log(cr.getCmdOutput().toString());
-		} catch (InterruptedException | IOException e) {
+			if (!proc.waitFor(RCA_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+				proc.destroyForcibly();
+				logger.atSevere().log("RCA timed out in %s", loc);
+				return RCA_TIMEDOUT;
+			}
+			return proc.exitValue();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.atSevere().log("Interrupted running RCA \n%s", e.getMessage());
+		} catch (IOException e) {
 			logger.atSevere().log("Exception occurred in run RCA \n%s", e.getMessage());
 		}
+		return -1;
 	}
 
 	private static void generateCoverageRCAPARM(Path outPath) {

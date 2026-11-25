@@ -142,6 +142,15 @@ public class GersEnvironment {
 	public static boolean isWindows() {
 		return get("OSNAME").startsWith("Win");
 	}
+
+	/**
+	 * True when the tests should run without a mainframe: any operating
+	 * system other than z/OS, or RUNOS=LOCAL.
+	 */
+	public static boolean isLocal() {
+		String os = get("OSNAME");
+		return !os.toLowerCase().startsWith("z/os") || "LOCAL".equalsIgnoreCase(get("RUNOS"));
+	}
 	
 	public static Map<String, String> getEnvironmentVariables() {
 		return environmentVariables;
